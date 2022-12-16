@@ -1,0 +1,5 @@
+node_modules
+.dccache
+.idea
+config
+migrations/004-add-user.sql
