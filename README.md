@@ -5,6 +5,19 @@ User registration, billing, deletion, management
 - https://stripe.com/docs/billing/subscriptions/build-subscriptions
 - https://dashboard.stripe.com/test/webhooks/create?endpoint_location=local
 
+## Architecture
+
+```mermaid
+flowchart LR
+    web-app("<a href='https://github.com/Gratheon/web-app'>web-app</a>") --> graphql-router
+    
+    graphql-router --> user-cycle("<a href='https://github.com/Gratheon/user-cycle'>user-cycle</a>") --> mysql
+    user-cycle --> stripe
+    user-cycle --"register schema"--> graphql-schema-registry
+    graphql-router --> graphql-schema-registry
+```
+
+
 ## Development
 ```
 npm run dev
