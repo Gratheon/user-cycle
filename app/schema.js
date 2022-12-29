@@ -7,22 +7,22 @@ export const schema = gql`
     
     type Query {
         user: User
-				invoices: [Invoice]
+        invoices: [Invoice]
     }
 
-		type Invoice {
-			total: Float
-			currency: String
-			date: DateTime
-			url: URL
-		}
+    type Invoice {
+        total: Float
+        currency: String
+        date: DateTime
+        url: URL
+    }
     
     type Mutation {
         register(email:String, password: String): LoginResult
         login(email:String, password: String): LoginResult
         updateUser(user: UserUpdateInput!): UpdateUserResult
-				createCheckoutSession: URL
-				cancelSubscription: CancelSubscriptionResult
+        createCheckoutSession: URL
+        cancelSubscription: CancelSubscriptionResult
     }
     
     type UserSession {
@@ -43,8 +43,8 @@ export const schema = gql`
         last_name: String
         date_added: DateTime
         date_expiration: DateTime
-				hasSubscription: Boolean
-				isSubscriptionExpired: Boolean
+        hasSubscription: Boolean
+        isSubscriptionExpired: Boolean
     }
     
     input UserUpdateInput{

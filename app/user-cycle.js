@@ -51,7 +51,7 @@ async function startApolloServer(app, typeDefs, resolvers) {
 		reply.send({ hello: 'world' })
 	})
 
-	try {
+	try {   
 		await registerSchema(schema);
 		console.log('Starting apollo server');
 		const path = await startApolloServer(app, schema, resolvers);
