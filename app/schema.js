@@ -11,6 +11,7 @@ export const schema = gql`
     }
 
     type Invoice {
+        id: ID!
         total: Float
         currency: String
         date: DateTime
@@ -38,6 +39,7 @@ export const schema = gql`
     union CancelSubscriptionResult = User | Error
     
     type User {
+        id: ID!
         email: String
         first_name: String
         last_name: String
