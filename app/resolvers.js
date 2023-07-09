@@ -129,7 +129,7 @@ export const resolvers = {
 
 			await storage().query(
 				sql`INSERT INTO account (email, password, date_expiration)
-				VALUES(${email}, ${sha1(password)}), ${expirationDateString}`
+				VALUES(${email}, ${sha1(password)}, ${expirationDateString})`
 			);
 
 			const rows = await storage().query(
