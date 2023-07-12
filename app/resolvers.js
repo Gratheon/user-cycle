@@ -96,7 +96,12 @@ export const resolvers = {
 
 		updateUser: async (parent, { user }, ctx) => {
 			await userModel.update(user, ctx.uid);
-			return await userModel.getById(ctx);
+			const result = await userModel.getById(ctx);
+
+			return {
+				__typename: 'User',
+				...result
+			}
 		},
 		login: async (parent, { email, password }) => {
 			const rows = await storage().query(

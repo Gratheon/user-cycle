@@ -2,12 +2,21 @@ import { ApolloServer } from "apollo-server-fastify";
 import { ApolloServerPluginDrainHttpServer, ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
 import fastify from "fastify";
 import { buildSubgraphSchema } from '@apollo/federation';
+import Sentry from '@sentry/node';
 
+import config from '../config/config.js';
 import { schema } from './schema.js';
 import { resolvers } from './resolvers.js';
 import { initStorage } from "./storage.js";
 import { registerStripe } from "./stripe.js";
 import { registerSchema } from "./schema-registry.js";
+
+
+Sentry.init({
+	dsn: config.sentryDsn,
+	environment: process.env.ENV_ID,
+});
+
 
 function fastifyAppClosePlugin(app) {
 	return {
@@ -46,12 +55,29 @@ async function startApolloServer(app, typeDefs, resolvers) {
 (async function main() {
 	await initStorage();
 
-	const app = fastify();
+	const app = fastify({
+		logger: true
+	});
+
+	app.setErrorHandler(async (error, request, reply) => {
+		// Logging locally
+		console.log(error);
+
+		Sentry.withScope(function (scope) {
+			scope.addEventProcessor(function (event) {
+			  return Sentry.addRequestDataToEvent(event, request);
+			});
+			Sentry.captureException(err);
+		});
+
+		reply.status(500).send({ error: "Something went wrong" });
+	});
+	  
 	app.get('/health', (request, reply) => {
 		reply.send({ hello: 'world' })
 	})
 
-	try {   
+	try {
 		await registerSchema(schema);
 		console.log('Starting apollo server');
 		const path = await startApolloServer(app, schema, resolvers);
