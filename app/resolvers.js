@@ -141,7 +141,7 @@ export const resolvers = {
 				sql`SELECT id FROM account WHERE email=${email} AND password=${sha1(password)}`
 			);
 
-			sendMail({
+			await sendMail({
 				email
 			});
 
