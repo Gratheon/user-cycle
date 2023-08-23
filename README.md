@@ -17,15 +17,9 @@ flowchart LR
     graphql-router --> graphql-schema-registry
 ```
 
-
 ## Development
 ```
 tilt up
-```
-
-## Deployment
-```
-make
 ```
 
 ## Testing
