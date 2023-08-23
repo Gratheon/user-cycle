@@ -1,5 +1,5 @@
 node_modules
 .dccache
 .idea
-config
+config/config.js
 migrations/004-add-user.sql
