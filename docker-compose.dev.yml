@@ -1,13 +1,14 @@
 version: '3.9'
 services:
   user-cycle:
-    build: .
-    command:
-      ./node_modules/.bin/nodemon app/user-cycle.js --watch app --watch config -L
+    image: local/user-cycle
+    # build: .
+    # command:
+    #   ./node_modules/.bin/nodemon app/user-cycle.js --watch app --watch config -L
     ports:
       - 4000:4000
-    volumes:
-      - .:/app/
+    # volumes:
+    #   - .:/app/
     restart: always
     environment:
       - ENV_ID=dev

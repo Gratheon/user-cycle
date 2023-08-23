@@ -10,6 +10,14 @@ export function storage() {
 }
 
 export async function initStorage() {
+  const conn = createConnectionPool(
+    `mysql://${config.mysql.user}:${config.mysql.password}@${config.mysql.host}:${config.mysql.port}/`
+  );
+
+  await conn.query(sql`
+  CREATE DATABASE IF NOT EXISTS \`swarm-user\` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+`);
+
   db = createConnectionPool(
     `mysql://${config.mysql.user}:${config.mysql.password}@${config.mysql.host}:${config.mysql.port}/${config.mysql.database}`
   );
