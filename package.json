@@ -2,24 +2,24 @@
   "name": "user-cycle",
   "version": "1.0.0",
   "description": "User registration, billing, deletion, management",
-  "main": "server.js",
-  "type": "module",
   "dependencies": {
-    "@apollo/federation": "0.37.1",
-    "@databases/mysql": "^5.2.1",
+    "@apollo/federation": "0.38.1",
+    "@databases/mysql": "5.2.1",
     "@sendgrid/mail": "7.5.0",
-    "@sentry/node": "^7.57.0",
+    "@sentry/integrations": "7.69.0",
+    "@sentry/node": "7.69.0",
     "apollo-server-core": "3.4.0",
     "apollo-server-fastify": "3.4.0",
+    "cross-fetch": "4.0.0",
     "fastify": "3.22.1",
     "fastify-raw-body": "3.2.0",
     "graphql": "15.8.0",
     "jwt-encode": "1.0.1",
-    "node-fetch": "3.0.0",
     "sha1": "1.1.1",
     "stripe": "10.15.0"
   },
   "scripts": {
+    "build": "tsc -p ./src/config/tsconfig.json",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ENV_ID=dev nodemon app/user-cycle.js",
     "start": "ENV_ID=prod node app/user-cycle.js",
@@ -36,6 +36,7 @@
   },
   "homepage": "https://github.com/gratheon/user-cycle#readme",
   "devDependencies": {
-    "nodemon": "^2.0.20"
+    "nodemon": "^2.0.20",
+    "typescript": "^5.2.2"
   }
 }

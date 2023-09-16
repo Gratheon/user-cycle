@@ -5,10 +5,14 @@ import sha1 from 'sha1';
 import { sql } from "@databases/mysql";
 
 // local dependencies
-import config from '../config/config.js';
-import { sendMail } from './send-mail.js';
-import { storage } from './storage.js';
-import { userModel } from './models/user.js';
+import config from './config/index';
+import { sendMail } from './send-mail';
+import { storage } from './storage';
+import { userModel } from './models/user';
+
+const stripe = new Stripe(config.stripe.secret, {
+	apiVersion: '2022-08-01'
+});
 
 const TRIAL_DAYS = 14;
 export const resolvers = {
@@ -31,7 +35,6 @@ export const resolvers = {
 	},
 	Mutation: {
 		cancelSubscription: async (_, __, ctx) => {
-			const stripe = Stripe(config.stripe.secret);
 			try {
 				const user = await userModel.getById(ctx);
 
@@ -50,7 +53,7 @@ export const resolvers = {
 
 				return await resolvers.Query.user(null, null, ctx);
 			} catch (e) {
-				console.error(e.message);
+				console.error(e);
 				return {
 					__typename: 'Error',
 					code: "INTERNAL_ERROR"
@@ -58,7 +61,6 @@ export const resolvers = {
 			}
 		},
 		createCheckoutSession: async (parent, args, ctx) => {
-			const stripe = Stripe(config.stripe.secret);
 			const domainURL = config.stripe.selfUrl;
 
 			const user = await userModel.getById(ctx);
@@ -89,7 +91,7 @@ export const resolvers = {
 
 				return session.url;
 			} catch (e) {
-				console.error(e.message);
+				console.error(e);
 				return null;
 			}
 		},

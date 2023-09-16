@@ -3,9 +3,10 @@ import stripe from 'stripe';
 import fastifyRawBody from 'fastify-raw-body';
 
 // local dependencies
-import config from './../config/config.js';
-import { storage } from "./storage.js";
-import { userModel } from './models/user.js';
+import config from './config/index';
+import { storage } from "./storage";
+import { userModel } from './models/user';
+import { Exception } from '@sentry/node';
 
 // This is your Stripe CLI webhook secret for testing your endpoint locally.
 const endpointSecret = config.stripe.webhook_secret;
@@ -34,9 +35,11 @@ export function registerStripe(app) {
 
 			try {
 				// console.log('webhook body', request.body)
+				//@ts-ignore
 				event = stripe.webhooks.constructEvent(request.rawBody, stripeSignature, endpointSecret);
 			} catch (err) {
 				console.error(err);
+				//@ts-ignore
 				response.status(400).send(`Webhook Error: ${err.message}`);
 				return;
 			}

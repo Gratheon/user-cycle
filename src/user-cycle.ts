@@ -2,19 +2,27 @@ import { ApolloServer } from "apollo-server-fastify";
 import { ApolloServerPluginDrainHttpServer, ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
 import fastify from "fastify";
 import { buildSubgraphSchema } from '@apollo/federation';
-import Sentry from '@sentry/node';
+import * as Sentry from '@sentry/node';
+import { RewriteFrames } from "@sentry/integrations";
 
-import config from '../config/config.js';
-import { schema } from './schema.js';
-import { resolvers } from './resolvers.js';
-import { initStorage } from "./storage.js";
-import { registerStripe } from "./stripe.js";
-import { registerSchema } from "./schema-registry.js";
+import config from './config/index';
+import { schema } from './schema';
+import { resolvers } from './resolvers';
+import { initStorage } from "./storage";
+import { registerStripe } from "./stripe";
+import { registerSchema } from "./schema-registry";
 
 
 Sentry.init({
 	dsn: config.sentryDsn,
 	environment: process.env.ENV_ID,
+	tracesSampleRate: 1.0,
+	integrations: [
+	  new RewriteFrames({
+		// @ts-ignore
+		root: global.__dirname,
+	  }),
+	],
 });
 
 
@@ -32,6 +40,7 @@ function fastifyAppClosePlugin(app) {
 
 async function startApolloServer(app, typeDefs, resolvers) {
 	const server = new ApolloServer({
+		//@ts-ignore
 		typeDefs: buildSubgraphSchema(typeDefs),
 		resolvers,
 		plugins: [
@@ -67,6 +76,7 @@ async function startApolloServer(app, typeDefs, resolvers) {
 			scope.addEventProcessor(function (event) {
 			  return Sentry.addRequestDataToEvent(event, request);
 			});
+			//@ts-ignore
 			Sentry.captureException(err);
 		});
 

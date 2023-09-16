@@ -1,6 +1,6 @@
 import { sql } from "@databases/mysql";
 
-import { storage } from "../storage.js";
+import { storage } from "../storage";
 
 export const userModel = {
 	extendAccountExpirationByOneMonth: async ({ email }) => {
