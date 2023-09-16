@@ -4,5 +4,7 @@ services:
     build: .
     ports:
       - 4000:4000
+    environment:
+      - ENV_ID=prod
     restart: always
     network_mode: host
