@@ -9,6 +9,7 @@ import config from './config/index';
 import { sendMail } from './send-mail';
 import { storage } from './storage';
 import { userModel } from './models/user';
+import { tokenModel } from './models/tokens';
 
 const stripe = new Stripe(config.stripe.secret, {
 	apiVersion: '2022-08-01'
@@ -18,9 +19,15 @@ const TRIAL_DAYS = 14;
 export const resolvers = {
 	Query: {
 		invoices: async (parent, args, ctx) => {
+			if (!ctx.uid) throw new Error('Unauthorized');
 			return await userModel.getInvoices(ctx);
 		},
+		api_tokens: async (parent, args, ctx) => {
+			if (!ctx.uid) throw new Error('Unauthorized');
+			return await tokenModel.getTokens(ctx);
+		},
 		user: async (_, __, ctx) => {
+			if (!ctx.uid) throw new Error('Unauthorized');
 			const user = await userModel.getById(ctx)
 			if (user) {
 				user.hasSubscription = user.stripe_subscription !== null;
@@ -34,8 +41,29 @@ export const resolvers = {
 		}
 	},
 	Mutation: {
+		generateApiToken: async (_, __, ctx) => {
+			return await tokenModel.create(ctx.uid)
+		},
+		validateApiToken: async (_, args) => {
+			const uid = tokenModel.getUserIDByToken(args.token)
+
+			if (!uid) {
+				return {
+					__typename: 'Error',
+					code: "INVALID_TOKEN"
+				};
+			}
+
+			return {
+				__typename: 'TokenUser',
+				id: uid
+			};
+
+		},
 		cancelSubscription: async (_, __, ctx) => {
 			try {
+				if (!ctx.uid) throw new Error('Unauthorized');
+
 				const user = await userModel.getById(ctx);
 
 				if (!user.stripe_subscription) {
@@ -61,6 +89,8 @@ export const resolvers = {
 			}
 		},
 		createCheckoutSession: async (parent, args, ctx) => {
+			if (!ctx.uid) throw new Error('Unauthorized');
+
 			const domainURL = config.stripe.selfUrl;
 
 			const user = await userModel.getById(ctx);
@@ -97,6 +127,8 @@ export const resolvers = {
 		},
 
 		updateUser: async (parent, { user }, ctx) => {
+			if (!ctx.uid) throw new Error('Unauthorized');
+			
 			await userModel.update(user, ctx.uid);
 			const result = await userModel.getById(ctx);
 
@@ -106,19 +138,15 @@ export const resolvers = {
 			}
 		},
 		login: async (parent, { email, password }) => {
-			const rows = await storage().query(
-				sql`SELECT id FROM account 
-				WHERE email=${email} AND password=${sha1(password)}`
-			);
 
-			if (!rows || !rows[0]) {
+			const id = await userModel.findForLogin(email, password)
+
+			if (!id) {
 				return {
 					__typename: 'Error',
 					code: "INVALID"
 				};
 			}
-
-			const id = rows[0].id;
 
 			const sessionKey = sign({
 				'user_id': id
@@ -134,20 +162,13 @@ export const resolvers = {
 			expirationDate.setDate(expirationDate.getDate() + TRIAL_DAYS);
 			const expirationDateString = expirationDate.toISOString().substring(0, 19).replace('T', ' ');
 
-			await storage().query(
-				sql`INSERT INTO account (email, password, date_expiration)
-				VALUES(${email}, ${sha1(password)}, ${expirationDateString})`
-			);
-
-			const rows = await storage().query(
-				sql`SELECT id FROM account WHERE email=${email} AND password=${sha1(password)}`
-			);
+			await userModel.create(email, password, expirationDateString);
+			const id = await userModel.findForLogin(email, password)
+			await tokenModel.create(id)
 
 			await sendMail({
 				email
 			});
-
-			const id = rows[0].id;
 
 			const sessionKey = sign({
 				'user_id': id

@@ -1,4 +1,5 @@
 import { sql } from "@databases/mysql";
+import sha1 from 'sha1';
 
 import { storage } from "../storage";
 
@@ -63,4 +64,20 @@ export const userModel = {
 			sql`UPDATE \`account\` SET first_name=${user.first_name}, last_name=${user.last_name} WHERE id=${uid}`
 		);
 	},
+
+	create: async function(email, password, expirationDateString){
+		return await storage().query(
+			sql`INSERT INTO account (email, password, date_expiration)
+			VALUES(${email}, ${sha1(password)}, ${expirationDateString})`
+		);
+	},
+
+	findForLogin: async function(email, password){
+		const rows = await storage().query(
+			sql`SELECT id FROM account WHERE email=${email} AND password=${sha1(password)}`
+		);
+
+		return rows[0].id;
+
+	}
 }
