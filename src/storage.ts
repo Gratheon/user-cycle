@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as crypto from "crypto";
 import createConnectionPool, { sql } from "@databases/mysql";
 
-import config from "../config/config.js";
+import config from './config/index';
 
 let db;
 export function storage() {

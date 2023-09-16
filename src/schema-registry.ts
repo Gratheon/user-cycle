@@ -1,8 +1,8 @@
 import fs from 'fs';
 import { resolve, dirname } from 'path';
-import fetch from "node-fetch";
+import fetch from "cross-fetch";
 import { print } from "graphql";
-import config from "../config/config.js";
+import config from './config/index';
 
 const packageJson = JSON.parse(fs.readFileSync(resolve('package.json'), 'utf8'));
 
@@ -10,6 +10,7 @@ async function postData(url = '', data = {}) {
 	// Default options are marked with *
 	const response = await fetch(url, {
 		method: 'POST',
+		//@ts-ignore
 		mode: 'cors', // no-cors, *cors, same-origin
 		cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
 		credentials: 'same-origin', // include, *same-origin, omit
