@@ -16,7 +16,8 @@
     "graphql": "15.8.0",
     "jwt-encode": "1.0.1",
     "sha1": "1.1.1",
-    "stripe": "10.15.0"
+    "stripe": "10.15.0",
+    "uuid": "9.0.1"
   },
   "scripts": {
     "build": "tsc -p ./src/config/tsconfig.json",

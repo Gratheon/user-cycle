@@ -8,6 +8,12 @@ export const schema = gql`
     type Query {
         user: User
         invoices: [Invoice]
+        api_tokens: [APIToken]
+    }
+
+    type APIToken {
+        id: ID!
+        token: String!
     }
 
     type Invoice {
@@ -21,9 +27,15 @@ export const schema = gql`
     type Mutation {
         register(email:String, password: String): LoginResult
         login(email:String, password: String): LoginResult
+        generateApiToken: APIToken
+        validateApiToken(token: String): ValidateTokenResult
         updateUser(user: UserUpdateInput!): UpdateUserResult
         createCheckoutSession: URL
         cancelSubscription: CancelSubscriptionResult
+    }
+    
+    type TokenUser {
+        id: ID!
     }
     
     type UserSession {
@@ -34,6 +46,7 @@ export const schema = gql`
         code: String
     }
     
+    union ValidateTokenResult = TokenUser | Error
     union LoginResult = UserSession | Error
     union UpdateUserResult = User | Error
     union CancelSubscriptionResult = User | Error
