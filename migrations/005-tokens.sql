@@ -1,6 +1,6 @@
 CREATE TABLE `api_tokens` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `token` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `token` char(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `user_id` int DEFAULT NULL,
   `deleted` int DEFAULT NULL,
   `date_added` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
