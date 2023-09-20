@@ -65,19 +65,22 @@ export const userModel = {
 		);
 	},
 
-	create: async function(email, password, expirationDateString){
+	create: async function (email, password, expirationDateString) {
 		return await storage().query(
 			sql`INSERT INTO account (email, password, date_expiration)
 			VALUES(${email}, ${sha1(password)}, ${expirationDateString})`
 		);
 	},
 
-	findForLogin: async function(email, password){
+	findForLogin: async function (email, password) {
 		const rows = await storage().query(
 			sql`SELECT id FROM account WHERE email=${email} AND password=${sha1(password)}`
 		);
 
-		return rows[0].id;
+		if (!rows[0]) {
+			return null
+		}
 
+		return rows[0].id;
 	}
 }

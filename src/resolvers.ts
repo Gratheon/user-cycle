@@ -10,24 +10,35 @@ import { sendMail } from './send-mail';
 import { storage } from './storage';
 import { userModel } from './models/user';
 import { tokenModel } from './models/tokens';
+import error_code from './error_code';
 
 const stripe = new Stripe(config.stripe.secret, {
 	apiVersion: '2022-08-01'
 });
 
+function err(code){
+	return {
+		__typename: 'Error',
+		code
+	};
+}
+
 const TRIAL_DAYS = 14;
 export const resolvers = {
 	Query: {
-		invoices: async (parent, args, ctx) => {
-			if (!ctx.uid) throw new Error('Unauthorized');
+		invoices: async (_, __, ctx) => {
+			if (!ctx.uid) return err(error_code.AUTHENTICATION_REQUIRED);
+
 			return await userModel.getInvoices(ctx);
 		},
-		api_tokens: async (parent, args, ctx) => {
-			if (!ctx.uid) throw new Error('Unauthorized');
+		api_tokens: async (_, __, ctx) => {
+			if (!ctx.uid) return err(error_code.AUTHENTICATION_REQUIRED);
+
 			return await tokenModel.getTokens(ctx);
 		},
 		user: async (_, __, ctx) => {
-			if (!ctx.uid) throw new Error('Unauthorized');
+			if (!ctx.uid) return err(error_code.AUTHENTICATION_REQUIRED);
+
 			const user = await userModel.getById(ctx)
 			if (user) {
 				user.hasSubscription = user.stripe_subscription !== null;
@@ -42,16 +53,15 @@ export const resolvers = {
 	},
 	Mutation: {
 		generateApiToken: async (_, __, ctx) => {
+			if (!ctx.uid) return err(error_code.AUTHENTICATION_REQUIRED);
+
 			return await tokenModel.create(ctx.uid)
 		},
 		validateApiToken: async (_, args) => {
 			const uid = tokenModel.getUserIDByToken(args.token)
 
 			if (!uid) {
-				return {
-					__typename: 'Error',
-					code: "INVALID_TOKEN"
-				};
+				return err(error_code.INVALID_TOKEN);
 			}
 
 			return {
@@ -62,15 +72,12 @@ export const resolvers = {
 		},
 		cancelSubscription: async (_, __, ctx) => {
 			try {
-				if (!ctx.uid) throw new Error('Unauthorized');
+				if (!ctx.uid) return err(error_code.AUTHENTICATION_REQUIRED);
 
 				const user = await userModel.getById(ctx);
 
 				if (!user.stripe_subscription) {
-					return {
-						__typename: 'Error',
-						code: "MISSING_SUBSCRIPTION"
-					};
+					return err(error_code.MISSING_SUBSCRIPTION);
 				}
 				stripe.subscriptions.del(user.stripe_subscription);
 
@@ -82,14 +89,11 @@ export const resolvers = {
 				return await resolvers.Query.user(null, null, ctx);
 			} catch (e) {
 				console.error(e);
-				return {
-					__typename: 'Error',
-					code: "INTERNAL_ERROR"
-				};
+				return err(error_code.INTERNAL_ERROR);
 			}
 		},
 		createCheckoutSession: async (parent, args, ctx) => {
-			if (!ctx.uid) throw new Error('Unauthorized');
+			if (!ctx.uid) return err(error_code.AUTHENTICATION_REQUIRED);
 
 			const domainURL = config.stripe.selfUrl;
 
@@ -127,7 +131,7 @@ export const resolvers = {
 		},
 
 		updateUser: async (parent, { user }, ctx) => {
-			if (!ctx.uid) throw new Error('Unauthorized');
+			if (!ctx.uid) return err(error_code.AUTHENTICATION_REQUIRED);
 			
 			await userModel.update(user, ctx.uid);
 			const result = await userModel.getById(ctx);
@@ -138,14 +142,10 @@ export const resolvers = {
 			}
 		},
 		login: async (parent, { email, password }) => {
-
 			const id = await userModel.findForLogin(email, password)
 
 			if (!id) {
-				return {
-					__typename: 'Error',
-					code: "INVALID"
-				};
+				return err(error_code.INVALID_USERNAME_PASSWORD)
 			}
 
 			const sessionKey = sign({
@@ -164,6 +164,9 @@ export const resolvers = {
 
 			await userModel.create(email, password, expirationDateString);
 			const id = await userModel.findForLogin(email, password)
+			if (!id) {
+				return err(error_code.INCONSISTENT_STORAGE);
+			}
 			await tokenModel.create(id)
 
 			await sendMail({
