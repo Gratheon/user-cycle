@@ -1,4 +1,4 @@
-CREATE TABLE `api_tokens` (
+CREATE TABLE IF NOT EXISTS `api_tokens` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `token` char(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `user_id` int DEFAULT NULL,
