@@ -1,3 +1,6 @@
+// server.ts
+import "./tracer"; // must come before importing any instrumented module.
+
 import { ApolloServer } from "apollo-server-fastify";
 import { ApolloServerPluginDrainHttpServer, ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
 import fastify from "fastify";
@@ -11,7 +14,6 @@ import { resolvers } from './resolvers';
 import { initStorage } from "./storage";
 import { registerStripe } from "./stripe";
 import { registerSchema } from "./schema-registry";
-
 
 Sentry.init({
 	dsn: config.sentryDsn,

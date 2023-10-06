@@ -6,5 +6,8 @@ services:
       - 4000:4000
     environment:
       - ENV_ID=prod
+      - DD_ENV=prod
+      - DD_LOGS_INJECTION=true
+      - DD_PROFILING_ENABLED=true
     restart: always
     network_mode: host
