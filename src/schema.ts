@@ -9,6 +9,7 @@ export const schema = gql`
         user: User
         invoices: [Invoice]
         api_tokens: [APIToken]
+        translate(en: String, key: String, tc: String): Locale
     }
 
     type APIToken {
@@ -22,6 +23,13 @@ export const schema = gql`
         currency: String
         date: DateTime
         url: URL
+    }
+
+    type Locale {
+        id: ID!
+        en: String
+        ru: String
+        key: String
     }
     
     type Mutation {
@@ -56,6 +64,11 @@ export const schema = gql`
         email: String
         first_name: String
         last_name: String
+
+        """
+        Language code: en, ru
+        """
+        lang: String
         date_added: DateTime
         date_expiration: DateTime
         hasSubscription: Boolean

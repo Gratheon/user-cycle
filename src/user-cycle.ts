@@ -13,16 +13,17 @@ import { resolvers } from './resolvers';
 import { initStorage } from "./storage";
 import { registerStripe } from "./stripe";
 import { registerSchema } from "./schema-registry";
+import { logger } from './logger'
 
 Sentry.init({
 	dsn: config.sentryDsn,
 	environment: process.env.ENV_ID,
 	tracesSampleRate: 1.0,
 	integrations: [
-	  new RewriteFrames({
-		// @ts-ignore
-		root: global.__dirname,
-	  }),
+		new RewriteFrames({
+			// @ts-ignore
+			root: global.__dirname,
+		}),
 	],
 });
 
@@ -66,16 +67,17 @@ async function startApolloServer(app, typeDefs, resolvers) {
 	await initStorage();
 
 	const app = fastify({
-		logger: true
+		logger
 	});
 
 	app.setErrorHandler(async (error, request, reply) => {
 		// Logging locally
-		console.log(error);
+		logger.error(error);
 
 		Sentry.withScope(function (scope) {
 			scope.addEventProcessor(function (event) {
-			  return Sentry.addRequestDataToEvent(event, request);
+				//@ts-ignore
+				return Sentry.addRequestDataToEvent(event, request);
 			});
 			//@ts-ignore
 			Sentry.captureException(err);
@@ -83,21 +85,21 @@ async function startApolloServer(app, typeDefs, resolvers) {
 
 		reply.status(500).send({ error: "Something went wrong" });
 	});
-	  
+
 	app.get('/health', (request, reply) => {
 		reply.send({ hello: 'world' })
 	})
 
 	try {
 		await registerSchema(schema);
-		console.log('Starting apollo server');
+		logger.info('Starting apollo server');
 		const path = await startApolloServer(app, schema, resolvers);
 
 		// STRIPE REST API
 		registerStripe(app);
 
 		await app.listen(4000, '0.0.0.0');
-		console.log(`🚀 Server ready at http://localhost:4000${path}`);
+		logger.info(`🚀 Server ready ! http://localhost:4000${path}`);
 	} catch (e) {
 		console.error(e);
 	}

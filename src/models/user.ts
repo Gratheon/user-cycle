@@ -49,7 +49,7 @@ export const userModel = {
 
 	getById: async function (ctx) {
 		const result = await storage().query(
-			sql`SELECT id, email, first_name, last_name, date_expiration, date_added, stripe_subscription, 
+			sql`SELECT id, email, first_name, last_name, date_expiration, date_added, stripe_subscription, lang,
 			(date_expiration IS NOT NULL AND date_expiration < NOW()) as isSubscriptionExpired
 			FROM account 
 			WHERE id=${ctx.uid}

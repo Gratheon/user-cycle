@@ -19,8 +19,10 @@ const config = {
 	},
 
 	JWT_KEY: '',
-	SENDGRID_API_KEY: ''
-	
+	SENDGRID_API_KEY: '',
+	clarifai: {
+		translation_PAT: ''
+	}
 };
 
 export default config;

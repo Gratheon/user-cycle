@@ -1,19 +1,19 @@
 version: '3.9'
 services:
   user-cycle:
-    image: local/user-cycle
-    # build: .
-    # command:
-    #   ./node_modules/.bin/nodemon app/user-cycle.js --watch app --watch config -L
+    # image: local/user-cycle
+    build: .
+    command:
+      node /app/app/user-cycle.js
     ports:
       - 4000:4000
-    # volumes:
-    #   - .:/app/
+    volumes:
+      - .:/app/
+    tty: true
     restart: always
     environment:
       - ENV_ID=dev
       - DD_ENV=dev
-      - DD_LOGS_INJECTION=true
       - DD_PROFILING_ENABLED=true
     network_mode: bridge
     networks:
