@@ -9,6 +9,8 @@ const { ClarifaiStub, grpc } = require("clarifai-nodejs-grpc");
 const languagesMap = {
 	'ru': 'russian',
 	'et': 'estonian',
+	'tr': 'turkish',
+	'pl': 'polish',
 }
 
 export const localeModel = {
@@ -34,10 +36,22 @@ export const localeModel = {
 
 				await storage().query(sql`UPDATE locales SET et=${et} WHERE id=${translation.id}`);
 			}
+
+			if (!translation['tr']) {
+				let tr = await translate('tr', translation, tc)
+
+				await storage().query(sql`UPDATE locales SET tr=${tr} WHERE id=${translation.id}`);
+			}
+
+			if (!translation['pl']) {
+				let pl = await translate('pl', translation, tc)
+
+				await storage().query(sql`UPDATE locales SET pl=${pl} WHERE id=${translation.id}`);
+			}
 		}
 
 
-		result = await storage().query(sql`SELECT id, en, ru, et FROM locales WHERE en=${en} LIMIT 1`);
+		result = await storage().query(sql`SELECT id, en, ru, et, tr, pl FROM locales WHERE en=${en} LIMIT 1`);
 		translation = result[0]
 
 		return translation;
@@ -58,7 +72,7 @@ async function translate(targetLangCode, translation, tc) {
 		RAW_TEXT += `It is already translated in russian as "${translation['ru']}", you can use that as aid.`
 	}
 
-	RAW_TEXT += `Do not write anything else but the translation of the following phrase: ${translation['en']}`;
+	RAW_TEXT += `Do not write anything else but the translation in the target language (no extra notes or other languages) of the following phrase: ${translation['en']}`;
 
 
 	//-------------------

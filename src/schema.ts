@@ -30,6 +30,8 @@ export const schema = gql`
         en: String
         ru: String
         et: String
+        tr: String
+        pl: String
         key: String
     }
     
@@ -67,7 +69,7 @@ export const schema = gql`
         last_name: String
 
         """
-        Language code: en, ru
+        Language code: en, ru, tr, et, pl
         """
         lang: String
         date_added: DateTime
