@@ -27,7 +27,7 @@ export const schema = gql`
 
     type Locale {
         id: ID!
-        en: String
+        en: String!
         ru: String
         et: String
         tr: String
