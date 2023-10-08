@@ -7,10 +7,11 @@ import { sql } from "@databases/mysql";
 // local dependencies
 import config from './config/index';
 import { sendMail } from './send-mail';
-import { storage } from './storage';
 import { userModel } from './models/user';
 import { tokenModel } from './models/tokens';
+import { localeModel } from './models/locales';
 import error_code from './error_code';
+import { logger } from './logger';
 
 const stripe = new Stripe(config.stripe.secret, {
 	apiVersion: '2022-08-01'
@@ -49,6 +50,9 @@ export const resolvers = {
 				__typename: 'User',
 				...user
 			};
+		},
+		translate: async(_, {en, key, tc}, __, ctx) => {			// if (!ctx.uid) { return err(error_code.AUTHENTICATION_REQUIRED); }
+			return (await localeModel.translate({en, key, tc}));
 		}
 	},
 	Mutation: {

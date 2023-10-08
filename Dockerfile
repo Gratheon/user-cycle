@@ -1,10 +1,11 @@
-FROM node:20-alpine
+FROM node:16-alpine
 
 WORKDIR /app
-COPY . /app/
 
-RUN npm install && npm run build
+COPY . /app/
+# RUN npm install
+# RUN npm run build
 
 EXPOSE 4000
 
-CMD ["node", "app/user-cycle.js"]
+# CMD ["node", "/app/app/user-cycle.js"]
