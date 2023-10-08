@@ -2,11 +2,15 @@ import fs from 'fs';
 import { resolve, dirname } from 'path';
 import fetch from "cross-fetch";
 import { print } from "graphql";
+import sha1 from 'sha1';
+
 import config from './config/index';
+import { logger } from './logger'
 
 const packageJson = JSON.parse(fs.readFileSync(resolve('package.json'), 'utf8'));
 
 async function postData(url = '', data = {}) {
+	logger.info("Pushing schema")
 	// Default options are marked with *
 	const response = await fetch(url, {
 		method: 'POST',
@@ -22,7 +26,9 @@ async function postData(url = '', data = {}) {
 		body: JSON.stringify(data) // body data type must match "Content-Type" header
 	});
 
-	if (!response.ok){
+	logger.info(response)
+
+	if (!response.ok) {
 		console.error(`schema-registry respose code ${response.status}: ${response.statusText}`);
 		return false;
 	}
@@ -31,16 +37,18 @@ async function postData(url = '', data = {}) {
 
 export async function registerSchema(schema) {
 	const url = `${config.schemaRegistryHost}/schema/push`
-	const version = fs.readFileSync("./.version", "utf8");
 
-	try{
+	try {
+		const schemaText = print(schema)
+		const version = sha1(schemaText)
+
 		await postData(url, {
 			"name": packageJson.name,
 			"url": config.selfUrl,
 			"version": process.env.ENV_ID === 'dev' ? "latest" : version,
-			"type_defs": print(schema)
+			"type_defs": schemaText
 		});
-	} catch (e){
+	} catch (e) {
 		console.error(e);
 	}
 }
