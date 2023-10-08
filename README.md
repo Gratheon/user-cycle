@@ -1,5 +1,8 @@
 # user-cycle
-User registration, billing, deletion, management
+Gratheon.com user data related service, responsible for:
+- registration & login
+- billing
+- translations of web-app labels (would be good to move to separate service)
 
 ## Stripe
 - https://stripe.com/docs/billing/subscriptions/build-subscriptions
@@ -11,10 +14,13 @@ User registration, billing, deletion, management
 flowchart LR
     web-app("<a href='https://github.com/Gratheon/web-app'>web-app</a>") --> graphql-router
     
-    graphql-router --> user-cycle("<a href='https://github.com/Gratheon/user-cycle'>user-cycle</a>") --> mysql
+    graphql-router --> user-cycle("<a href='https://github.com/Gratheon/user-cycle'>user-cycle</a>") --"CRUD on user"--> mysql
     user-cycle --> stripe
     user-cycle --"register schema"--> graphql-schema-registry
     graphql-router --> graphql-schema-registry
+
+    web-app--"translate text" --> user-cycle --"translate phrases"--> clarifai
+    user-cycle--"get/set translations"--> mysql
 ```
 
 ## Development
