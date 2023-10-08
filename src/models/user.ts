@@ -61,7 +61,9 @@ export const userModel = {
 
 	update: async function (user, uid) {
 		await storage().query(
-			sql`UPDATE \`account\` SET first_name=${user.first_name}, last_name=${user.last_name} WHERE id=${uid}`
+			sql`UPDATE \`account\` 
+			SET first_name=${user.first_name}, last_name=${user.last_name}, lang=${user.lang}
+			WHERE id=${uid}`
 		);
 	},
 

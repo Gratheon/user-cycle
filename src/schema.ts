@@ -29,6 +29,7 @@ export const schema = gql`
         id: ID!
         en: String
         ru: String
+        et: String
         key: String
     }
     
@@ -78,5 +79,6 @@ export const schema = gql`
     input UserUpdateInput{
         first_name: String
         last_name: String
+        lang: String
     }
 `;

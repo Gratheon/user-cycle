@@ -6,47 +6,61 @@ import config from "../config/index";
 
 const { ClarifaiStub, grpc } = require("clarifai-nodejs-grpc");
 
+const languagesMap = {
+	'ru': 'russian',
+	'et': 'estonian',
+}
+
 export const localeModel = {
 	translate: async function ({ en, key, tc }) {
-		const result = await storage().query(
-			sql`SELECT id, en, ru FROM locales WHERE en=${en} LIMIT 1`
-		);
+		let result = await storage().query(sql`SELECT id, en, ru, et FROM locales WHERE en=${en} LIMIT 1`);
 
 		let translation = result[0]
 
-		console.log(translation)
+		if (process.env.ENV_ID == 'dev') {
+			if (!translation) {
+				await storage().query(sql`INSERT INTO locales (translation_context, en) VALUES(${tc}, ${en})`);
+			}
 
-		if (!translation && process.env.ENV_ID == 'dev') {
-			const ru = await translate('ru', en, `Used in beekeeping and monitoring web app. ${tc}`)
+			if (!translation['ru']) {
+				let ru = await translate('ru', translation, tc)
+				translation['ru'] = ru
 
-			await storage().query(
-				sql`INSERT INTO locales (translation_context, en, ru)
-				VALUES(${tc}, ${en}, ${ru})`
-			);
+				await storage().query(sql`UPDATE locales SET ru=${ru} WHERE id=${translation.id}`);
+			}
 
-			const result = await storage().query(
-				sql`SELECT id, en, ru FROM locales WHERE en=${en} LIMIT 1`
-			);
-			translation = result[0]
+			if (!translation['et']) {
+				let et = await translate('et', translation, tc)
+
+				await storage().query(sql`UPDATE locales SET et=${et} WHERE id=${translation.id}`);
+			}
 		}
+
+
+		result = await storage().query(sql`SELECT id, en, ru, et FROM locales WHERE en=${en} LIMIT 1`);
+		translation = result[0]
+
+		console.log(translation)
 
 		return translation;
 	},
 }
 
 
-async function translate(targetLangCode, value, tc) {
-	const languagesMap = {
-		'ru': 'russian'
-	}
-
+async function translate(targetLangCode, translation, tc) {
 	const language = languagesMap[targetLangCode]
 
-	let RAW_TEXT = `You are an expert translator. You need to translate from English.`
+	let RAW_TEXT = `You are an expert translator. You need to translate from English. Used in beekeeping and monitoring web app.`
 	if (tc) {
 		RAW_TEXT += `The translation context is "${tc}"`
 	}
-	RAW_TEXT += `Translate to ${language}. Do not write anything else but the translation of the following phrase: ${value}`;
+	RAW_TEXT += `Translate to ${language}.`
+
+	if (translation['ru']) {
+		RAW_TEXT += `It is already translated in russian as "${translation['ru']}", you can use that as aid.`
+	}
+
+	RAW_TEXT += `Do not write anything else but the translation of the following phrase: ${translation['en']}`;
 
 
 	//-------------------
@@ -60,7 +74,7 @@ async function translate(targetLangCode, value, tc) {
 	const MODEL_ID = 'GPT-3_5-turbo';
 	const MODEL_VERSION_ID = '011eaadb8fc64aecac3a983b3c8c4b00';
 
-	
+
 
 	const stub = ClarifaiStub.grpc();
 
