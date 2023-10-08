@@ -40,8 +40,6 @@ export const localeModel = {
 		result = await storage().query(sql`SELECT id, en, ru, et FROM locales WHERE en=${en} LIMIT 1`);
 		translation = result[0]
 
-		console.log(translation)
-
 		return translation;
 	},
 }

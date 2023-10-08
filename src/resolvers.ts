@@ -52,7 +52,12 @@ export const resolvers = {
 			};
 		},
 		translate: async(_, {en, key, tc}, __, ctx) => {			// if (!ctx.uid) { return err(error_code.AUTHENTICATION_REQUIRED); }
-			return (await localeModel.translate({en, key, tc}));
+			const result = (await localeModel.translate({en, key, tc}));
+			
+			return {
+				...result,
+				__typename: 'Locale'
+			}
 		}
 	},
 	Mutation: {
