@@ -17,7 +17,7 @@ const stripe = new Stripe(config.stripe.secret, {
 	apiVersion: '2022-08-01'
 });
 
-function err(code){
+function err(code) {
 	return {
 		__typename: 'Error',
 		code
@@ -51,9 +51,9 @@ export const resolvers = {
 				...user
 			};
 		},
-		translate: async(_, {en, key, tc}, __, ctx) => {			// if (!ctx.uid) { return err(error_code.AUTHENTICATION_REQUIRED); }
-			const result = (await localeModel.translate({en, key, tc}));
-			
+		translate: async (_, { en, key, tc }, __, ctx) => {			// if (!ctx.uid) { return err(error_code.AUTHENTICATION_REQUIRED); }
+			const result = (await localeModel.translate({ en, key, tc }));
+
 			return {
 				...result,
 				__typename: 'Locale'
@@ -141,7 +141,7 @@ export const resolvers = {
 
 		updateUser: async (parent, { user }, ctx) => {
 			if (!ctx.uid) return err(error_code.AUTHENTICATION_REQUIRED);
-			
+
 			await userModel.update(user, ctx.uid);
 			const result = await userModel.getById(ctx);
 
@@ -150,13 +150,16 @@ export const resolvers = {
 				...result
 			}
 		},
-		login: async (parent, { email, password }) => {
+		login: async (_, { email, password }) => {
 			const id = await userModel.findForLogin(email, password)
 
 			if (!id) {
+				await sleepForSecurity()
+				logger.error(`Login - INVALID_USERNAME_PASSWORD`)
 				return err(error_code.INVALID_USERNAME_PASSWORD)
 			}
 
+			logger.error(`User ${id} logged in`)
 			const sessionKey = sign({
 				'user_id': id
 			}, config.JWT_KEY);
@@ -166,21 +169,48 @@ export const resolvers = {
 				key: sessionKey
 			}
 		},
-		register: async (parent, { email, password }) => {
-			const expirationDate = new Date();
-			expirationDate.setDate(expirationDate.getDate() + TRIAL_DAYS);
-			const expirationDateString = expirationDate.toISOString().substring(0, 19).replace('T', ' ');
+		register: async (_, { email, password }) => {
+			// try to login first
+			let id = await userModel.findForLogin(email, password)
 
-			await userModel.create(email, password, expirationDateString);
-			const id = await userModel.findForLogin(email, password)
 			if (!id) {
+				const exID = await userModel.findEmailTaken(email)
+
+				// wait for security
+				await new Promise(resolve => setTimeout(resolve, 500));
+
+				if (exID) {
+					await sleepForSecurity()
+					logger.warn(`Registration - EMAIL_TAKEN`)
+					return err(error_code.EMAIL_TAKEN);
+				}
+
+				const expirationDate = new Date();
+				expirationDate.setDate(expirationDate.getDate() + TRIAL_DAYS);
+				const expirationDateString = expirationDate.toISOString().substring(0, 19).replace('T', ' ');
+
+				// register
+				await userModel.create(email, password, expirationDateString);
+				id = await userModel.findForLogin(email, password)
+				logger.info(`Created user with id ${id}`)
+
+				if (!id) {
+					logger.error(`Registration - INCONSISTENT_STORAGE`)
+					return err(error_code.INCONSISTENT_STORAGE);
+				}
+
+				// add api token
+				await tokenModel.create(id)
+
+				await sendMail({
+					email
+				});
+			}
+
+			if (!id) {
+				logger.error(`Registration - INCONSISTENT_STORAGE`)
 				return err(error_code.INCONSISTENT_STORAGE);
 			}
-			await tokenModel.create(id)
-
-			await sendMail({
-				email
-			});
 
 			const sessionKey = sign({
 				'user_id': id
@@ -192,4 +222,9 @@ export const resolvers = {
 			}
 		}
 	}
+}
+
+async function sleepForSecurity(){
+	// slow down API for security to slow down brute-force
+	await new Promise(resolve => setTimeout(resolve, 300 + Math.random() * 5000));
 }

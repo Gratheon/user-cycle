@@ -84,5 +84,17 @@ export const userModel = {
 		}
 
 		return rows[0].id;
+	},
+
+	findEmailTaken: async function (email) {
+		const rows = await storage().query(
+			sql`SELECT id FROM account WHERE email=${email}`
+		);
+
+		if (!rows[0]) {
+			return null
+		}
+
+		return rows[0].id;
 	}
 }
