@@ -32,6 +32,8 @@ export const schema = gql`
         et: String
         tr: String
         pl: String
+        de: String
+        fr: String
         key: String
     }
     

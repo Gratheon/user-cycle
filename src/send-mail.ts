@@ -11,7 +11,7 @@ export async function sendMail({ email }) {
 
 		text: `Hey! 
 		Thanks for registering. 
-		I am thrilled to have you join Gratheon to test out bee detection and monitoring that we have here.
+		I am happy to have you join Gratheon to test out bee detection and monitoring that we have here.
 		If you have any questions, feel free to reply. 
 		
 		Best regards,
@@ -21,7 +21,7 @@ export async function sendMail({ email }) {
 
 		<p>
 		Thanks for registering. 
-		I am thrilled to have you join Gratheon to test out bee detection and monitoring that we have here.
+		I am happy to have you join Gratheon to test out bee detection and monitoring that we have here.
 		If you have any questions, feel free to reply. 
 		</p>
 		

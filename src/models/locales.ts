@@ -11,6 +11,8 @@ const languagesMap = {
 	'et': 'estonian',
 	'tr': 'turkish',
 	'pl': 'polish',
+	'de': 'german',
+	'fr': 'french',
 }
 
 export const localeModel = {
@@ -48,10 +50,20 @@ export const localeModel = {
 
 				await storage().query(sql`UPDATE locales SET pl=${pl} WHERE id=${translation.id}`);
 			}
+			if (!translation['de']) {
+				let pl = await translate('de', translation, tc)
+
+				await storage().query(sql`UPDATE locales SET de=${pl} WHERE id=${translation.id}`);
+			}
+			if (!translation['fr']) {
+				let pl = await translate('fr', translation, tc)
+
+				await storage().query(sql`UPDATE locales SET fr=${pl} WHERE id=${translation.id}`);
+			}
 		}
 
 
-		result = await storage().query(sql`SELECT id, en, ru, et, tr, pl FROM locales WHERE en=${en} LIMIT 1`);
+		result = await storage().query(sql`SELECT id, en, ru, et, tr, pl, de, fr FROM locales WHERE en=${en} LIMIT 1`);
 		translation = result[0]
 
 		return translation;
