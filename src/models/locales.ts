@@ -17,7 +17,7 @@ const languagesMap = {
 
 export const localeModel = {
 	translate: async function ({ en, key, tc }) {
-		let result = await storage().query(sql`SELECT id, en, ru, et FROM locales WHERE en=${en} LIMIT 1`);
+		let result = await storage().query(sql`SELECT id, en, ru, et, tr, pl, de, fr FROM locales WHERE en=${en} LIMIT 1`);
 
 		let translation = result[0]
 
@@ -35,36 +35,39 @@ export const localeModel = {
 
 			if (!translation['et']) {
 				let et = await translate('et', translation, tc)
+				translation['et'] = et
 
 				await storage().query(sql`UPDATE locales SET et=${et} WHERE id=${translation.id}`);
 			}
 
 			if (!translation['tr']) {
 				let tr = await translate('tr', translation, tc)
+				translation['tr'] = tr
 
 				await storage().query(sql`UPDATE locales SET tr=${tr} WHERE id=${translation.id}`);
 			}
 
 			if (!translation['pl']) {
 				let pl = await translate('pl', translation, tc)
+				translation['pl'] = pl
 
 				await storage().query(sql`UPDATE locales SET pl=${pl} WHERE id=${translation.id}`);
 			}
 			if (!translation['de']) {
-				let pl = await translate('de', translation, tc)
-
-				await storage().query(sql`UPDATE locales SET de=${pl} WHERE id=${translation.id}`);
+				let de = await translate('de', translation, tc)
+				translation['de'] = de
+				await storage().query(sql`UPDATE locales SET de=${de} WHERE id=${translation.id}`);
 			}
+
 			if (!translation['fr']) {
-				let pl = await translate('fr', translation, tc)
-
-				await storage().query(sql`UPDATE locales SET fr=${pl} WHERE id=${translation.id}`);
+				let fr = await translate('fr', translation, tc)
+				translation['fr'] = fr
+				await storage().query(sql`UPDATE locales SET fr=${fr} WHERE id=${translation.id}`);
 			}
+
+			result = await storage().query(sql`SELECT id, en, ru, et, tr, pl, de, fr FROM locales WHERE en=${en} LIMIT 1`);
+			translation = result[0]
 		}
-
-
-		result = await storage().query(sql`SELECT id, en, ru, et, tr, pl, de, fr FROM locales WHERE en=${en} LIMIT 1`);
-		translation = result[0]
 
 		return translation;
 	},
