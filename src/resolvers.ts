@@ -6,7 +6,7 @@ import { sql } from "@databases/mysql";
 
 // local dependencies
 import config from './config/index';
-import { sendMail } from './send-mail';
+import { sendWelcomeMail, sendAdminUserRegisteredMail } from './send-mail';
 import { userModel } from './models/user';
 import { tokenModel } from './models/tokens';
 import { localeModel } from './models/locales';
@@ -202,9 +202,8 @@ export const resolvers = {
 				// add api token
 				await tokenModel.create(id)
 
-				await sendMail({
-					email
-				});
+				await sendWelcomeMail({ email });
+				await sendAdminUserRegisteredMail({ email });
 			}
 
 			if (!id) {

@@ -1,7 +1,7 @@
 import sgMail from '@sendgrid/mail';
 import config from './config/index';
 
-export async function sendMail({ email }) {
+export async function sendWelcomeMail({ email }) {
 	sgMail.setApiKey(config.SENDGRID_API_KEY)
 
 	const msg = {
@@ -29,6 +29,20 @@ export async function sendMail({ email }) {
 		Best regards,
 		Artjom
 		</p>`,
+	}
+
+	return sgMail.send(msg)
+}
+
+export async function sendAdminUserRegisteredMail({ email }) {
+	sgMail.setApiKey(config.SENDGRID_API_KEY)
+
+	const msg = {
+		to: 'artkurapov@gmail.com',
+		from: 'pilot@gratheon.com',
+		subject: 'gratheon - new user',
+
+		text: `New user registered ${email}`,
 	}
 
 	return sgMail.send(msg)
