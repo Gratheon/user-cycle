@@ -21,6 +21,8 @@ flowchart LR
 
     web-app--"translate text" --> user-cycle --"translate phrases"--> clarifai
     user-cycle--"get/set translations"--> mysql
+
+    user-cycle--"send emails"--> sendgrid
 ```
 
 ## Development
