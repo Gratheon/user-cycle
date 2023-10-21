@@ -4,6 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    command: "node /app/app/user-cycle.js"
     ports:
       - 4000:4000
     environment:
