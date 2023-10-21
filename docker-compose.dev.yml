@@ -1,20 +1,20 @@
 version: '3.9'
 services:
   user-cycle:
-    # image: local/user-cycle
-    build: .
+    build:
+      dockerfile: Dockerfile
     command:
-      node /app/app/user-cycle.js
-    ports:
-      - 4000:4000
-    volumes:
-      - .:/app/
-    tty: true
-    restart: always
+      ./node_modules/.bin/tsc-watch --project ./src/config/tsconfig.json --onSuccess "node /app/app/user-cycle.js"
     environment:
       - ENV_ID=dev
       - DD_ENV=dev
       - DD_PROFILING_ENABLED=true
+    tty: true
+    ports:
+      - 4000:4000
+    volumes:
+      - .:/app/
+    restart: always
     network_mode: bridge
     networks:
       - gratheon

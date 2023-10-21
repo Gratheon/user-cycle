@@ -9,8 +9,14 @@ import { logger } from './logger'
 
 const packageJson = JSON.parse(fs.readFileSync(resolve('package.json'), 'utf8'));
 
-async function postData(url = '', data = {}) {
-	logger.info("Pushing schema")
+type SchemaRegistryInput ={
+	name: string
+	url: string
+	version: string
+	type_defs: string
+}
+async function postData(url = '', data: SchemaRegistryInput) {
+	logger.info(`Pushing schema as version ${data?.version}`)
 	// Default options are marked with *
 	const response = await fetch(url, {
 		method: 'POST',
@@ -26,6 +32,7 @@ async function postData(url = '', data = {}) {
 		body: JSON.stringify(data) // body data type must match "Content-Type" header
 	});
 
+	logger.info("schema-registry response:")
 	logger.info(response)
 
 	if (!response.ok) {
@@ -39,14 +46,13 @@ export async function registerSchema(schema) {
 	const url = `${config.schemaRegistryHost}/schema/push`
 
 	try {
-		const schemaText = print(schema)
-		const version = sha1(schemaText)
+		const version = sha1(schema)
 
 		await postData(url, {
 			"name": packageJson.name,
 			"url": config.selfUrl,
 			"version": process.env.ENV_ID === 'dev' ? "latest" : version,
-			"type_defs": schemaText
+			"type_defs": schema
 		});
 	} catch (e) {
 		console.error(e);

@@ -40,7 +40,7 @@ export const resolvers = {
 		user: async (_, __, ctx) => {
 			if (!ctx.uid) return err(error_code.AUTHENTICATION_REQUIRED);
 
-			const user = await userModel.getById(ctx)
+			const user = await userModel.getById(ctx.uid)
 			if (user) {
 				user.hasSubscription = user.stripe_subscription !== null;
 				delete user.stripe_subscription;
@@ -83,7 +83,7 @@ export const resolvers = {
 			try {
 				if (!ctx.uid) return err(error_code.AUTHENTICATION_REQUIRED);
 
-				const user = await userModel.getById(ctx);
+				const user = await userModel.getById(ctx.uid);
 
 				if (!user.stripe_subscription) {
 					return err(error_code.MISSING_SUBSCRIPTION);
@@ -106,7 +106,7 @@ export const resolvers = {
 
 			const domainURL = config.stripe.selfUrl;
 
-			const user = await userModel.getById(ctx);
+			const user = await userModel.getById(ctx.uid);
 
 			// Create new Checkout Session for the order
 			// Other optional params include:
@@ -143,7 +143,7 @@ export const resolvers = {
 			if (!ctx.uid) return err(error_code.AUTHENTICATION_REQUIRED);
 
 			await userModel.update(user, ctx.uid);
-			const result = await userModel.getById(ctx);
+			const result = await userModel.getById(ctx.uid);
 
 			return {
 				__typename: 'User',
@@ -152,6 +152,7 @@ export const resolvers = {
 		},
 		login: async (_, { email, password }) => {
 			const id = await userModel.findForLogin(email, password)
+			const user = await userModel.getById(id)
 
 			if (!id) {
 				await sleepForSecurity()
@@ -159,14 +160,19 @@ export const resolvers = {
 				return err(error_code.INVALID_USERNAME_PASSWORD)
 			}
 
-			logger.error(`User ${id} logged in`)
+			logger.info(`User ${id} logged in`)
+			logger.info(user)
 			const sessionKey = sign({
 				'user_id': id
 			}, config.JWT_KEY);
 
 			return {
 				__typename: 'UserSession',
-				key: sessionKey
+				key: sessionKey,
+				user: {
+					__typename: 'User',
+					...user
+				}
 			}
 		},
 		register: async (_, { email, password }) => {

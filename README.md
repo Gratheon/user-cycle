@@ -27,7 +27,7 @@ flowchart LR
 
 ## Development
 ```
-tilt up
+make start
 ```
 
 ## Testing

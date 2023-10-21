@@ -6,6 +6,7 @@ import fastify from "fastify";
 import { buildSubgraphSchema } from '@apollo/federation';
 import * as Sentry from '@sentry/node';
 import { RewriteFrames } from "@sentry/integrations";
+import gql from "graphql-tag";
 
 import config from './config/index';
 import { schema } from './schema';
@@ -42,9 +43,7 @@ function fastifyAppClosePlugin(app) {
 
 async function startApolloServer(app, typeDefs, resolvers) {
 	const server = new ApolloServer({
-		//@ts-ignore
-		typeDefs: buildSubgraphSchema(typeDefs),
-		resolvers,
+		schema: buildSubgraphSchema({ typeDefs: gql(typeDefs), resolvers }),
 		plugins: [
 			fastifyAppClosePlugin(app),
 			ApolloServerPluginLandingPageGraphQLPlayground(),
