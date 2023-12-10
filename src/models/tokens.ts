@@ -30,6 +30,12 @@ export const tokenModel = {
 		return result[0]['user_id'];
 	},
 
+	deleteByUID: async function(uid){
+		await storage().query(
+			sql`DELETE FROM \`api_tokens\` WHERE user_id=${uid}`
+		);
+	},
+	
 	create: async function(user_id){
 		const token: string = uuidv4();
 

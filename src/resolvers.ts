@@ -79,6 +79,18 @@ export const resolvers = {
 			};
 
 		},
+		deleteUserSelf: async (_, __, ctx) => {
+			try {
+				if (!ctx.uid) return err(error_code.AUTHENTICATION_REQUIRED);
+
+				await resolvers.Mutation.cancelSubscription(_, __, ctx);
+				await userModel.deleteSelf(ctx.uid);
+			} catch (e) {
+				logger.error(e);
+				return err(error_code.INTERNAL_ERROR);
+			}
+			return true;
+		},
 		cancelSubscription: async (_, __, ctx) => {
 			try {
 				if (!ctx.uid) return err(error_code.AUTHENTICATION_REQUIRED);
@@ -97,7 +109,7 @@ export const resolvers = {
 
 				return await resolvers.Query.user(null, null, ctx);
 			} catch (e) {
-				console.error(e);
+				logger.error(e);
 				return err(error_code.INTERNAL_ERROR);
 			}
 		},
@@ -134,7 +146,7 @@ export const resolvers = {
 
 				return session.url;
 			} catch (e) {
-				console.error(e);
+				logger.error(e);
 				return null;
 			}
 		},
@@ -142,12 +154,18 @@ export const resolvers = {
 		updateUser: async (parent, { user }, ctx) => {
 			if (!ctx.uid) return err(error_code.AUTHENTICATION_REQUIRED);
 
-			await userModel.update(user, ctx.uid);
-			const result = await userModel.getById(ctx.uid);
+			try {
+				await userModel.update(user, ctx.uid);
+				const result = await userModel.getById(ctx.uid);
 
-			return {
-				__typename: 'User',
-				...result
+				return {
+					__typename: 'User',
+					...result
+				}
+
+			} catch (e) {
+				logger.error(e);
+				return null;
 			}
 		},
 		login: async (_, { email, password }) => {
@@ -229,7 +247,7 @@ export const resolvers = {
 	}
 }
 
-async function sleepForSecurity(){
+async function sleepForSecurity() {
 	// slow down API for security to slow down brute-force
 	await new Promise(resolve => setTimeout(resolve, 300 + Math.random() * 5000));
 }

@@ -42,6 +42,7 @@ type Mutation {
 	updateUser(user: UserUpdateInput!): UpdateUserResult
 	createCheckoutSession: URL
 	cancelSubscription: CancelSubscriptionResult
+	deleteUserSelf: Error
 }
 
 type TokenUser {

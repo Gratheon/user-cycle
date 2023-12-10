@@ -59,6 +59,12 @@ export const userModel = {
 		return result[0];
 	},
 
+	deleteSelf: async function (uid) {
+		await storage().query(
+			sql`DELETE FROM \`account\` WHERE id=${uid}`
+		);
+	},
+
 	update: async function (user, uid) {
 		await storage().query(
 			sql`UPDATE \`account\` 
