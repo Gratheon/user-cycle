@@ -226,8 +226,10 @@ export const resolvers = {
 				// add api token
 				await tokenModel.create(id)
 
-				await sendWelcomeMail({ email });
-				await sendAdminUserRegisteredMail({ email });
+				if (process.env.ENV_ID == 'prod') {
+					await sendWelcomeMail({ email });
+					await sendAdminUserRegisteredMail({ email });
+				}
 			}
 
 			if (!id) {
