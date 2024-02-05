@@ -13,6 +13,7 @@ const config = {
 	stripe: {
 		price: '',
 		selfUrl: '',
+		appUrl: '',
 		publicKey: '',
 		secret: '',
 		webhook_secret: '',

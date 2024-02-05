@@ -116,7 +116,7 @@ export const resolvers = {
 		createCheckoutSession: async (parent, args, ctx) => {
 			if (!ctx.uid) return err(error_code.AUTHENTICATION_REQUIRED);
 
-			const domainURL = config.stripe.selfUrl;
+			const appUrl = config.stripe.selfUrl;
 
 			const user = await userModel.getById(ctx.uid);
 
@@ -138,9 +138,9 @@ export const resolvers = {
 						},
 					],
 					// ?session_id={CHECKOUT_SESSION_ID} means the redirect will have the session ID set as a query param
-					success_url: `${domainURL}/account/success`,
+					success_url: `${appUrl}/account/success`,
 					// success_url: `${domainURL}/account/success?session_id={CHECKOUT_SESSION_ID}`,
-					cancel_url: `${domainURL}/account/cancel`,
+					cancel_url: `${appUrl}/account/cancel`,
 					// automatic_tax: { enabled: true }
 				});
 
