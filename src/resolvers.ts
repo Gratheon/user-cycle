@@ -24,7 +24,8 @@ function err(code) {
 	};
 }
 
-const TRIAL_DAYS = 14;
+const TRIAL_DAYS = 14; // should not affect free billing_plan
+
 export const resolvers = {
 	Query: {
 		invoices: async (_, __, ctx) => {

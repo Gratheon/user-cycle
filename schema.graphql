@@ -77,6 +77,12 @@ type User {
 	date_expiration: DateTime
 	hasSubscription: Boolean
 	isSubscriptionExpired: Boolean
+
+
+	"""
+	Billing plan: free, base, pro
+	"""
+	billingPlan: String
 }
 
 input UserUpdateInput{
