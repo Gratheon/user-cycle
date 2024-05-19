@@ -1,5 +1,16 @@
+//@ts-ignore
+import * as fs from 'fs';
+//@ts-ignore
+import * as path from 'path';
+
 import sgMail from '@sendgrid/mail';
 import config from './config/index';
+
+//@ts-ignore
+const welcomeEmailHtml = fs.readFileSync(path.join(__dirname, '..', 'emails', 'welcome.html'), 'utf8')
+
+//@ts-ignore
+const welcomeEmailTxt = fs.readFileSync(path.join(__dirname, '..', 'emails', 'welcome.txt'), 'utf8')
 
 export async function sendWelcomeMail({ email }) {
 	sgMail.setApiKey(config.SENDGRID_API_KEY)
@@ -7,28 +18,10 @@ export async function sendWelcomeMail({ email }) {
 	const msg = {
 		to: email,
 		from: 'pilot@gratheon.com',
-		subject: 'Welcome to gratheon.com!',
+		subject: 'Welcome to Gratheon!',
 
-		text: `Hey! 
-		Thanks for registering. 
-		I am happy to have you join Gratheon to test out bee detection and monitoring that we have here.
-		If you have any questions, feel free to reply. 
-		
-		Best regards,
-		Artjom`,
-
-		html: `Hey! <br />
-
-		<p>
-		Thanks for registering. 
-		I am happy to have you join Gratheon to test out bee detection and monitoring that we have here.
-		If you have any questions, feel free to reply. 
-		</p>
-		
-		<p>
-		Best regards,
-		Artjom
-		</p>`,
+		text: welcomeEmailTxt,
+		html: welcomeEmailHtml,
 	}
 
 	return sgMail.send(msg)
@@ -41,7 +34,6 @@ export async function sendAdminUserRegisteredMail({ email }) {
 		to: 'artkurapov@gmail.com',
 		from: 'pilot@gratheon.com',
 		subject: 'gratheon - new user',
-
 		text: `New user registered ${email}`,
 	}
 
