@@ -65,9 +65,8 @@ async function startApolloServer(app, typeDefs, resolvers) {
 (async function main() {
 	await initStorage();
 
-	const app = fastify({
-		logger
-	});
+	// @ts-ignore
+	const app = fastify({ logger });
 
 	app.setErrorHandler(async (error, request, reply) => {
 		// Logging locally
@@ -91,14 +90,14 @@ async function startApolloServer(app, typeDefs, resolvers) {
 
 	try {
 		await registerSchema(schema);
-		logger.info('Starting apollo server');
+		logger.info('starting user-cycle apollo server');
 		const path = await startApolloServer(app, schema, resolvers);
 
 		// STRIPE REST API
 		registerStripe(app);
 
 		await app.listen(4000, '0.0.0.0');
-		logger.info(`🚀 Server ready ! http://localhost:4000${path}`);
+		logger.info(`🚀 user-cycle service is ready at http://localhost:4000${path}`);
 	} catch (e) {
 		console.error(e);
 	}

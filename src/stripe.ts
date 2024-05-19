@@ -3,6 +3,7 @@ import stripe from 'stripe';
 import fastifyRawBody from 'fastify-raw-body';
 
 // local dependencies
+import {logger} from './logger';
 import config from './config/index';
 import { storage } from "./storage";
 import { userModel } from './models/user';
@@ -34,11 +35,10 @@ export function registerStripe(app) {
 			const parsedBody = request.body;
 
 			try {
-				// console.log('webhook body', request.body)
 				//@ts-ignore
 				event = stripe.webhooks.constructEvent(request.rawBody, stripeSignature, endpointSecret);
 			} catch (err) {
-				console.error(err);
+				logger.error(err);
 				//@ts-ignore
 				response.status(400).send(`Webhook Error: ${err.message}`);
 				return;
@@ -70,7 +70,7 @@ export function registerStripe(app) {
 						// Continue to provision the subscription as payments continue to be made.
 						// Store the status in your database and check when a user accesses your service.
 						// This approach helps you avoid hitting rate limits.
-						console.log('Extending session for email', session.customer_email);
+						logger.info('Extending session for email', session.customer_email);
 						await userModel.extendAccountExpirationByOneMonth({
 							email: session.customer_email
 						});
@@ -96,11 +96,11 @@ export function registerStripe(app) {
 					// case 'payment_intent.created': break;
 
 					default:
-						console.log(`Unhandled event type ${event.type}`);
+						logger.info(`Unhandled event type ${event.type}`);
 				}
 
 			} catch (e) {
-				console.error(e);
+				logger.error(e);
 				throw e;
 			}
 

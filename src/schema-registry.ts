@@ -32,8 +32,7 @@ async function postData(url = '', data: SchemaRegistryInput) {
 		body: JSON.stringify(data) // body data type must match "Content-Type" header
 	});
 
-	logger.info("schema-registry response:")
-	logger.info(response)
+	logger.info("schema-registry response:", { response })
 
 	if (!response.ok) {
 		console.error(`schema-registry respose code ${response.status}: ${response.statusText}`);

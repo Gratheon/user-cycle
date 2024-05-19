@@ -3,6 +3,7 @@ import * as crypto from "crypto";
 import createConnectionPool, { sql } from "@databases/mysql";
 
 import config from './config/index';
+import { logger } from './logger';
 
 let db;
 export function storage() {
@@ -63,16 +64,16 @@ async function migrate() {
       if (rows.length === 0) {
         await db.query(sql.file(`./migrations/${file}`));
 
-        console.log(`Successfully executed SQL from ${file}.`);
+        logger.info(`Successfully executed SQL from ${file}.`);
 
         // Store the hash in the dedicated table
         await db.query(sql`INSERT INTO _db_migrations (hash, filename, executionTime) VALUES (${hash}, ${file}, NOW())`);
-        console.log(`Successfully stored hash in executed_sql_hashes table.`);
+        logger.info(`Successfully stored hash in executed_sql_hashes table.`);
       } else {
-        console.log(`SQL from ${file} has already been executed. Skipping.`);
+        logger.info(`SQL from ${file} has already been executed. Skipping.`);
       }
     }
   } catch (err) {
-    console.error(err);
+    logger.error(err);
   }
 }

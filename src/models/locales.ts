@@ -133,20 +133,17 @@ async function translate(targetLangCode, translation, tc) {
 			metadata,
 			(err, response) => {
 				if (err) {
-					logger.error(err)
+					logger.error("Translation error", {err})
 					return reject(err);
 				}
 
 				if (response.status.code !== 10000) {
-					logger.error(response)
+					logger.error("Translation error - status code not 10000", response)
 					return reject("Post model outputs failed, status: " + response.status.description);
 				}
 
 				// Since we have one input, one output will exist here.
 				const output = response.outputs[0];
-
-				logger.info("Translate result:\n");
-				logger.info(output.data.text.raw);
 
 				resolve(output.data.text.raw)
 			}

@@ -74,6 +74,9 @@ export const userModel = {
 			WHERE id=${uid}`
 		);
 	},
+	updateLastLogin: async function (uid) {
+		await storage().query(sql`UPDATE \`account\` SET date_last_login=NOW() WHERE id=${uid}`);
+	},
 
 	create: async function (email, password, expirationDateString) {
 		return await storage().query(

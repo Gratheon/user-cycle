@@ -1,8 +1,6 @@
 // global dependencies
 import Stripe from 'stripe';
 import sign from 'jwt-encode';
-import sha1 from 'sha1';
-import { sql } from "@databases/mysql";
 
 // local dependencies
 import config from './config/index';
@@ -175,12 +173,15 @@ export const resolvers = {
 
 			if (!id) {
 				await sleepForSecurity()
-				logger.error(`Login - INVALID_USERNAME_PASSWORD`)
+				logger.error(`Login - INVALID_USERNAME_PASSWORD`, {
+					email
+				})
 				return err(error_code.INVALID_USERNAME_PASSWORD)
 			}
 
-			logger.info(`User ${id} logged in`)
-			logger.info(user)
+			userModel.updateLastLogin(id)
+
+			logger.info(`User logged in`, { user })
 			const sessionKey = sign({
 				'user_id': id
 			}, config.JWT_KEY);
@@ -206,7 +207,7 @@ export const resolvers = {
 
 				if (exID) {
 					await sleepForSecurity()
-					logger.warn(`Registration - EMAIL_TAKEN`)
+					logger.warn(`Registration - EMAIL_TAKEN`, { email })
 					return err(error_code.EMAIL_TAKEN);
 				}
 
@@ -217,12 +218,12 @@ export const resolvers = {
 				// register
 				await userModel.create(email, password, expirationDateString);
 				id = await userModel.findForLogin(email, password)
-				logger.info(`Created user with id ${id}`)
 
 				if (!id) {
 					logger.error(`Registration - INCONSISTENT_STORAGE`)
 					return err(error_code.INCONSISTENT_STORAGE);
 				}
+				logger.info(`Created user with id ${id}`, { email})
 
 				// add api token
 				await tokenModel.create(id)
@@ -234,7 +235,7 @@ export const resolvers = {
 			}
 
 			if (!id) {
-				logger.error(`Registration - INCONSISTENT_STORAGE`)
+				logger.error(`Registration - INCONSISTENT_STORAGE`, { email})
 				return err(error_code.INCONSISTENT_STORAGE);
 			}
 
