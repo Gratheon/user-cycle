@@ -50,8 +50,10 @@ export const resolvers = {
 				...user
 			};
 		},
-		translate: async (_, { en, key, tc }, __, ctx) => {			// if (!ctx.uid) { return err(error_code.AUTHENTICATION_REQUIRED); }
+		translate: async (_, { en, key, tc }, __, ctx) => {
 			const result = (await localeModel.translate({ en, key, tc }));
+
+			if (!result) return null;
 
 			return {
 				...result,
@@ -223,7 +225,7 @@ export const resolvers = {
 					logger.error(`Registration - INCONSISTENT_STORAGE`)
 					return err(error_code.INCONSISTENT_STORAGE);
 				}
-				logger.info(`Created user with id ${id}`, { email})
+				logger.info(`Created user with id ${id}`, { email })
 
 				// add api token
 				await tokenModel.create(id)
@@ -235,7 +237,7 @@ export const resolvers = {
 			}
 
 			if (!id) {
-				logger.error(`Registration - INCONSISTENT_STORAGE`, { email})
+				logger.error(`Registration - INCONSISTENT_STORAGE`, { email })
 				return err(error_code.INCONSISTENT_STORAGE);
 			}
 
