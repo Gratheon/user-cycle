@@ -35,9 +35,9 @@ export const userModel = {
 	getInvoices: async function (ctx) {
 		const result = await storage().query(
 			sql`SELECT created as \`date\`, 
-				JSON_EXTRACT(data, "$.object.invoice_pdf") as url, 
-				JSON_EXTRACT(data, "$.object.total") as total, 
-				JSON_EXTRACT(data, "$.object.currency") as currency
+				COALESCE(JSON_EXTRACT(data, "$.object.invoice_pdf"), '') as url, 
+				COALESCE(JSON_EXTRACT(data, "$.object.total"), 0) as total, 
+				COALESCE(JSON_EXTRACT(data, "$.object.currency"), '') as currency
 			FROM stripe_events
 			WHERE user_id=${ctx.uid} AND \`type\`='invoice.payment_succeeded'
 			ORDER BY created DESC
