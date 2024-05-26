@@ -16,7 +16,7 @@ export async function initStorage() {
   );
 
   await conn.query(sql`
-  CREATE DATABASE IF NOT EXISTS \`swarm-user\` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+  CREATE DATABASE IF NOT EXISTS \`user-cycle\` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 `);
 
   db = createConnectionPool(
