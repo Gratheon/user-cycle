@@ -94,7 +94,7 @@ export function registerGoogle(app) {
 			if (process.env.ENV_ID === 'dev') {
 				res.cookie('token', sessionKey, { domain: 'localhost', path:'/' });
 			} else {
-				res.cookie('token', sessionKey, { domain: 'gratheon.com' });
+				res.cookie('token', sessionKey, { domain: '.gratheon.com', path:'/'  });
 			}
 
 			// successful login - go to app
