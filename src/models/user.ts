@@ -2,6 +2,7 @@ import { sql } from "@databases/mysql";
 import sha1 from 'sha1';
 
 import { storage } from "../storage";
+export const TRIAL_DAYS = 14; // should not affect free billing_plan
 
 export const userModel = {
 	extendAccountExpirationByOneMonth: async ({ email }) => {
@@ -85,7 +86,7 @@ export const userModel = {
 		);
 	},
 
-	findForLogin: async function (email, password) {
+	findByEmailAndPass: async function (email, password) {
 		const rows = await storage().query(
 			sql`SELECT id FROM account WHERE email=${email} AND password=${sha1(password)}`
 		);
@@ -97,7 +98,7 @@ export const userModel = {
 		return rows[0].id;
 	},
 
-	findEmailTaken: async function (email) {
+	findByEmail: async function (email) {
 		const rows = await storage().query(
 			sql`SELECT id FROM account WHERE email=${email}`
 		);

@@ -15,6 +15,7 @@ import { initStorage } from "./storage";
 import { registerStripe } from "./stripe";
 import { registerSchema } from "./schema-registry";
 import { logger } from './logger'
+import { registerGoogle } from "./google-auth";
 
 Sentry.init({
 	dsn: config.sentryDsn,
@@ -68,6 +69,11 @@ async function startApolloServer(app, typeDefs, resolvers) {
 	// @ts-ignore
 	const app = fastify({ logger });
 
+	app.register(require('fastify-cookie'), {
+		secret: "my-secret", // for cookies signature
+		parseOptions: {}     // options for parsing cookies
+	})
+
 	app.setErrorHandler(async (error, request, reply) => {
 		// Logging locally
 		logger.error(error);
@@ -95,6 +101,9 @@ async function startApolloServer(app, typeDefs, resolvers) {
 
 		// STRIPE REST API
 		registerStripe(app);
+
+		// GOOGLE REST API
+		registerGoogle(app);
 
 		await app.listen(4000, '0.0.0.0');
 		logger.info(`🚀 user-cycle service is ready at http://localhost:4000${path}`);

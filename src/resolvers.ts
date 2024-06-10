@@ -5,7 +5,7 @@ import sign from 'jwt-encode';
 // local dependencies
 import config from './config/index';
 import { sendWelcomeMail, sendAdminUserRegisteredMail } from './send-mail';
-import { userModel } from './models/user';
+import { TRIAL_DAYS, userModel } from './models/user';
 import { tokenModel } from './models/tokens';
 import { localeModel } from './models/locales';
 import error_code from './error_code';
@@ -21,8 +21,6 @@ function err(code) {
 		code
 	};
 }
-
-const TRIAL_DAYS = 14; // should not affect free billing_plan
 
 export const resolvers = {
 	Query: {
@@ -170,7 +168,7 @@ export const resolvers = {
 			}
 		},
 		login: async (_, { email, password }) => {
-			const id = await userModel.findForLogin(email, password)
+			const id = await userModel.findByEmailAndPass(email, password)
 			const user = await userModel.getById(id)
 
 			if (!id) {
@@ -199,10 +197,10 @@ export const resolvers = {
 		},
 		register: async (_, { first_name, last_name, email, password }) => {
 			// try to login first
-			let id = await userModel.findForLogin(email, password)
+			let id = await userModel.findByEmailAndPass(email, password)
 
 			if (!id) {
-				const exID = await userModel.findEmailTaken(email)
+				const exID = await userModel.findByEmail(email)
 
 				// wait for security
 				await new Promise(resolve => setTimeout(resolve, 500));
@@ -219,7 +217,7 @@ export const resolvers = {
 
 				// register
 				await userModel.create(first_name, last_name, email, password, expirationDateString);
-				id = await userModel.findForLogin(email, password)
+				id = await userModel.findByEmailAndPass(email, password)
 
 				if (!id) {
 					logger.error(`Registration - INCONSISTENT_STORAGE`)
