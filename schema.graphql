@@ -35,8 +35,8 @@ type Locale {
 }
 
 type Mutation {
-	register(email:String, password: String): LoginResult
-	login(email:String, password: String): LoginResult
+	register(first_name: String, last_name: String, email:String!, password: String!): LoginResult
+	login(email: String!, password: String!): LoginResult
 	generateApiToken: APIToken
 	validateApiToken(token: String): ValidateTokenResult
 	updateUser(user: UserUpdateInput!): UpdateUserResult

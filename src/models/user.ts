@@ -78,10 +78,10 @@ export const userModel = {
 		await storage().query(sql`UPDATE \`account\` SET date_last_login=NOW() WHERE id=${uid}`);
 	},
 
-	create: async function (email, password, expirationDateString) {
+	create: async function (first_name, last_name, email, password, expirationDateString) {
 		return await storage().query(
-			sql`INSERT INTO account (email, password, date_expiration)
-			VALUES(${email}, ${sha1(password)}, ${expirationDateString})`
+			sql`INSERT INTO account (first_name, last_name, email, password, date_expiration)
+			VALUES(${first_name}, ${last_name}, ${email}, ${sha1(password)}, ${expirationDateString})`
 		);
 	},
 

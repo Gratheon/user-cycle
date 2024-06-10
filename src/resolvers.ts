@@ -197,7 +197,7 @@ export const resolvers = {
 				}
 			}
 		},
-		register: async (_, { email, password }) => {
+		register: async (_, { first_name, last_name, email, password }) => {
 			// try to login first
 			let id = await userModel.findForLogin(email, password)
 
@@ -218,7 +218,7 @@ export const resolvers = {
 				const expirationDateString = expirationDate.toISOString().substring(0, 19).replace('T', ' ');
 
 				// register
-				await userModel.create(email, password, expirationDateString);
+				await userModel.create(first_name, last_name, email, password, expirationDateString);
 				id = await userModel.findForLogin(email, password)
 
 				if (!id) {
