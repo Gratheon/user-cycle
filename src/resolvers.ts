@@ -6,7 +6,7 @@ import sign from 'jwt-encode';
 import config from './config/index';
 import { sendWelcomeMail, sendAdminUserRegisteredMail } from './send-mail';
 import { TRIAL_DAYS, userModel } from './models/user';
-import { tokenModel } from './models/tokens';
+import { shareTokenModel, tokenModel } from './models/tokens';
 import { localeModel } from './models/locales';
 import error_code from './error_code';
 import { logger } from './logger';
@@ -29,10 +29,15 @@ export const resolvers = {
 
 			return await userModel.getInvoices(ctx);
 		},
-		api_tokens: async (_, __, ctx) => {
+		apiTokens: async (_, __, ctx) => {
 			if (!ctx.uid) return err(error_code.AUTHENTICATION_REQUIRED);
 
 			return await tokenModel.getTokens(ctx);
+		},
+		shareTokens: async (_, __, ctx) => {
+			if (!ctx.uid) return err(error_code.AUTHENTICATION_REQUIRED);
+
+			return await shareTokenModel.getTokens(ctx);
 		},
 		user: async (_, __, ctx) => {
 			if (!ctx.uid) return err(error_code.AUTHENTICATION_REQUIRED);
@@ -64,6 +69,21 @@ export const resolvers = {
 			if (!ctx.uid) return err(error_code.AUTHENTICATION_REQUIRED);
 
 			return await tokenModel.create(ctx.uid)
+		},
+		generateShareToken: async (_, {name, sourceUrl, scopes}, ctx) => {
+			if (!ctx.uid) return err(error_code.AUTHENTICATION_REQUIRED);
+			
+			return await shareTokenModel.create(ctx.uid, name, sourceUrl, scopes)
+		},
+		revokeApiToken: async (_, { token }, ctx) => {
+			if (!ctx.uid) return err(error_code.AUTHENTICATION_REQUIRED);
+
+			await tokenModel.softDelete(ctx, token)
+		},
+		revokeShareToken: async (_, { token }, ctx) => {
+			if (!ctx.uid) return err(error_code.AUTHENTICATION_REQUIRED);
+
+			await shareTokenModel.softDelete(ctx, token)
 		},
 		validateApiToken: async (_, args) => {
 			const uid = tokenModel.getUserIDByToken(args.token)
