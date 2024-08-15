@@ -4,23 +4,18 @@ import sign from 'jwt-encode';
 
 // local dependencies
 import config from './config/index';
-import { sendWelcomeMail, sendAdminUserRegisteredMail } from './send-mail';
-import { TRIAL_DAYS, userModel } from './models/user';
+import { userModel } from './models/user';
 import { shareTokenModel, tokenModel } from './models/tokens';
 import { localeModel } from './models/locales';
-import error_code from './error_code';
+import error_code, { err } from './error_code';
 import { logger } from './logger';
+import registerUser from './models/user-register';
+import { sleepForSecurity } from './models/sleep';
 
 const stripe = new Stripe(config.stripe.secret, {
 	apiVersion: '2022-08-01'
 });
 
-function err(code) {
-	return {
-		__typename: 'Error',
-		code
-	};
-}
 
 export const resolvers = {
 	Query: {
@@ -215,63 +210,6 @@ export const resolvers = {
 				}
 			}
 		},
-		register: async (_, { first_name, last_name, email, password }) => {
-			// try to login first
-			let id = await userModel.findByEmailAndPass(email, password)
-
-			if (!id) {
-				const exID = await userModel.findByEmail(email)
-
-				// wait for security
-				await new Promise(resolve => setTimeout(resolve, 500));
-
-				if (exID) {
-					await sleepForSecurity()
-					logger.warn(`Registration - EMAIL_TAKEN`, { email })
-					return err(error_code.EMAIL_TAKEN);
-				}
-
-				const expirationDate = new Date();
-				expirationDate.setDate(expirationDate.getDate() + TRIAL_DAYS);
-				const expirationDateString = expirationDate.toISOString().substring(0, 19).replace('T', ' ');
-
-				// register
-				await userModel.create(first_name, last_name, email, password, expirationDateString);
-				id = await userModel.findByEmailAndPass(email, password)
-
-				if (!id) {
-					logger.error(`Registration - INCONSISTENT_STORAGE`)
-					return err(error_code.INCONSISTENT_STORAGE);
-				}
-				logger.info(`Created user with id ${id}`, { email })
-
-				// add api token
-				await tokenModel.create(id)
-
-				if (process.env.ENV_ID == 'prod') {
-					await sendWelcomeMail({ email });
-					await sendAdminUserRegisteredMail({ email });
-				}
-			}
-
-			if (!id) {
-				logger.error(`Registration - INCONSISTENT_STORAGE`, { email })
-				return err(error_code.INCONSISTENT_STORAGE);
-			}
-
-			const sessionKey = sign({
-				'user_id': id
-			}, config.JWT_KEY);
-
-			return {
-				__typename: 'UserSession',
-				key: sessionKey
-			}
-		}
+		register: registerUser,
 	}
-}
-
-async function sleepForSecurity() {
-	// slow down API for security to slow down brute-force
-	await new Promise(resolve => setTimeout(resolve, 300 + Math.random() * 5000));
 }

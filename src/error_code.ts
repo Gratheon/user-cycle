@@ -6,7 +6,15 @@ export default {
 
 	// endpoint-specific
 	INVALID_TOKEN:'INVALID_TOKEN',
+	INVALID_EMAIL:'INVALID_EMAIL',
 	INVALID_USERNAME_PASSWORD:'INVALID_USERNAME_PASSWORD',
 	EMAIL_TAKEN:'EMAIL_TAKEN',
 	MISSING_SUBSCRIPTION:'MISSING_SUBSCRIPTION'
+}
+
+export function err(code) {
+	return {
+		__typename: 'Error',
+		code
+	};
 }
