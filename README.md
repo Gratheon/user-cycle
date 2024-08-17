@@ -4,6 +4,20 @@ Gratheon.com user data related service, responsible for:
 - billing
 - translations of web-app labels (would be good to move to separate service)
 
+## URLs
+| Environment | URL |
+|-------------| --- |
+| Local       | http://localhost:4000 |
+| Prod        | https://user-cycle.gratheon.com |
+
+## API
+| Method | URL          | Description             |
+|--------|--------------|-------------------------|
+| POST   | /graphql     | GraphQL API             |
+| POST   | /webhook     | Stripe webhook          |
+| GET    | /health      | Health check            |
+| GET    | /user/cancel | Redirect from stripe UI |
+
 ## Stripe
 - https://stripe.com/docs/billing/subscriptions/build-subscriptions
 - https://dashboard.stripe.com/test/webhooks/create?endpoint_location=local

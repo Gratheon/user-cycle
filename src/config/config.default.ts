@@ -3,11 +3,11 @@ const config = {
 	schemaRegistryHost: ``,
 	selfUrl: "",
 	mysql: {
-		host: '',
-		port: '',
-		user: '',
-		password: '',
-		database: '',
+		host: 'mysql',
+		port: '3306',
+		user: 'test',
+		password: 'test',
+		database: 'user-cycle',
 	},
 
 	stripe: {
