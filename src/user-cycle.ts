@@ -92,7 +92,7 @@ async function startApolloServer(app, typeDefs, resolvers) {
     app.get('/health', (request, reply) => {
         reply.send({hello: 'world'})
     })
-    app.get('/user/cancel', (request, reply) => {
+    app.get('/account/cancel', (request, reply) => {
         if (process.env.ENV_ID == 'dev') {
             // web-app is running on
             reply.redirect(301, 'http://0.0.0.0:8080/account/cancel');
