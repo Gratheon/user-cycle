@@ -1,6 +1,6 @@
 const config = {
 	sentryDsn: "",
-	schemaRegistryHost: ``,
+	schemaRegistryHost: `http://gql-schema-registry:3000`,
 	selfUrl: "",
 	mysql: {
 		host: 'mysql',
