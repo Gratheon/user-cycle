@@ -3,7 +3,7 @@ scalar DateTime
 scalar URL
 
 type Query {
-	user: User
+	user: UserOrError
 	invoices: [Invoice]
 	apiTokens: [APIToken]
 	shareTokens: [ShareToken]
@@ -71,6 +71,7 @@ type Error{
 	code: String
 }
 
+union UserOrError = User | Error
 union ValidateTokenResult = TokenUser | Error
 union LoginResult = UserSession | Error
 union UpdateUserResult = User | Error

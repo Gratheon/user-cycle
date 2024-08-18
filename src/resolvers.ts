@@ -20,24 +20,37 @@ const stripe = new Stripe(config.stripe.secret, {
 export const resolvers = {
 	Query: {
 		invoices: async (_, __, ctx) => {
-			if (!ctx.uid) return err(error_code.AUTHENTICATION_REQUIRED);
+			if (!ctx.uid) {
+				logger.warn("Authentication required for invoices resolver")
+				return err(error_code.AUTHENTICATION_REQUIRED);
+			}
 
 			return await userModel.getInvoices(ctx);
 		},
 		apiTokens: async (_, __, ctx) => {
-			if (!ctx.uid) return err(error_code.AUTHENTICATION_REQUIRED);
+			if (!ctx.uid) {
+				logger.warn("Authentication required for apiTokens resolver")
+				return err(error_code.AUTHENTICATION_REQUIRED);
+			}
 
 			return await tokenModel.getTokens(ctx);
 		},
 		shareTokens: async (_, __, ctx) => {
-			if (!ctx.uid) return err(error_code.AUTHENTICATION_REQUIRED);
+			if (!ctx.uid) {
+				logger.warn("Authentication required for apiTokens resolver")
+				return err(error_code.AUTHENTICATION_REQUIRED);
+			}
 
 			return await shareTokenModel.getTokens(ctx);
 		},
 		user: async (_, __, ctx) => {
-			if (!ctx.uid) return err(error_code.AUTHENTICATION_REQUIRED);
+			if (!ctx.uid) {
+				logger.warn("Authentication required for user resolver")
+				return err(error_code.AUTHENTICATION_REQUIRED);
+			}
 
 			const user = await userModel.getById(ctx.uid)
+			logger.info("user", user)
 			if (user) {
 				user.hasSubscription = user.stripe_subscription !== null;
 				delete user.stripe_subscription;

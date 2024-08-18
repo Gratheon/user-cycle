@@ -1,7 +1,7 @@
 const config = {
 	sentryDsn: "",
 	schemaRegistryHost: `http://gql-schema-registry:3000`,
-	selfUrl: "",
+	selfUrl: "user-cycle:4000",
 	mysql: {
 		host: 'mysql',
 		port: '3306',
@@ -19,7 +19,8 @@ const config = {
 		webhook_secret: '',
 	},
 
-	JWT_KEY: '',
+	// this must match graphql-router
+	JWT_KEY: 'okzfERFAXXbRTQWkGFfjo3EcAXjRijnGnaAMEsTXnmdjAVDkQrfyLzscPwUiymbj',
 	SENDGRID_API_KEY: '',
 	clarifai: {
 		translation_PAT: ''
