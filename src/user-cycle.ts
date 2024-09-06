@@ -1,4 +1,3 @@
-import "./tracer"; // must come before importing any instrumented module.
 import {ApolloServer} from "apollo-server-fastify";
 import {ApolloServerPluginDrainHttpServer, ApolloServerPluginLandingPageGraphQLPlayground} from "apollo-server-core";
 import fastify from "fastify";
@@ -63,7 +62,7 @@ async function startApolloServer(app, typeDefs, resolvers) {
 }
 
 (async function main() {
-    await initStorage();
+    await initStorage(logger);
 
     // @ts-ignore
     const app = fastify({logger});
@@ -113,7 +112,7 @@ async function startApolloServer(app, typeDefs, resolvers) {
         registerGoogle(app);
 
         await app.listen(4000, '0.0.0.0');
-        logger.info(`🚀 user-cycle service is ready at http://localhost:4000${path}`);
+        logger.info(`🧑‍🚀 user-cycle service is ready at http://localhost:4000${path}`);
     } catch (e) {
         console.error(e);
     }

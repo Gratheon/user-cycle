@@ -4,7 +4,7 @@
   "description": "User registration, billing, deletion, management",
   "dependencies": {
     "@apollo/federation": "0.38.1",
-    "@databases/mysql": "5.2.1",
+    "@databases/mysql": "6.0.0",
     "@sendgrid/mail": "7.5.0",
     "@sentry/integrations": "7.69.0",
     "@sentry/node": "7.69.0",
@@ -13,7 +13,6 @@
     "axios": "1.7.2",
     "clarifai-nodejs-grpc": "^9.9.0",
     "cross-fetch": "4.0.0",
-    "dd-trace": "4.16.0",
     "deep-email-validator": "^0.1.21",
     "fastify": "3.29.5",
     "fastify-cookie": "5.5.0",
@@ -22,15 +21,13 @@
     "jwt-encode": "1.0.1",
     "sha1": "1.1.1",
     "stripe": "10.15.0",
-    "uuid": "9.0.1",
-    "winston": "3.13.0"
+    "uuid": "9.0.1"
   },
   "scripts": {
     "build": "tsc -p ./src/config/tsconfig.json",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ENV_ID=dev nodemon app/user-cycle.js",
-    "start": "ENV_ID=prod node app/user-cycle.js",
-    "deploy": "make"
+    "start": "ENV_ID=prod node app/user-cycle.js"
   },
   "repository": {
     "type": "git",

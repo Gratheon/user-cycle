@@ -7,15 +7,9 @@ services:
       ./node_modules/.bin/tsc-watch --project ./src/config/tsconfig.json --onSuccess "node /app/app/user-cycle.js"
     environment:
       - ENV_ID=dev
-      - DD_ENV=dev
-      - DD_PROFILING_ENABLED=true
     tty: true
     ports:
       - 4000:4000
     volumes:
       - .:/app/
     restart: always
-#    networks:
-#      - gratheon
-#networks:
-#  gratheon:
