@@ -59,6 +59,17 @@ export const logger = {
         log('error', String(message), meta)
         storeInDB('error', message, meta)
     },
+    errorEnriched: (message: string, error: Error|any, meta?: any) => {
+        if (error.message && error.stack) {
+            storeInDB('error', message, meta)
+            return log('error', `${message}: ${error.message}`, {
+                stack: error.stack,
+                ...meta
+            });
+        }
+        log('error', String(message), meta)
+        storeInDB('error', message, meta)
+    },
     warn: (message: string, meta?: any) => {
         log('warn', message, meta)
         storeInDB('warn', message, meta)
