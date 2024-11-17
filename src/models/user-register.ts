@@ -32,7 +32,7 @@ export default async function registerUser (_, { first_name, last_name, email, p
 			validateMx: true,
 			validateTypo: true,
 			validateDisposable: false, // its ok if its disposable
-			validateSMTP: true,
+			validateSMTP: false,
 		  })
 
 		if (!emailValidationResult?.valid) {
