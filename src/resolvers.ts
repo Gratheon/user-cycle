@@ -9,7 +9,7 @@ import { shareTokenModel, tokenModel } from './models/tokens';
 import { localeModel } from './models/locales';
 import error_code, { err } from './error_code';
 import { logger } from './logger';
-import registerUser from './models/user-register';
+import registerUser from './user-register';
 import { sleepForSecurity } from './models/sleep';
 
 const stripe = new Stripe(config.stripe.secret, {

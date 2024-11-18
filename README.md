@@ -50,6 +50,7 @@ flowchart LR
     user-cycle--"get/set translations"--> mysql
 
     user-cycle--"send emails"--> sendgrid
+    user-cycle--"create grafana org and user"--> grafana
 ```
 
 ## Testing

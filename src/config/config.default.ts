@@ -2,6 +2,9 @@ const config = {
 	sentryDsn: "",
 	schemaRegistryHost: `http://gql-schema-registry:3000`,
 	selfUrl: "user-cycle:4000",
+	grafanaUrl: "grafana:9000",
+	grafanaUser: "admin",
+	grafanaPassword: "admin",
 	mysql: {
 		host: 'mysql',
 		port: '3306',

@@ -1,19 +1,25 @@
 import validate from 'deep-email-validator'
 import sign from 'jwt-encode';
 
-import { sendWelcomeMail, sendAdminUserRegisteredMail } from '../send-mail';
-import { TRIAL_DAYS, userModel } from './user';
-import { sleepForSecurity } from './sleep';
-import { logger } from '../logger';
-import error_code, { err } from '../error_code';
-import { tokenModel } from './tokens';
-import config from '../config';
+import { sendWelcomeMail, sendAdminUserRegisteredMail } from './send-mail';
+import { TRIAL_DAYS, userModel } from './models/user';
+import { sleepForSecurity } from './models/sleep';
+import { logger } from './logger';
+import error_code, { err } from './error_code';
+import { tokenModel } from './models/tokens';
+import config from './config';
+import { createGrafanaUser } from './models/grafana';
 
 export default async function registerUser (_, { first_name, last_name, email, password }) {
 	// try to login first
 	let id = await userModel.findByEmailAndPass(email, password)
 
 	if (!id) {
+		if (password.length < 6) {
+			logger.warn(`Registration - SIMPLE_PASSWORD`, { email })
+			return err(error_code.SIMPLE_PASSWORD);
+		}
+
 		const exID = await userModel.findByEmail(email)
 
 		// wait for security
@@ -60,6 +66,12 @@ export default async function registerUser (_, { first_name, last_name, email, p
 		if (process.env.ENV_ID == 'prod') {
 			await sendWelcomeMail({ email });
 			await sendAdminUserRegisteredMail({ email });
+		}
+
+		try {
+			await createGrafanaUser(email, password, `${first_name} ${last_name}`);
+		} catch (e) {
+			logger.errorEnriched(`Failed to create grafana user`, e, { email });
 		}
 	}
 
