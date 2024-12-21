@@ -39,7 +39,7 @@ function storeInDB(level: string, message: string, meta?: any){
     if(!meta) meta = ""
     conn.query(sql`
         INSERT INTO logs (level, message, meta, timestamp)
-        VALUES (${level}, ${message}, ${JSON.stringify(meta)}, NOW())
+        VALUES (${level}, ${message}, ${JSON.stringify(meta).slice(0,2000)}, NOW())
     `);
 }
 

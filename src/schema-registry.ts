@@ -16,7 +16,7 @@ type SchemaRegistryInput ={
 	type_defs: string
 }
 async function postData(url = '', data: SchemaRegistryInput) {
-	logger.info(`Pushing schema as version ${data?.version}`)
+	logger.info(`Pushing schema as version ${data?.version}`, data)
 	// Default options are marked with *
 	const response = await fetch(url, {
 		method: 'POST',
@@ -32,12 +32,12 @@ async function postData(url = '', data: SchemaRegistryInput) {
 		body: JSON.stringify(data) // body data type must match "Content-Type" header
 	});
 
-	logger.info("schema-registry response:", { response })
 
 	if (!response.ok) {
 		console.error(`schema-registry respose code ${response.status}: ${response.statusText}`);
-		return false;
+		return await response.text();
 	}
+
 	return await response.json(); // parses JSON response into native JavaScript objects
 }
 
