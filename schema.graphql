@@ -55,7 +55,7 @@ type Mutation {
 	register(first_name: String, last_name: String, email:String!, password: String!): LoginResult
 	login(email: String!, password: String!): LoginResult
 	generateApiToken: APIToken
-	generateShareToken(name: String!, scopes: JSON!, sourceUrl: URL!, apiaryId: ID!, hiveId: ID!, inspectionId: ID!): ShareToken
+	generateShareToken(name: String!, scopes: JSON!, sourceUrl: URL!, scopeParams: JSON!): ShareToken
 	validateApiToken(token: String): ValidateTokenResult
 	updateUser(user: UserUpdateInput!): UpdateUserResult
 	createCheckoutSession: URL

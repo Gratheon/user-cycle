@@ -91,10 +91,23 @@ export const shareTokenModel = {
 		);
 	},
 
-	// Updated to accept IDs and construct correct URL
-	create: async function (user_id, name, sourceUrl, scopes, apiaryId, hiveId, inspectionId) {
+	// Updated to accept scopeParams and construct correct URL
+	create: async function (user_id, name, sourceUrl, scopes, scopeParams) {
 		const token: string = uuidv4();
-		// Construct the correct relative path using the provided IDs
+
+		// Extract IDs from scopeParams (add validation if needed)
+		const apiaryId = scopeParams?.apiaryId;
+		const hiveId = scopeParams?.hiveId;
+		const inspectionId = scopeParams?.inspectionId;
+
+		// Handle cases where IDs might be missing in scopeParams
+		if (!apiaryId || !hiveId || !inspectionId) {
+			console.error("Missing required IDs in scopeParams for share token creation:", scopeParams);
+			// Consider throwing an error or returning a specific error object
+			throw new Error("Missing required IDs in scopeParams");
+		}
+
+		// Construct the correct relative path using the extracted IDs
 		const relativePath = `/apiaries/${apiaryId}/hives/${hiveId}/inspections/${inspectionId}/share/${token}`;
 		// Prepend the web-app base URL (assuming config.stripe.selfUrl is correct, adjust if needed)
 		// Ensure no double slashes if selfUrl already has a trailing slash

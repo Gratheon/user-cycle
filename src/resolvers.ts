@@ -98,11 +98,10 @@ export const resolvers = {
 
 			return await tokenModel.create(ctx.uid)
 		},
-		generateShareToken: async (_, {name, sourceUrl, scopes, apiaryId, hiveId, inspectionId}, ctx) => {
+		generateShareToken: async (_, {name, sourceUrl, scopes, scopeParams}, ctx) => {
 			if (!ctx.uid) return err(error_code.AUTHENTICATION_REQUIRED);
-			
-			// Pass the new IDs to the model function
-			return await shareTokenModel.create(ctx.uid, name, sourceUrl, scopes, apiaryId, hiveId, inspectionId)
+
+			return await shareTokenModel.create(ctx.uid, name, sourceUrl, scopes, scopeParams)
 		},
 		revokeApiToken: async (_, { token }, ctx) => {
 			if (!ctx.uid) return err(error_code.AUTHENTICATION_REQUIRED);
