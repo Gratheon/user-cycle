@@ -70,6 +70,26 @@ export const resolvers = {
 				...result,
 				__typename: 'Locale'
 			}
+		},
+		validateShareToken: async (_, { token }) => {
+			const details = await shareTokenModel.getTokenDetailsByToken(token);
+
+			if (!details) {
+				logger.warn("Invalid or expired share token provided", { token });
+				// Add a small delay to mitigate timing attacks
+				await sleepForSecurity();
+				return { __typename: 'Error', code: error_code.INVALID_TOKEN };
+			}
+
+			logger.info("Validated share token", { tokenId: details.id, name: details.name });
+			// Explicitly add __typename for the union type resolution
+			return {
+				__typename: 'ShareTokenDetails', // Ensure this is included
+				id: details.id,
+				name: details.name,
+				scopes: details.scopes, // Return parsed scopes
+				userId: details.userId, // Add userId
+			};
 		}
 	},
 	Mutation: {
@@ -78,10 +98,11 @@ export const resolvers = {
 
 			return await tokenModel.create(ctx.uid)
 		},
-		generateShareToken: async (_, {name, sourceUrl, scopes}, ctx) => {
+		generateShareToken: async (_, {name, sourceUrl, scopes, apiaryId, hiveId, inspectionId}, ctx) => {
 			if (!ctx.uid) return err(error_code.AUTHENTICATION_REQUIRED);
 			
-			return await shareTokenModel.create(ctx.uid, name, sourceUrl, scopes)
+			// Pass the new IDs to the model function
+			return await shareTokenModel.create(ctx.uid, name, sourceUrl, scopes, apiaryId, hiveId, inspectionId)
 		},
 		revokeApiToken: async (_, { token }, ctx) => {
 			if (!ctx.uid) return err(error_code.AUTHENTICATION_REQUIRED);

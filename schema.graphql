@@ -8,6 +8,7 @@ type Query {
 	apiTokens: [APIToken]
 	shareTokens: [ShareToken]
 	translate(en: String, key: String, tc: String): Locale
+	validateShareToken(token: String!): ValidateShareTokenResult
 }
 
 type APIToken {
@@ -21,6 +22,13 @@ type ShareToken {
 	name: String
 	scopes: JSON
 	targetUrl: URL
+}
+
+type ShareTokenDetails {
+	id: ID!
+	name: String
+	scopes: JSON
+	userId: ID! # Add the user ID field
 }
 
 type Invoice {
@@ -47,7 +55,7 @@ type Mutation {
 	register(first_name: String, last_name: String, email:String!, password: String!): LoginResult
 	login(email: String!, password: String!): LoginResult
 	generateApiToken: APIToken
-	generateShareToken(name: String!, scopes: JSON!, sourceUrl: URL!): ShareToken
+	generateShareToken(name: String!, scopes: JSON!, sourceUrl: URL!, apiaryId: ID!, hiveId: ID!, inspectionId: ID!): ShareToken
 	validateApiToken(token: String): ValidateTokenResult
 	updateUser(user: UserUpdateInput!): UpdateUserResult
 	createCheckoutSession: URL
@@ -73,6 +81,7 @@ type Error{
 
 union UserOrError = User | Error
 union ValidateTokenResult = TokenUser | Error
+union ValidateShareTokenResult = ShareTokenDetails | Error
 union LoginResult = UserSession | Error
 union UpdateUserResult = User | Error
 union CancelSubscriptionResult = User | Error
