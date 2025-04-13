@@ -108,10 +108,10 @@ export const shareTokenModel = {
 		}
 
 		// Construct the correct relative path using the extracted IDs
-		const relativePath = `/apiaries/${apiaryId}/hives/${hiveId}/inspections/${inspectionId}/share/${token}`;
+		const relativePath = `apiaries/${apiaryId}/hives/${hiveId}/inspections/${inspectionId}/share/${token}`;
 		// Prepend the web-app base URL (assuming config.stripe.selfUrl is correct, adjust if needed)
 		// Ensure no double slashes if selfUrl already has a trailing slash
-		const webAppBaseUrl = config.stripe.selfUrl.replace(/\/$/, '');
+		const webAppBaseUrl = config.appShareTokenUrlPrefix;
 		const targetUrl = webAppBaseUrl + relativePath;
 		console.log("Constructed share targetUrl:", targetUrl); // Add log
 
