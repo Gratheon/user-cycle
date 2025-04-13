@@ -37,7 +37,7 @@ const config = {
 
 	login_ui_url: 'http://localhost:8080/account/authenticate/',
 	app_ui_url: 'http://localhost:8080/apiaries',
-	appShareTokenUrlPrefix: 'https://localhost:8080/',
+	appShareTokenUrlPrefix: 'http://localhost:8080/',
 };
 
 export default config;
