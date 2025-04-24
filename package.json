@@ -8,7 +8,7 @@
     "@sendgrid/mail": "7.5.0",
     "@sentry/integrations": "7.69.0",
     "@sentry/node": "7.69.0",
-    "apollo-server-core": "3.4.0",
+    "apollo-server-core": "3.13.0",
     "apollo-server-fastify": "3.4.0",
     "axios": "1.7.2",
     "clarifai-nodejs-grpc": "^9.9.0",
