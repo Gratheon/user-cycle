@@ -14,6 +14,8 @@ import {registerStripe} from "./stripe";
 import {registerSchema} from "./schema-registry";
 import {logger} from './logger'
 import {registerGoogle} from "./google-auth";
+import {rootHandler} from './handlers/rootHandler';
+
 
 Sentry.init({
     dsn: config.sentryDsn,
@@ -87,6 +89,8 @@ async function startApolloServer(app, typeDefs, resolvers) {
 
         reply.status(500).send({error: "Something went wrong"});
     });
+
+    app.get('/', rootHandler);
 
     app.get('/health', (request, reply) => {
         reply.send({hello: 'world'})
