@@ -11,7 +11,7 @@
     "apollo-server-core": "3.4.0",
     "apollo-server-fastify": "3.4.0",
     "axios": "1.7.2",
-    "clarifai-nodejs-grpc": "^9.9.0",
+    "clarifai-nodejs-grpc": "^11.3.3",
     "cross-fetch": "4.0.0",
     "deep-email-validator": "^0.1.21",
     "fastify": "3.29.5",
