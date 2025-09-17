@@ -63,10 +63,18 @@ export default async function registerUser (_, { first_name, last_name, email, p
 		// add api token
 		await tokenModel.create(id)
 
-		if (process.env.ENV_ID == 'prod') {
-			await sendWelcomeMail({ email });
-			await sendAdminUserRegisteredMail({ email });
-		}
+        if (process.env.ENV_ID == 'prod') {
+            try {
+                await sendWelcomeMail({ email });
+            } catch (e) {
+                logger.errorEnriched(`Failed to send welcome mail`, e, { email });
+            }
+            try {
+                await sendAdminUserRegisteredMail({ email });
+            } catch (e) {
+                logger.errorEnriched(`Failed to send admin user registered mail`, e, { email });
+            }
+        }
 
 		try {
 			await createGrafanaUser(email, password, `${first_name} ${last_name}`);
