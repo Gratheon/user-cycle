@@ -24,7 +24,14 @@ const config = {
 
 	// this must match graphql-router
 	JWT_KEY: 'okzfERFAXXbRTQWkGFfjo3EcAXjRijnGnaAMEsTXnmdjAVDkQrfyLzscPwUiymbj',
-	SENDGRID_API_KEY: '',
+	
+	// AWS SES configuration
+	aws: {
+		region: 'us-east-1', // Default region, can be overridden by environment
+		accessKeyId: '',
+		secretAccessKey: '',
+		sesFromEmail: 'pilot@gratheon.com'
+	},
 	clarifai: {
 		translation_PAT: ''
 	},
