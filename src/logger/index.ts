@@ -35,49 +35,78 @@ function log(level: string, message: string, meta?: any) {
     console.log(`${hhMMTime} [${level}]: ${message} ${meta}`);
 }
 
-function storeInDB(level: string, message: string, meta?: any){
-    if(!meta) meta = ""
-    conn.query(sql`
-        INSERT INTO logs (level, message, meta, timestamp)
-        VALUES (${level}, ${message}, ${jsonStringify(meta).slice(0,2000)}, NOW())
-    `);
+function safeToStringMessage(message: any): string {
+    if (typeof message === 'string') return message;
+    if (message && typeof message === 'object') {
+        if (message.message && typeof message.message === 'string') return message.message;
+        try {
+            return jsonStringify(message).slice(0, 2000);
+        } catch {
+            return String(message);
+        }
+    }
+    return String(message);
+}
+
+function safeMeta(meta: any): any {
+    if (!meta) return {};
+    return meta;
+}
+
+function storeInDB(level: string, message: any, meta?: any){
+    try {
+        const msg = safeToStringMessage(message);
+        const metaObj = safeMeta(meta);
+        const metaStr = jsonStringify(metaObj).slice(0, 2000);
+        // Fire and forget; avoid awaiting in hot path. Catch errors to avoid unhandled rejection.
+        conn.query(sql`INSERT INTO \`logs\` (level, message, meta, timestamp) VALUES (${level}, ${msg}, ${metaStr}, NOW())`).catch(e => {
+            // fallback console output only
+            console.error('Failed to persist log to DB', e);
+        });
+    } catch (e) {
+        console.error('Unexpected failure preparing log for DB', e);
+    }
 }
 
 export const logger = {
     info: (message: string, meta?: any) => {
-        log('info', message, meta)
-        storeInDB('info', message, meta)
+        const metaObj = safeMeta(meta);
+        log('info', safeToStringMessage(message), metaObj);
+        storeInDB('info', message, metaObj);
     },
     error: (message: string | Error | any, meta?: any) => {
-        if (message.message && message.stack) {
-            storeInDB('error', message, meta)
-            return log('error', message.message, {
-                stack: message.stack,
-                ...meta
-            });
+        const metaObj = safeMeta(meta);
+        if (message instanceof Error) {
+            const enrichedMeta = {stack: message.stack, name: message.name, ...metaObj};
+            log('error', message.message, enrichedMeta);
+            storeInDB('error', message.message, enrichedMeta);
+            return;
         }
-        log('error', String(message), meta)
-        storeInDB('error', message, meta)
+        const msgStr = safeToStringMessage(message);
+        log('error', msgStr, metaObj);
+        storeInDB('error', msgStr, metaObj);
     },
     errorEnriched: (message: string, error: Error|any, meta?: any) => {
-        if (error.message && error.stack) {
-            storeInDB('error', message, meta)
-            return log('error', `${message}: ${error.message}`, {
-                stack: error.stack,
-                ...meta
-            });
+        const metaObj = safeMeta(meta);
+        if (error instanceof Error) {
+            const enrichedMeta = {stack: error.stack, name: error.name, ...metaObj};
+            log('error', `${message}: ${error.message}`, enrichedMeta);
+            storeInDB('error', `${message}: ${error.message}`, enrichedMeta);
+            return;
         }
-        log('error', String(message), meta)
-        storeInDB('error', message, meta)
+        const errStr = safeToStringMessage(error);
+        log('error', `${message}: ${errStr}`, metaObj);
+        storeInDB('error', `${message}: ${errStr}`, metaObj);
     },
     warn: (message: string, meta?: any) => {
-        log('warn', message, meta)
-        storeInDB('warn', message, meta)
+        const metaObj = safeMeta(meta);
+        log('warn', safeToStringMessage(message), metaObj);
+        storeInDB('warn', message, metaObj);
     },
 
     // do not store debug logs in DB
     debug: (message: string, meta?: any) => {
-        log('debug', message, meta)
+        log('debug', safeToStringMessage(message), safeMeta(meta));
     },
 };
 
