@@ -13,6 +13,13 @@ const config = {
 		database: 'user-cycle',
 	},
 
+	aws: {
+		region: 'eu-west-1',
+		accessKeyId: '',
+		secretAccessKey: '',
+		sesFromEmail: 'pilot@gratheon.com'
+	},
+
 	stripe: {
 		price: '',
 		selfUrl: '',

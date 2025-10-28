@@ -2,9 +2,19 @@
 import * as fs from 'fs';
 //@ts-ignore
 import * as path from 'path';
+import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
 
-import sgMail from '@sendgrid/mail';
 import config from './config/index';
+import { logger } from './logger';
+
+// Initialize SES client
+const sesClient = new SESClient({
+    region: config.aws.region,
+    credentials: {
+        accessKeyId: config.aws.accessKeyId,
+        secretAccessKey: config.aws.secretAccessKey,
+    },
+});
 
 //@ts-ignore
 const welcomeEmailHtml = fs.readFileSync(path.join(__dirname, '..', 'emails', 'welcome.html'), 'utf8')
@@ -12,30 +22,74 @@ const welcomeEmailHtml = fs.readFileSync(path.join(__dirname, '..', 'emails', 'w
 //@ts-ignore
 const welcomeEmailTxt = fs.readFileSync(path.join(__dirname, '..', 'emails', 'welcome.txt'), 'utf8')
 
-export async function sendWelcomeMail({ email }) {
-	sgMail.setApiKey(config.SENDGRID_API_KEY)
+async function sendEmailWithSES({ 
+    to, 
+    subject, 
+    textBody, 
+    htmlBody 
+}: {
+    to: string;
+    subject: string;
+    textBody: string;
+    htmlBody?: string;
+}) {
+    const params = {
+        Destination: {
+            ToAddresses: [to],
+        },
+        Message: {
+            Body: {
+                Text: {
+                    Charset: 'UTF-8',
+                    Data: textBody,
+                },
+                ...(htmlBody && {
+                    Html: {
+                        Charset: 'UTF-8',
+                        Data: htmlBody,
+                    },
+                }),
+            },
+            Subject: {
+                Charset: 'UTF-8',
+                Data: subject,
+            },
+        },
+        Source: config.aws.sesFromEmail,
+    };
 
-	const msg = {
-		to: email,
-		from: 'pilot@gratheon.com',
-		subject: 'Welcome to Gratheon!',
-
-		text: welcomeEmailTxt,
-		html: welcomeEmailHtml,
-	}
-
-	return sgMail.send(msg)
+    try {
+        const command = new SendEmailCommand(params);
+        const response = await sesClient.send(command);
+        logger.info('Email sent successfully via SES', { 
+            messageId: response.MessageId, 
+            to, 
+            subject 
+        });
+        return response;
+    } catch (error) {
+        logger.error('Failed to send email via SES', { error, to, subject });
+        throw error;
+    }
 }
 
-export async function sendAdminUserRegisteredMail({ email }) {
-	sgMail.setApiKey(config.SENDGRID_API_KEY)
+export async function sendWelcomeMail({ email }: { email: string }) {
+    return await sendEmailWithSES({
+        to: email,
+        subject: 'Welcome to Gratheon!',
+        textBody: welcomeEmailTxt,
+        htmlBody: welcomeEmailHtml,
+    });
+}
 
-	const msg = {
-		to: 'artkurapov@gmail.com',
-		from: 'pilot@gratheon.com',
-		subject: 'gratheon - new user',
-		text: `New user registered ${email}`,
-	}
+export async function sendAdminUserRegisteredMail({ email }: { email: string }) {
+    const adminEmail = 'pilot@gratheon.com';
+    const subject = 'gratheon - new user';
+    const textBody = `New user registered ${email}`;
 
-	return sgMail.send(msg)
+    return await sendEmailWithSES({
+        to: adminEmail,
+        subject,
+        textBody,
+    });
 }
