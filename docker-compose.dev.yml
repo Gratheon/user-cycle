@@ -2,14 +2,16 @@ version: '3.9'
 services:
   user-cycle:
     build:
-      dockerfile: Dockerfile
-    command:
-      ./node_modules/.bin/tsc-watch --project ./src/config/tsconfig.json --onSuccess "node /app/app/user-cycle.js"
+      dockerfile: Dockerfile.dev
+    command: ./node_modules/.bin/tsc-watch --project ./src/config/tsconfig.json --onSuccess "node /app/app/user-cycle.js"
     environment:
       - ENV_ID=dev
     tty: true
     ports:
       - 4000:4000
     volumes:
-      - .:/app/
+      # Mount source code
+      - .:/app
+      # Preserve container's node_modules separate from host (avoid overwriting)
+      - /app/node_modules
     restart: always
