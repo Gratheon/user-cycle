@@ -27,7 +27,8 @@
     "build": "tsc -p ./src/config/tsconfig.json",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ENV_ID=dev nodemon app/user-cycle.js",
-    "start": "ENV_ID=prod node app/user-cycle.js"
+    "start": "ENV_ID=prod node app/user-cycle.js",
+    "dev:ts": "ENV_ID=dev ts-node-dev --respawn --transpile-only --prefer-ts --exit-child src/user-cycle.ts"
   },
   "repository": {
     "type": "git",
@@ -46,6 +47,9 @@
     "nodemon": "^2.0.20",
     "ts-jest": "^29.2.5",
     "tsc-watch": "^6.0.4",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "source-map-support": "^0.5.21",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0"
   }
 }

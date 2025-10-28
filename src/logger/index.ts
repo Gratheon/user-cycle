@@ -2,6 +2,8 @@ import config from "../config/index";
 
 import createConnectionPool, {sql} from "@databases/mysql";
 import jsonStringify from 'fast-safe-stringify'
+import fs from 'fs';
+import path from 'path';
 
 
 const conn = createConnectionPool(
@@ -68,6 +70,114 @@ function storeInDB(level: string, message: any, meta?: any){
     }
 }
 
+function formatStack(stack?: string): string {
+    if (!stack) return '';
+    // Remove first line if it duplicates the error message already printed.
+    const lines = stack.split('\n');
+    if (lines.length > 1 && lines[0].startsWith('Error')) {
+        lines.shift();
+    }
+    // Grey color for stack lines
+    return lines.map(l => `\x1b[90m${l}\x1b[0m`).join('\n');
+}
+
+function printStackIfAny(possibleError: any) {
+    if (possibleError && typeof possibleError === 'object' && typeof possibleError.stack === 'string') {
+        console.log(formatStack(possibleError.stack));
+    }
+}
+
+function extractFirstProjectFrame(stack?: string): {file?: string, line?: number, column?: number} {
+    if (!stack) return {};
+    const lines = stack.split('\n');
+    for (const l of lines) {
+        // Match: at FunctionName (/app/src/some/file.ts:123:45)
+        const m = l.match(/\(([^()]+\.ts):(\d+):(\d+)\)/);
+        if (m) {
+            return {file: m[1], line: parseInt(m[2], 10), column: parseInt(m[3], 10)};
+        }
+        // Alternate format: at /app/src/file.ts:123:45
+        const m2 = l.match(/\s(at\s)?([^()]+\.ts):(\d+):(\d+)/);
+        if (m2) {
+            return {file: m2[2], line: parseInt(m2[3], 10), column: parseInt(m2[4], 10)};
+        }
+    }
+    return {};
+}
+
+function buildCodeFrame(frame: {file?: string, line?: number, column?: number}): string {
+    if (!frame.file || frame.line == null) return '';
+    try {
+        const filePath = frame.file.startsWith('/') ? frame.file : path.join(process.cwd(), frame.file);
+        if (!fs.existsSync(filePath)) return '';
+        const content = fs.readFileSync(filePath, 'utf8').split(/\r?\n/);
+        const start = Math.max(0, frame.line - 3);
+        const end = Math.min(content.length, frame.line + 2);
+        const lines: string[] = [];
+        for (let i = start; i < end; i++) {
+            const prefix = (i + 1 === frame.line) ? '\x1b[31m>\x1b[0m' : ' '; // highlight culprit line
+            const num = String(i + 1).padStart(4,' ');
+            let codeLine = content[i];
+            if (i + 1 === frame.line && frame.column) {
+                // Add caret marker under column
+                const caretPad = ' '.repeat(frame.column - 1);
+                codeLine += `\n     ${caretPad}\x1b[31m^\x1b[0m`;
+            }
+            lines.push(`${prefix} ${num} | ${codeLine}`);
+        }
+        return lines.join('\n');
+    } catch {return '';}
+}
+
+function hasProjectTsFrame(stack?: string): boolean {
+    if (!stack) return false;
+    return stack.split('\n').some(l => l.includes('/src/') && l.includes('.ts'));
+}
+
+function printStackEnhanced(possibleError: any) {
+    if (!possibleError) return;
+    const stack = possibleError.stack;
+    if (typeof stack !== 'string') return;
+    let outputStack = stack;
+    if (process.env.ENV_ID === 'dev' && !hasProjectTsFrame(stack)) {
+        // Capture a callsite stack to show where logger.error was invoked
+        const callsite = new Error('__callsite__');
+        if (callsite.stack) {
+            const filtered = callsite.stack
+                .split('\n')
+                .filter(l => l.includes('/src/') && l.includes('.ts'))
+                .slice(0, 5) // keep it short
+                .join('\n');
+            if (filtered) {
+                outputStack += '\n\nCaptured callsite (added by logger):\n' + filtered;
+            }
+        }
+    }
+    console.log(formatStack(outputStack));
+    if (process.env.ENV_ID === 'dev') {
+        const frame = extractFirstProjectFrame(outputStack);
+        const codeFrame = buildCodeFrame(frame);
+        if (codeFrame) {
+            console.log('\n\x1b[36mCode frame:\x1b[0m\n' + codeFrame + '\n');
+        }
+    }
+}
+
+function buildCauseChain(err: any): string[] {
+    const chain: string[] = [];
+    const visited = new Set<any>();
+    let current = err;
+    while (current && typeof current === 'object' && !visited.has(current)) {
+        visited.add(current);
+        if (current !== err) {
+            const title = current.name ? `${current.name}: ${current.message}` : safeToStringMessage(current);
+            chain.push(title);
+        }
+        current = current.cause;
+    }
+    return chain;
+}
+
 export const logger = {
     info: (message: string, meta?: any) => {
         const metaObj = safeMeta(meta);
@@ -77,25 +187,41 @@ export const logger = {
     error: (message: string | Error | any, meta?: any) => {
         const metaObj = safeMeta(meta);
         if (message instanceof Error) {
-            const enrichedMeta = {stack: message.stack, name: message.name, ...metaObj};
+            const causeChain = buildCauseChain(message);
+            const enrichedMeta = {stack: message.stack, name: message.name, causeChain, ...metaObj};
             log('error', message.message, enrichedMeta);
+            if (message.stack) {
+                printStackEnhanced(message);
+            }
+            if (causeChain.length) {
+                console.log('\x1b[35mCause chain:\x1b[0m ' + causeChain.join(' -> '));
+            }
             storeInDB('error', message.message, enrichedMeta);
             return;
         }
         const msgStr = safeToStringMessage(message);
         log('error', msgStr, metaObj);
+        printStackEnhanced(message);
         storeInDB('error', msgStr, metaObj);
     },
     errorEnriched: (message: string, error: Error|any, meta?: any) => {
         const metaObj = safeMeta(meta);
         if (error instanceof Error) {
-            const enrichedMeta = {stack: error.stack, name: error.name, ...metaObj};
+            const causeChain = buildCauseChain(error);
+            const enrichedMeta = {stack: error.stack, name: error.name, causeChain, ...metaObj};
             log('error', `${message}: ${error.message}`, enrichedMeta);
+            if (error.stack) {
+                printStackEnhanced(error);
+            }
+            if (causeChain.length) {
+                console.log('\x1b[35mCause chain:\x1b[0m ' + causeChain.join(' -> '));
+            }
             storeInDB('error', `${message}: ${error.message}`, enrichedMeta);
             return;
         }
         const errStr = safeToStringMessage(error);
         log('error', `${message}: ${errStr}`, metaObj);
+        printStackEnhanced(error);
         storeInDB('error', `${message}: ${errStr}`, metaObj);
     },
     warn: (message: string, meta?: any) => {
@@ -112,5 +238,9 @@ export const logger = {
 
 
 process.on('uncaughtException', function (err) {
-    console.log("UncaughtException processing: %s", err);
+    logger.error('UncaughtException', err);
+});
+
+process.on('unhandledRejection', function (reason: any) {
+    logger.error('UnhandledRejection', reason);
 });

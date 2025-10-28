@@ -1,7 +1,10 @@
-# Development Dockerfile (no build step, uses tsc-watch via docker-compose)
+# Development Dockerfile (no build step, uses ts-node-dev via docker-compose)
 FROM node:20-alpine
 
 WORKDIR /app
+
+# Ensure dev dependencies are installed
+ENV NODE_ENV=development
 
 # Optional: install build tools if native modules are needed later
 # RUN apk add --no-cache python3 make g++
@@ -9,13 +12,12 @@ WORKDIR /app
 # Copy manifests for better caching
 COPY package.json package-lock.json* ./
 
-RUN npm install
+# Install including dev dependencies explicitly (robust against NODE_ENV mismatches)
+RUN npm install --include=dev
 
-# Copy tsconfig so tsc-watch can read it even before volume mount
+# Copy tsconfig so tooling can read it even before volume mount
 COPY src/config ./src/config
-
-ENV NODE_ENV=development
 
 EXPOSE 4000
 
-# No CMD; docker-compose will supply tsc-watch command
+# No CMD; docker-compose will supply ts-node-dev command
