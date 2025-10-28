@@ -16,6 +16,19 @@ import {logger} from './logger'
 import {registerGoogle} from "./google-auth";
 import {rootHandler} from './handlers/rootHandler';
 
+if (process.env.ENV_ID === 'dev') {
+    try {
+        // Dynamically install source-map-support so error stacks map to .ts lines in dev
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        require('source-map-support').install({
+            handleUncaughtExceptions: false,
+            environment: 'node',
+            hookRequire: true,
+        });
+    } catch (e) {
+        console.error('Failed to enable source-map-support', e);
+    }
+}
 
 Sentry.init({
     dsn: config.sentryDsn,
@@ -84,7 +97,7 @@ async function startApolloServer(app, typeDefs, resolvers) {
                 return Sentry.addRequestDataToEvent(event, request);
             });
             //@ts-ignore
-            Sentry.captureException(err);
+            Sentry.captureException(error);
         });
 
         reply.status(500).send({error: "Something went wrong"});
@@ -103,6 +116,18 @@ async function startApolloServer(app, typeDefs, resolvers) {
             reply.redirect(301, 'https://app.gratheon.com/account/cancel');
         }
     })
+
+    if (process.env.ENV_ID === 'dev') {
+        app.get('/dev-error', async (request, reply) => {
+            try {
+                // Simulate an application-level error to inspect TS stack frames
+                throw new Error('Dev test error from user-cycle.ts');
+            } catch (err) {
+                logger.error('Triggered /dev-error', err);
+                reply.status(500).send({ok: false});
+            }
+        });
+    }
 
     try {
         await registerSchema(schema);
