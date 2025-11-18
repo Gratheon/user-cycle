@@ -49,7 +49,16 @@ export function registerGoogle(app) {
 			// do login
 			if (id) {
 				logger.info('Google auth - user already exists, logging in');
-				userModel.updateLastLogin(id)
+				const isFirstLogin = await userModel.isFirstLogin(id)
+				await userModel.updateLastLogin(id)
+
+				if (isFirstLogin) {
+					try {
+						await sendWelcomeMail({ email: profile.email });
+					} catch (e) {
+						logger.errorEnriched(`Failed to send welcome mail on first login via Google auth`, e, { email: profile.email });
+					}
+				}
 			}
 
 			// do registration
@@ -74,12 +83,6 @@ export function registerGoogle(app) {
 				// add api token
 				logger.info(`Created user, adding API token`, { id, email })
 				await tokenModel.create(id)
-
-				if (process.env.ENV_ID == 'prod') {
-					logger.info(`Sending email`, { id, email })
-					await sendWelcomeMail({ email });
-					await sendAdminUserRegisteredMail({ email });
-				}
 			}
 
 			// log in

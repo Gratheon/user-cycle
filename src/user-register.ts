@@ -1,7 +1,6 @@
 import validate from 'deep-email-validator'
 import sign from 'jwt-encode';
 
-import {sendAdminUserRegisteredMail, sendWelcomeMail} from './send-mail';
 import {TRIAL_DAYS, userModel} from './models/user';
 import {sleepForSecurity} from './models/sleep';
 import {logger} from './logger';
@@ -9,6 +8,7 @@ import error_code, {err} from './error_code';
 import {tokenModel} from './models/tokens';
 import config from './config';
 import {createGrafanaUser} from './models/grafana';
+import {sendAdminUserRegisteredMail} from "./send-mail";
 
 export default async function registerUser(_, {first_name, last_name, email, password}) {
   // try to login first
@@ -19,6 +19,7 @@ export default async function registerUser(_, {first_name, last_name, email, pas
       logger.warn(`Registration - SIMPLE_PASSWORD`, {email})
       return err(error_code.SIMPLE_PASSWORD);
     }
+
 
     const exID = await userModel.findByEmail(email)
 
@@ -63,12 +64,6 @@ export default async function registerUser(_, {first_name, last_name, email, pas
     // add api token
     await tokenModel.create(id)
 
-    // send welcome mail
-    try {
-      await sendWelcomeMail({email});
-    } catch (e) {
-      logger.errorEnriched(`Failed to send welcome mail`, e, {email});
-    }
     try {
       await sendAdminUserRegisteredMail({email});
     } catch (e) {

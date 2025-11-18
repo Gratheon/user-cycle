@@ -20,14 +20,17 @@ const config = {
 		sesFromEmail: 'pilot@gratheon.com'
 	},
 
+
 	stripe: {
-		price: '',
-		selfUrl: '',
-		appUrl: '',
-		publicKey: '',
-		secret: '',
+		price: 'price_1LvqKUHn51a1XdKKdwNvlN86',
+		selfUrl: 'http://localhost:4000',
+		appUrl: 'http://localhost:8080',
+
+		secret: 'sk_test_51HVkniHn51a1XdKK7P6yhVUkm28eOP4YJO3Wj7KqCjDuayQlM9aaMZgMyiQofwj1XAk2TwBIyQl1GZEqaboaWjuu00E2VtHCZZ',
 		webhook_secret: '',
 	},
+
+
 
 	// this must match graphql-router
 	JWT_KEY: 'okzfERFAXXbRTQWkGFfjo3EcAXjRijnGnaAMEsTXnmdjAVDkQrfyLzscPwUiymbj',

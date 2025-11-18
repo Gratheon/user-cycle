@@ -79,6 +79,14 @@ export const userModel = {
 		await storage().query(sql`UPDATE \`account\` SET date_last_login=NOW() WHERE id=${uid}`);
 	},
 
+	isFirstLogin: async function (uid) {
+		const result = await storage().query(
+			sql`SELECT date_last_login FROM account WHERE id=${uid}`
+		);
+
+		return !result[0] || result[0].date_last_login === null;
+	},
+
 	create: async function (first_name, last_name, email, password, expirationDateString) {
 		return await storage().query(
 			sql`INSERT INTO account (first_name, last_name, email, password, date_expiration)
