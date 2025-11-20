@@ -148,10 +148,24 @@ export const localeModel = {
 				}
 
 				if (Object.keys(updates).length > 0) {
-					const setClauses = Object.entries(updates).map(([lang, value]) => `${lang} = ?`).join(', ');
-					const values = Object.values(updates);
-
-					await storage().query(sql`UPDATE locales SET `.append(setClauses).append(sql` WHERE id=${translation.id}`), values);
+					if (updates['ru']) {
+						await storage().query(sql`UPDATE locales SET ru=${updates['ru']} WHERE id=${translation.id}`);
+					}
+					if (updates['et']) {
+						await storage().query(sql`UPDATE locales SET et=${updates['et']} WHERE id=${translation.id}`);
+					}
+					if (updates['tr']) {
+						await storage().query(sql`UPDATE locales SET tr=${updates['tr']} WHERE id=${translation.id}`);
+					}
+					if (updates['pl']) {
+						await storage().query(sql`UPDATE locales SET pl=${updates['pl']} WHERE id=${translation.id}`);
+					}
+					if (updates['de']) {
+						await storage().query(sql`UPDATE locales SET de=${updates['de']} WHERE id=${translation.id}`);
+					}
+					if (updates['fr']) {
+						await storage().query(sql`UPDATE locales SET fr=${updates['fr']} WHERE id=${translation.id}`);
+					}
 
 					Object.assign(translation, updates);
 				}
