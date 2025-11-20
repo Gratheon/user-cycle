@@ -8,6 +8,7 @@ type Query {
 	apiTokens: [APIToken]
 	shareTokens: [ShareToken]
 	translate(en: String, key: String, tc: String): Locale
+	translateBatch(requests: [TranslateRequest!]!): [Locale]
 	validateShareToken(token: String!): ValidateShareTokenResult
 	registrationNonce: RegistrationNonce
 }
@@ -119,4 +120,9 @@ input UserUpdateInput{
 	first_name: String
 	last_name: String
 	lang: String
+}
+
+input TranslateRequest {
+	en: String!
+	tc: String
 }

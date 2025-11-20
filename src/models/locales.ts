@@ -71,6 +71,104 @@ export const localeModel = {
 
 		return translation;
 	},
+
+	translateBatch: async function (requests: Array<{ en: string, tc: string }>) {
+		if (requests.length === 0) return [];
+
+		const enTexts = requests.map(r => r.en);
+
+		const results = await storage().query(
+			sql`SELECT id, en, ru, et, tr, pl, de, fr FROM locales WHERE en IN (${enTexts})`
+		);
+
+		const translationMap = new Map();
+		for (const result of results) {
+			translationMap.set(result.en, result);
+		}
+
+		if (process.env.ENV_ID == 'dev') {
+			const missingTranslations = [];
+
+			for (const request of requests) {
+				if (!translationMap.has(request.en)) {
+					missingTranslations.push(request);
+				}
+			}
+
+			for (const request of missingTranslations) {
+				await storage().query(sql`INSERT INTO locales (translation_context, en) VALUES(${request.tc || ''}, ${request.en})`);
+				const newResult = await storage().query(sql`SELECT id, en, ru, et, tr, pl, de, fr FROM locales WHERE en=${request.en} LIMIT 1`);
+				if (newResult[0]) {
+					translationMap.set(request.en, newResult[0]);
+				}
+			}
+
+			const translationsToUpdate = [];
+			for (const translation of translationMap.values()) {
+				const request = requests.find(r => r.en === translation.en);
+				const tc = request?.tc || '';
+
+				const needsUpdate = {
+					id: translation.id,
+					en: translation.en,
+					ru: !translation.ru,
+					et: !translation.et,
+					tr: !translation.tr,
+					pl: !translation.pl,
+					de: !translation.de,
+					fr: !translation.fr,
+					tc
+				};
+
+				if (needsUpdate.ru || needsUpdate.et || needsUpdate.tr || needsUpdate.pl || needsUpdate.de || needsUpdate.fr) {
+					translationsToUpdate.push({ translation, needsUpdate });
+				}
+			}
+
+			for (const { translation, needsUpdate } of translationsToUpdate) {
+				const updates: any = {};
+
+				if (needsUpdate.ru) {
+					updates['ru'] = await translate('ru', translation, needsUpdate.tc);
+				}
+				if (needsUpdate.et) {
+					updates['et'] = await translate('et', translation, needsUpdate.tc);
+				}
+				if (needsUpdate.tr) {
+					updates['tr'] = await translate('tr', translation, needsUpdate.tc);
+				}
+				if (needsUpdate.pl) {
+					updates['pl'] = await translate('pl', translation, needsUpdate.tc);
+				}
+				if (needsUpdate.de) {
+					updates['de'] = await translate('de', translation, needsUpdate.tc);
+				}
+				if (needsUpdate.fr) {
+					updates['fr'] = await translate('fr', translation, needsUpdate.tc);
+				}
+
+				if (Object.keys(updates).length > 0) {
+					const setClauses = Object.entries(updates).map(([lang, value]) => `${lang} = ?`).join(', ');
+					const values = Object.values(updates);
+
+					await storage().query(sql`UPDATE locales SET `.append(setClauses).append(sql` WHERE id=${translation.id}`), values);
+
+					Object.assign(translation, updates);
+				}
+			}
+
+			const finalResults = await storage().query(
+				sql`SELECT id, en, ru, et, tr, pl, de, fr FROM locales WHERE en IN (${enTexts})`
+			);
+
+			translationMap.clear();
+			for (const result of finalResults) {
+				translationMap.set(result.en, result);
+			}
+		}
+
+		return requests.map(r => translationMap.get(r.en)).filter(Boolean);
+	}
 }
 
 

@@ -77,6 +77,13 @@ export const resolvers = {
 				__typename: 'Locale'
 			}
 		},
+		translateBatch: async (_, { requests }) => {
+			const results = await localeModel.translateBatch(requests);
+			return results.map(result => ({
+				...result,
+				__typename: 'Locale'
+			}));
+		},
 		validateShareToken: async (_, { token }) => {
 			const details = await shareTokenModel.getTokenDetailsByToken(token);
 
