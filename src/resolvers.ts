@@ -12,6 +12,7 @@ import { logger } from './logger';
 import registerUser from './user-register';
 import { sleepForSecurity } from './models/sleep';
 import { sendAdminUserRegisteredMail, sendWelcomeMail } from './send-mail';
+import { registrationNonceModel } from './models/registration-nonce';
 
 const stripe = new Stripe(config.stripe.secret, {
 	apiVersion: '2022-08-01'
@@ -20,6 +21,9 @@ const stripe = new Stripe(config.stripe.secret, {
 
 export const resolvers = {
 	Query: {
+		registrationNonce: async () => {
+			return registrationNonceModel.generateNonce();
+		},
 		invoices: async (_, __, ctx) => {
 			if (!ctx.uid) {
 				logger.warn("Authentication required for invoices resolver")
@@ -229,18 +233,9 @@ export const resolvers = {
 				return err(error_code.INVALID_USERNAME_PASSWORD)
 			}
 
-			const isFirstLogin = await userModel.isFirstLogin(id)
 			await userModel.updateLastLogin(id)
 
-			if (isFirstLogin) {
-				try {
-					await sendWelcomeMail({ email });
-				} catch (e) {
-					logger.errorEnriched(`Failed to send welcome mail on first login`, e, { email });
-				}
-			}
-
-			logger.info(`User logged in`, { user, isFirstLogin })
+			logger.info(`User logged in`, { user })
 			const sessionKey = sign({
 				'user_id': id
 			}, config.JWT_KEY);

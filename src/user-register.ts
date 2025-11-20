@@ -8,9 +8,21 @@ import error_code, {err} from './error_code';
 import {tokenModel} from './models/tokens';
 import config from './config';
 import {createGrafanaUser} from './models/grafana';
-import {sendAdminUserRegisteredMail} from "./send-mail";
+import {sendAdminUserRegisteredMail, sendWelcomeMail} from "./send-mail";
+import {registrationNonceModel} from './models/registration-nonce';
 
-export default async function registerUser(_, {first_name, last_name, email, password}) {
+export default async function registerUser(_, {first_name, last_name, email, password, nonce, solution}) {
+  if (!nonce || !solution) {
+    logger.warn(`Registration - MISSING_NONCE`, {email})
+    return err(error_code.MISSING_NONCE);
+  }
+
+  if (!registrationNonceModel.verifyProofOfWork(nonce, solution)) {
+    await sleepForSecurity()
+    logger.warn(`Registration - INVALID_PROOF_OF_WORK`, {email})
+    return err(error_code.INVALID_PROOF_OF_WORK);
+  }
+
   // try to login first
   let id = await userModel.findByEmailAndPass(email, password)
 
@@ -63,6 +75,12 @@ export default async function registerUser(_, {first_name, last_name, email, pas
 
     // add api token
     await tokenModel.create(id)
+
+    try {
+      await sendWelcomeMail({ email });
+    } catch (e) {
+      logger.errorEnriched(`Failed to send welcome mail on first login`, e, { email });
+    }
 
     try {
       await sendAdminUserRegisteredMail({email});

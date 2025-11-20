@@ -9,6 +9,7 @@ type Query {
 	shareTokens: [ShareToken]
 	translate(en: String, key: String, tc: String): Locale
 	validateShareToken(token: String!): ValidateShareTokenResult
+	registrationNonce: RegistrationNonce
 }
 
 type APIToken {
@@ -51,8 +52,14 @@ type Locale {
 	key: String
 }
 
+type RegistrationNonce {
+	nonce: String!
+	challenge: String!
+	difficulty: Int!
+}
+
 type Mutation {
-	register(first_name: String, last_name: String, email:String!, password: String!): LoginResult
+	register(first_name: String, last_name: String, email:String!, password: String!, nonce: String!, solution: String!): LoginResult
 	login(email: String!, password: String!): LoginResult
 	generateApiToken: APIToken
 	generateShareToken(name: String!, scopes: JSON!, sourceUrl: URL!, scopeParams: JSON!): ShareToken
