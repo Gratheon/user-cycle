@@ -9,7 +9,10 @@ import gql from "graphql-tag";
 import config from './config/index';
 import {schema} from './schema';
 import {resolvers} from './resolvers';
-import {initStorage} from "./storage";
+
+
+
+import {initStorage, isStorageConnected} from "./storage";
 import {registerStripe} from "./stripe";
 import {registerSchema} from "./schema-registry";
 import {logger} from './logger'
@@ -106,7 +109,10 @@ async function startApolloServer(app, typeDefs, resolvers) {
     app.get('/', rootHandler);
 
     app.get('/health', (request, reply) => {
-        reply.send({hello: 'world'})
+        reply.send({
+            status: 'ok',
+            mysql: isStorageConnected() ? 'connected' : 'disconnected'
+        })
     })
     app.get('/account/cancel', (request, reply) => {
         if (process.env.ENV_ID == 'dev') {
