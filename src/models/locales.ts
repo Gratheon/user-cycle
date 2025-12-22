@@ -202,16 +202,11 @@ async function translate(targetLangCode, translation, tc) {
 	RAW_TEXT += `Do not write anything else but the translation in the target language (no extra notes or other languages) of the following phrase: ${translation['en']}`;
 
 
-	//-------------------
-	// Your PAT (Personal Access Token) can be found in the portal under Authentification
 	const PAT = config.clarifai.translation_PAT;
-	// Specify the correct user_id/app_id pairings
-	// Since you're making inferences outside your app's scope
 	const USER_ID = 'openai';
 	const APP_ID = 'chat-completion';
-	// Change these to whatever model and text URL you want to use
-	const MODEL_ID = 'GPT-3_5-turbo';
-	const MODEL_VERSION_ID = '011eaadb8fc64aecac3a983b3c8c4b00';
+	const MODEL_ID = 'gpt-oss-120b';
+	const MODEL_VERSION_ID = '1d3ee440e48c4e7a94af6acac7d7cdfc';
 
 
 
