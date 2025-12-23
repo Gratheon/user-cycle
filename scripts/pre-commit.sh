@@ -3,17 +3,29 @@
 echo "Running pre-commit checks for user-cycle..."
 
 if [ -f "$HOME/.nvm/nvm.sh" ]; then
-    . "$HOME/.nvm/nvm.sh"
+    export NVM_DIR="$HOME/.nvm"
+    . "$NVM_DIR/nvm.sh"
 fi
 
-export PATH="/usr/local/bin:/opt/homebrew/bin:$HOME/.nvm/versions/node/$(ls -t $HOME/.nvm/versions/node 2>/dev/null | head -1)/bin:$PATH"
+export PATH="/usr/local/bin:/opt/homebrew/bin:$PATH"
+
+if [ -d "$HOME/.nvm/versions/node" ]; then
+    LATEST_NODE=$(ls -t "$HOME/.nvm/versions/node" 2>/dev/null | head -1)
+    if [ -n "$LATEST_NODE" ]; then
+        export PATH="$HOME/.nvm/versions/node/$LATEST_NODE/bin:$PATH"
+    fi
+fi
 
 if ! command -v node >/dev/null 2>&1; then
-    echo "⚠️  Warning: node not found in PATH. Attempting to locate..."
+    echo "⚠️  Warning: node not found in PATH. Searching common locations..."
 
-    for NODE_DIR in /usr/local/bin /opt/homebrew/bin $HOME/.nvm/versions/node/*/bin; do
-        if [ -x "$NODE_DIR/node" ]; then
-            export PATH="$NODE_DIR:$PATH"
+    for NODE_PATH in \
+        /usr/local/bin/node \
+        /opt/homebrew/bin/node \
+        $HOME/.nvm/versions/node/*/bin/node; do
+
+        if [ -x "$NODE_PATH" ]; then
+            export PATH="$(dirname "$NODE_PATH"):$PATH"
             break
         fi
     done
@@ -23,6 +35,7 @@ echo "1. Running TypeScript compilation check..."
 
 if ! command -v node >/dev/null 2>&1; then
     echo "❌ Error: Could not find node. Please ensure Node.js is installed."
+    echo "   Searched paths: /usr/local/bin, /opt/homebrew/bin, ~/.nvm/versions/node"
     exit 1
 fi
 
