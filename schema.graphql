@@ -88,6 +88,8 @@ type Mutation {
 
 	revokeApiToken(token: String!): Error
 	revokeShareToken(token: String!): Error
+
+	updateTranslationValue(key: String!, lang: String!, value: String!): Translation
 }
 
 type TokenUser {

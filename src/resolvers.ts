@@ -354,5 +354,28 @@ export const resolvers = {
 			}
 		},
 		register: registerUser,
+
+		updateTranslationValue: async (_, { key, lang, value }, ctx) => {
+			if (!ctx.uid) {
+				logger.warn("Authentication required for updateTranslationValue");
+				return err(error_code.AUTHENTICATION_REQUIRED);
+			}
+
+			logger.info(`[updateTranslationValue] Updating translation`, { key, lang, value });
+
+			const translationId = await translationModel.getOrCreate(key);
+			await translationModel.setValue(translationId, lang, value);
+
+			const translation = await translationModel.translateBatch([{ key }]);
+
+			if (translation && translation.length > 0) {
+				return {
+					__typename: 'Translation',
+					...translation[0]
+				};
+			}
+
+			return null;
+		},
 	}
 }
