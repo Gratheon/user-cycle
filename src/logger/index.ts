@@ -2,8 +2,8 @@ import config from "../config/index";
 
 import createConnectionPool, {sql} from "@databases/mysql";
 import jsonStringify from 'fast-safe-stringify'
-import fs from 'fs';
-import path from 'path';
+import * as fs from 'fs';
+import * as path from 'path';
 
 
 const conn = createConnectionPool(

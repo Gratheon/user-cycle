@@ -7,6 +7,7 @@ import config from './config/index';
 import { userModel } from './models/user';
 import { shareTokenModel, tokenModel } from './models/tokens';
 import { localeModel } from './models/locales';
+import { translationModel } from './models/translations';
 import error_code, { err } from './error_code';
 import { logger } from './logger';
 import registerUser from './user-register';
@@ -83,6 +84,102 @@ export const resolvers = {
 				...result,
 				__typename: 'Locale'
 			}));
+		},
+		getTranslations: async (_, { keys }) => {
+			logger.info(`[getTranslations] Received request for ${keys.length} keys:`, { keys });
+			const results = [];
+
+			// List of words that should have plural forms
+			const pluralWords = ['hive', 'apiary', 'box', 'frame', 'bee', 'queen', 'worker', 'drone'];
+
+			for (const key of keys) {
+				logger.info(`[getTranslations] Processing key: "${key}"`);
+
+				const translationId = await translationModel.getByKey(key);
+				logger.info(`[getTranslations] Translation ID for "${key}":`, { translationId });
+
+				if (!translationId) {
+					logger.info(`[getTranslations] No existing translation for "${key}", creating new one`);
+
+					// Check if this is a word that needs plural forms
+					const needsPluralForms = pluralWords.some(word =>
+						key.toLowerCase() === word || key.toLowerCase() === word + 's'
+					);
+
+					logger.info(`[getTranslations] Word "${key}" needs plural forms:`, { needsPluralForms });
+
+					const [newTranslation] = await translationModel.translateBatch([
+						{ key, isPlural: needsPluralForms }
+					]);
+
+					logger.info(`[getTranslations] Created new translation:`, {
+						key,
+						id: newTranslation.id,
+						hasValues: !!newTranslation.values,
+						hasPluralForms: !!newTranslation.plurals
+					});
+					results.push({
+						...newTranslation,
+						__typename: 'Translation'
+					});
+					continue;
+				}
+
+				const hasPluralForms = await translationModel.hasPluralForms(translationId);
+				logger.info(`[getTranslations] Plural forms check for "${key}" (id: ${translationId}):`, { hasPluralForms });
+
+				// If no plural forms but should have them (dev mode only), generate them
+				if (!hasPluralForms && process.env.ENV_ID === 'dev') {
+					const shouldHavePlurals = pluralWords.some(word =>
+						key.toLowerCase() === word || key.toLowerCase() === word + 's'
+					);
+
+					if (shouldHavePlurals) {
+						logger.info(`[getTranslations] Generating missing plural forms for "${key}" in dev mode`);
+
+						// Generate plural forms for all languages
+						for (const lang of Object.keys({ ru: 'russian', et: 'estonian', tr: 'turkish', pl: 'polish', de: 'german', fr: 'french' })) {
+							const forms = await translationModel.getPluralRules(lang);
+							const pluralData = await translationModel.generatePluralForms(key, lang, forms);
+							await translationModel.setPluralForms(translationId, lang, pluralData);
+							logger.info(`[getTranslations] Generated plural forms for "${key}" in ${lang}`);
+						}
+					}
+				}
+
+				// Re-check if we now have plural forms
+				const hasPluralsNow = await translationModel.hasPluralForms(translationId);
+
+				const [translation] = await translationModel.translateBatch([
+					{ key, isPlural: hasPluralsNow }
+				]);
+
+				logger.info(`[getTranslations] Final translation for "${key}":`, {
+					id: translation.id,
+					key: translation.key,
+					isPlural: translation.isPlural,
+					hasValues: !!translation.values,
+					hasPluralForms: !!translation.plurals,
+					valueKeys: translation.values ? Object.keys(translation.values) : [],
+					pluralKeys: translation.plurals ? Object.keys(translation.plurals) : []
+				});
+
+				results.push({
+					...translation,
+					__typename: 'Translation'
+				});
+			}
+
+			logger.info(`[getTranslations] Returning ${results.length} translations`);
+			return results;
+		},
+		getPluralRules: async (_, { lang }) => {
+			const forms = await translationModel.getPluralRules(lang);
+			return {
+				lang,
+				forms,
+				__typename: 'PluralRules'
+			};
 		},
 		validateShareToken: async (_, { token }) => {
 			const details = await shareTokenModel.getTokenDetailsByToken(token);

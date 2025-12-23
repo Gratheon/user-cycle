@@ -9,6 +9,8 @@ type Query {
 	shareTokens: [ShareToken]
 	translate(en: String, key: String, tc: String): Locale
 	translateBatch(requests: [TranslateRequest!]!): [Locale]
+	getTranslations(keys: [String!]!): [Translation]
+	getPluralRules(lang: String!): PluralRules
 	validateShareToken(token: String!): ValidateShareTokenResult
 	registrationNonce: RegistrationNonce
 }
@@ -51,6 +53,20 @@ type Locale {
 	de: String
 	fr: String
 	key: String
+}
+
+type Translation {
+	id: ID!
+	key: String!
+	context: String
+	values: JSON
+	plurals: JSON
+	isPlural: Boolean!
+}
+
+type PluralRules {
+	lang: String!
+	forms: [String!]!
 }
 
 type RegistrationNonce {
