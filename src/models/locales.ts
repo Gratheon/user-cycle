@@ -43,7 +43,7 @@ export const localeModel = {
 			}
 
 			if (!translation['ru']) {
-				let ru = await translate('ru', translation, tc)
+				let ru = await translate('ru', translation, tc) as string
 				logger.debug(`[translate] Generated RU translation: "${ru}" (${ru?.length} chars) for en="${translation.en}"`);
 				translation['ru'] = ru
 
@@ -51,7 +51,7 @@ export const localeModel = {
 			}
 
 			if (!translation['et']) {
-				let et = await translate('et', translation, tc)
+				let et = await translate('et', translation, tc) as string
 				logger.debug(`[translate] Generated ET translation: "${et}" (${et?.length} chars)`);
 				translation['et'] = et
 
@@ -59,7 +59,7 @@ export const localeModel = {
 			}
 
 			if (!translation['tr']) {
-				let tr = await translate('tr', translation, tc)
+				let tr = await translate('tr', translation, tc) as string
 				logger.debug(`[translate] Generated TR translation: "${tr}" (${tr?.length} chars)`);
 				translation['tr'] = tr
 
@@ -67,21 +67,21 @@ export const localeModel = {
 			}
 
 			if (!translation['pl']) {
-				let pl = await translate('pl', translation, tc)
+				let pl = await translate('pl', translation, tc) as string
 				logger.debug(`[translate] Generated PL translation: "${pl}" (${pl?.length} chars)`);
 				translation['pl'] = pl
 
 				await storage().query(sql`UPDATE locales SET pl=${pl} WHERE id=${translation.id}`);
 			}
 			if (!translation['de']) {
-				let de = await translate('de', translation, tc)
+				let de = await translate('de', translation, tc) as string
 				logger.debug(`[translate] Generated DE translation: "${de}" (${de?.length} chars)`);
 				translation['de'] = de
 				await storage().query(sql`UPDATE locales SET de=${de} WHERE id=${translation.id}`);
 			}
 
 			if (!translation['fr']) {
-				let fr = await translate('fr', translation, tc)
+				let fr = await translate('fr', translation, tc) as string
 				logger.debug(`[translate] Generated FR translation: "${fr}" (${fr?.length} chars)`);
 				translation['fr'] = fr
 				await storage().query(sql`UPDATE locales SET fr=${fr} WHERE id=${translation.id}`);
@@ -203,27 +203,27 @@ export const localeModel = {
 				const updates: any = {};
 
 				if (needsUpdate.ru) {
-					updates['ru'] = await translate('ru', translation, needsUpdate.tc);
+					updates['ru'] = await translate('ru', translation, needsUpdate.tc) as string;
 					logger.debug(`[translateBatch] Generated RU: "${updates['ru']}" (${updates['ru']?.length} chars) for en="${translation.en}"`);
 				}
 				if (needsUpdate.et) {
-					updates['et'] = await translate('et', translation, needsUpdate.tc);
+					updates['et'] = await translate('et', translation, needsUpdate.tc) as string;
 					logger.debug(`[translateBatch] Generated ET: "${updates['et']}" (${updates['et']?.length} chars)`);
 				}
 				if (needsUpdate.tr) {
-					updates['tr'] = await translate('tr', translation, needsUpdate.tc);
+					updates['tr'] = await translate('tr', translation, needsUpdate.tc) as string;
 					logger.debug(`[translateBatch] Generated TR: "${updates['tr']}" (${updates['tr']?.length} chars)`);
 				}
 				if (needsUpdate.pl) {
-					updates['pl'] = await translate('pl', translation, needsUpdate.tc);
+					updates['pl'] = await translate('pl', translation, needsUpdate.tc) as string;
 					logger.debug(`[translateBatch] Generated PL: "${updates['pl']}" (${updates['pl']?.length} chars)`);
 				}
 				if (needsUpdate.de) {
-					updates['de'] = await translate('de', translation, needsUpdate.tc);
+					updates['de'] = await translate('de', translation, needsUpdate.tc) as string;
 					logger.debug(`[translateBatch] Generated DE: "${updates['de']}" (${updates['de']?.length} chars)`);
 				}
 				if (needsUpdate.fr) {
-					updates['fr'] = await translate('fr', translation, needsUpdate.tc);
+					updates['fr'] = await translate('fr', translation, needsUpdate.tc) as string;
 					logger.debug(`[translateBatch] Generated FR: "${updates['fr']}" (${updates['fr']?.length} chars)`);
 				}
 
