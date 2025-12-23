@@ -361,6 +361,11 @@ export const resolvers = {
 				return err(error_code.AUTHENTICATION_REQUIRED);
 			}
 
+			if (process.env.ENV_ID !== 'dev') {
+				logger.warn("updateTranslationValue only allowed in dev mode", { env: process.env.ENV_ID });
+				return err(error_code.FORBIDDEN);
+			}
+
 			logger.info(`[updateTranslationValue] Updating translation`, { key, lang, value });
 
 			const translationId = await translationModel.getOrCreate(key);
