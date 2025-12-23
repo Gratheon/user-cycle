@@ -17,17 +17,34 @@ const languagesMap = {
 
 export const localeModel = {
 	translate: async function ({ en, key, tc }) {
-		let result = await storage().query(sql`SELECT id, en, ru, et, tr, pl, de, fr FROM locales WHERE en=${en} LIMIT 1`);
+		logger.debug(`[translate] Request: en="${en}" (${en?.length} chars), key="${key}" (${key?.length} chars), tc="${tc}" (${tc?.length} chars)`);
+
+		let result;
+
+		if (key) {
+			result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr FROM locales WHERE \`key\`=${key} LIMIT 1`);
+		} else {
+			result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr FROM locales WHERE en=${en} LIMIT 1`);
+		}
 
 		let translation = result[0]
 
 		if (process.env.ENV_ID == 'dev') {
 			if (!translation) {
-				await storage().query(sql`INSERT INTO locales (translation_context, en) VALUES(${tc}, ${en})`);
+				logger.info(`[translate] Creating new translation entry: key="${key}" (${key?.length} chars), en="${en}"`);
+				await storage().query(sql`INSERT INTO locales (\`key\`, translation_context, en) VALUES(${key}, ${tc}, ${en})`);
+
+				if (key) {
+					result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr FROM locales WHERE \`key\`=${key} LIMIT 1`);
+				} else {
+					result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr FROM locales WHERE en=${en} LIMIT 1`);
+				}
+				translation = result[0]
 			}
 
 			if (!translation['ru']) {
 				let ru = await translate('ru', translation, tc)
+				logger.debug(`[translate] Generated RU translation: "${ru}" (${ru?.length} chars) for en="${translation.en}"`);
 				translation['ru'] = ru
 
 				await storage().query(sql`UPDATE locales SET ru=${ru} WHERE id=${translation.id}`);
@@ -35,6 +52,7 @@ export const localeModel = {
 
 			if (!translation['et']) {
 				let et = await translate('et', translation, tc)
+				logger.debug(`[translate] Generated ET translation: "${et}" (${et?.length} chars)`);
 				translation['et'] = et
 
 				await storage().query(sql`UPDATE locales SET et=${et} WHERE id=${translation.id}`);
@@ -42,6 +60,7 @@ export const localeModel = {
 
 			if (!translation['tr']) {
 				let tr = await translate('tr', translation, tc)
+				logger.debug(`[translate] Generated TR translation: "${tr}" (${tr?.length} chars)`);
 				translation['tr'] = tr
 
 				await storage().query(sql`UPDATE locales SET tr=${tr} WHERE id=${translation.id}`);
@@ -49,64 +68,119 @@ export const localeModel = {
 
 			if (!translation['pl']) {
 				let pl = await translate('pl', translation, tc)
+				logger.debug(`[translate] Generated PL translation: "${pl}" (${pl?.length} chars)`);
 				translation['pl'] = pl
 
 				await storage().query(sql`UPDATE locales SET pl=${pl} WHERE id=${translation.id}`);
 			}
 			if (!translation['de']) {
 				let de = await translate('de', translation, tc)
+				logger.debug(`[translate] Generated DE translation: "${de}" (${de?.length} chars)`);
 				translation['de'] = de
 				await storage().query(sql`UPDATE locales SET de=${de} WHERE id=${translation.id}`);
 			}
 
 			if (!translation['fr']) {
 				let fr = await translate('fr', translation, tc)
+				logger.debug(`[translate] Generated FR translation: "${fr}" (${fr?.length} chars)`);
 				translation['fr'] = fr
 				await storage().query(sql`UPDATE locales SET fr=${fr} WHERE id=${translation.id}`);
 			}
 
-			result = await storage().query(sql`SELECT id, en, ru, et, tr, pl, de, fr FROM locales WHERE en=${en} LIMIT 1`);
+			if (key) {
+				result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr FROM locales WHERE \`key\`=${key} LIMIT 1`);
+			} else {
+				result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr FROM locales WHERE en=${en} LIMIT 1`);
+			}
 			translation = result[0]
 		}
 
 		return translation;
 	},
 
-	translateBatch: async function (requests: Array<{ en: string, tc: string }>) {
+	translateBatch: async function (requests: Array<{ en: string, tc: string, key?: string }>) {
 		if (requests.length === 0) return [];
 
-		const enTexts = requests.map(r => r.en);
+		logger.info(`[translateBatch] Processing ${requests.length} requests`);
+		requests.forEach((req, i) => {
+			logger.debug(`[translateBatch] Request ${i}: en="${req.en}" (${req.en?.length} chars), key="${req.key}" (${req.key?.length} chars), tc="${req.tc}" (${req.tc?.length} chars)`);
+		});
 
-		const results = await storage().query(
-			sql`SELECT id, en, ru, et, tr, pl, de, fr FROM locales WHERE en IN (${enTexts})`
-		);
+		// Separate requests by whether they have a key or not
+		const keyRequests = requests.filter(r => r.key);
+		const enRequests = requests.filter(r => !r.key);
 
+		logger.debug(`[translateBatch] ${keyRequests.length} requests with key, ${enRequests.length} without key`);
+
+		const results = [];
+
+		// Fetch by key
+		if (keyRequests.length > 0) {
+			const keys = keyRequests.map(r => r.key);
+			const keyResults = await storage().query(
+				sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr FROM locales WHERE \`key\` IN (${keys})`
+			);
+			results.push(...keyResults);
+		}
+
+		// Fetch by en
+		if (enRequests.length > 0) {
+			const enTexts = enRequests.map(r => r.en);
+			const enResults = await storage().query(
+				sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr FROM locales WHERE en IN (${enTexts})`
+			);
+			results.push(...enResults);
+		}
+
+		// Build translation map - index by both key and en for lookup
 		const translationMap = new Map();
 		for (const result of results) {
-			translationMap.set(result.en, result);
+			if (result.key) {
+				translationMap.set(`key:${result.key}`, result);
+			}
+			translationMap.set(`en:${result.en}`, result);
 		}
 
 		if (process.env.ENV_ID == 'dev') {
 			const missingTranslations = [];
 
 			for (const request of requests) {
-				if (!translationMap.has(request.en)) {
+				const lookupKey = request.key ? `key:${request.key}` : `en:${request.en}`;
+
+				if (!translationMap.has(lookupKey)) {
+					logger.info(`[translateBatch] Missing translation for: en="${request.en}", key="${request.key}" (${request.key?.length} chars)`);
 					missingTranslations.push(request);
 				}
 			}
 
 			for (const request of missingTranslations) {
-				await storage().query(sql`INSERT INTO locales (translation_context, en) VALUES(${request.tc || ''}, ${request.en})`);
-				const newResult = await storage().query(sql`SELECT id, en, ru, et, tr, pl, de, fr FROM locales WHERE en=${request.en} LIMIT 1`);
+				logger.info(`[translateBatch] Creating new entry: key="${request.key || null}" (${request.key?.length} chars), en="${request.en}"`);
+				await storage().query(sql`INSERT INTO locales (\`key\`, translation_context, en) VALUES(${request.key || null}, ${request.tc || ''}, ${request.en})`);
+
+				let newResult;
+				if (request.key) {
+					newResult = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr FROM locales WHERE \`key\`=${request.key} LIMIT 1`);
+				} else {
+					newResult = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr FROM locales WHERE en=${request.en} LIMIT 1`);
+				}
+
 				if (newResult[0]) {
-					translationMap.set(request.en, newResult[0]);
+					const result = newResult[0];
+					if (result.key) {
+						translationMap.set(`key:${result.key}`, result);
+					}
+					translationMap.set(`en:${result.en}`, result);
 				}
 			}
 
 			const translationsToUpdate = [];
-			for (const translation of translationMap.values()) {
-				const request = requests.find(r => r.en === translation.en);
-				const tc = request?.tc || '';
+			for (const request of requests) {
+				const lookupKey = request.key ? `key:${request.key}` : `en:${request.en}`;
+				const translation = translationMap.get(lookupKey);
+
+				if (!translation) continue;
+
+				const tc = request.tc || '';
 
 				const needsUpdate = {
 					id: translation.id,
@@ -130,21 +204,27 @@ export const localeModel = {
 
 				if (needsUpdate.ru) {
 					updates['ru'] = await translate('ru', translation, needsUpdate.tc);
+					logger.debug(`[translateBatch] Generated RU: "${updates['ru']}" (${updates['ru']?.length} chars) for en="${translation.en}"`);
 				}
 				if (needsUpdate.et) {
 					updates['et'] = await translate('et', translation, needsUpdate.tc);
+					logger.debug(`[translateBatch] Generated ET: "${updates['et']}" (${updates['et']?.length} chars)`);
 				}
 				if (needsUpdate.tr) {
 					updates['tr'] = await translate('tr', translation, needsUpdate.tc);
+					logger.debug(`[translateBatch] Generated TR: "${updates['tr']}" (${updates['tr']?.length} chars)`);
 				}
 				if (needsUpdate.pl) {
 					updates['pl'] = await translate('pl', translation, needsUpdate.tc);
+					logger.debug(`[translateBatch] Generated PL: "${updates['pl']}" (${updates['pl']?.length} chars)`);
 				}
 				if (needsUpdate.de) {
 					updates['de'] = await translate('de', translation, needsUpdate.tc);
+					logger.debug(`[translateBatch] Generated DE: "${updates['de']}" (${updates['de']?.length} chars)`);
 				}
 				if (needsUpdate.fr) {
 					updates['fr'] = await translate('fr', translation, needsUpdate.tc);
+					logger.debug(`[translateBatch] Generated FR: "${updates['fr']}" (${updates['fr']?.length} chars)`);
 				}
 
 				if (Object.keys(updates).length > 0) {
@@ -171,17 +251,38 @@ export const localeModel = {
 				}
 			}
 
-			const finalResults = await storage().query(
-				sql`SELECT id, en, ru, et, tr, pl, de, fr FROM locales WHERE en IN (${enTexts})`
-			);
+			// Refresh the translation map
+			const finalResults = [];
+
+			if (keyRequests.length > 0) {
+				const keys = keyRequests.map(r => r.key);
+				const keyResults = await storage().query(
+					sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr FROM locales WHERE \`key\` IN (${keys})`
+				);
+				finalResults.push(...keyResults);
+			}
+
+			if (enRequests.length > 0) {
+				const enTexts = enRequests.map(r => r.en);
+				const enResults = await storage().query(
+					sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr FROM locales WHERE en IN (${enTexts})`
+				);
+				finalResults.push(...enResults);
+			}
 
 			translationMap.clear();
 			for (const result of finalResults) {
-				translationMap.set(result.en, result);
+				if (result.key) {
+					translationMap.set(`key:${result.key}`, result);
+				}
+				translationMap.set(`en:${result.en}`, result);
 			}
 		}
 
-		return requests.map(r => translationMap.get(r.en)).filter(Boolean);
+		return requests.map(r => {
+			const lookupKey = r.key ? `key:${r.key}` : `en:${r.en}`;
+			return translationMap.get(lookupKey);
+		}).filter(Boolean);
 	}
 }
 
@@ -190,16 +291,34 @@ async function translate(targetLangCode, translation, tc) {
 	const language = languagesMap[targetLangCode]
 
 	let RAW_TEXT = `You are an expert translator. You need to translate from English. Used in beekeeping and monitoring web app.`
+
 	if (tc) {
-		RAW_TEXT += `The translation context is "${tc}"`
-	}
-	RAW_TEXT += `Translate to ${language}.`
+		RAW_TEXT += ` The translation context is "${tc}".`
 
-	if (translation['ru']) {
-		RAW_TEXT += `It is already translated in russian as "${translation['ru']}", you can use that as aid.`
+		// Add specific instructions for plural forms
+		if (tc.includes('plural:')) {
+			RAW_TEXT += ` This is a PLURAL FORM translation. Translate the word to match the grammatical form used with the counts specified in the context.`
+
+			if (targetLangCode === 'ru' || targetLangCode === 'pl') {
+				if (tc.includes('plural:one')) {
+					RAW_TEXT += ` Use the singular/nominative form (like Russian "улей" for 1, 21, 31...).`
+				} else if (tc.includes('plural:few')) {
+					RAW_TEXT += ` Use the genitive singular form (like Russian "улья" for 2, 3, 4, 22, 23, 24...).`
+				} else if (tc.includes('plural:many')) {
+					RAW_TEXT += ` Use the genitive plural form (like Russian "ульев" for 5, 6, 7...20, 25, 26...).`
+				}
+			}
+		}
 	}
 
-	RAW_TEXT += `Do not write anything else but the translation in the target language (no extra notes or other languages) of the following phrase: ${translation['en']}`;
+	RAW_TEXT += ` Translate to ${language}.`
+
+	if (translation['ru'] && targetLangCode !== 'ru') {
+		RAW_TEXT += ` It is already translated in russian as "${translation['ru']}", you can use that as aid.`
+	}
+
+	RAW_TEXT += ` Do not write anything else but the translation in the target language (no extra notes or other languages) of the following phrase: ${translation['en']}`;
+
 
 
 	const PAT = config.clarifai.translation_PAT;

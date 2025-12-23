@@ -125,4 +125,5 @@ input UserUpdateInput{
 input TranslateRequest {
 	en: String!
 	tc: String
+	key: String
 }
