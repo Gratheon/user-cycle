@@ -25,12 +25,14 @@
   },
   "scripts": {
     "build": "tsc -p ./src/config/tsconfig.json",
+    "typecheck": "tsc -p ./src/config/tsconfig.json --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "dev": "ENV_ID=dev nodemon app/user-cycle.js",
     "start": "ENV_ID=prod node app/user-cycle.js",
-    "dev:ts": "ENV_ID=dev ts-node-dev --respawn --transpile-only --prefer-ts --exit-child src/user-cycle.ts"
+    "dev:ts": "ENV_ID=dev ts-node-dev --respawn --transpile-only --prefer-ts --exit-child src/user-cycle.ts",
+    "setup-git-hooks": "sh scripts/setup-git-hooks.sh"
   },
   "repository": {
     "type": "git",
