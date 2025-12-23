@@ -2,6 +2,11 @@ scalar JSON
 scalar DateTime
 scalar URL
 
+input TranslationInput {
+	key: String!
+	context: String
+}
+
 type Query {
 	user: UserOrError
 	invoices: [Invoice]
@@ -9,7 +14,7 @@ type Query {
 	shareTokens: [ShareToken]
 	translate(en: String, key: String, tc: String): Locale
 	translateBatch(requests: [TranslateRequest!]!): [Locale]
-	getTranslations(keys: [String!]!): [Translation]
+	getTranslations(inputs: [TranslationInput!]!): [Translation]
 	getPluralRules(lang: String!): PluralRules
 	validateShareToken(token: String!): ValidateShareTokenResult
 	registrationNonce: RegistrationNonce

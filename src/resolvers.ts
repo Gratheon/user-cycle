@@ -85,21 +85,22 @@ export const resolvers = {
 				__typename: 'Locale'
 			}));
 		},
-		getTranslations: async (_, { keys }) => {
-			logger.info(`[getTranslations] Received request for ${keys.length} keys:`, { keys });
+		getTranslations: async (_, { inputs }) => {
+			logger.info(`[getTranslations] Received request for ${inputs.length} inputs:`, { inputs });
 			const results = [];
 
 			// List of words that should have plural forms
 			const pluralWords = ['hive', 'apiary', 'box', 'frame', 'bee', 'queen', 'worker', 'drone'];
 
-			for (const key of keys) {
-				logger.info(`[getTranslations] Processing key: "${key}"`);
+			for (const input of inputs) {
+				const { key, context } = input;
+				logger.info(`[getTranslations] Processing key: "${key}" with context: "${context}"`);
 
 				const translationId = await translationModel.getByKey(key);
 				logger.info(`[getTranslations] Translation ID for "${key}":`, { translationId });
 
 				if (!translationId) {
-					logger.info(`[getTranslations] No existing translation for "${key}", creating new one`);
+					logger.info(`[getTranslations] No existing translation for "${key}", creating new one with context`);
 
 					// Check if this is a word that needs plural forms
 					const needsPluralForms = pluralWords.some(word =>
@@ -109,11 +110,12 @@ export const resolvers = {
 					logger.info(`[getTranslations] Word "${key}" needs plural forms:`, { needsPluralForms });
 
 					const [newTranslation] = await translationModel.translateBatch([
-						{ key, isPlural: needsPluralForms }
+						{ key, context, isPlural: needsPluralForms }
 					]);
 
 					logger.info(`[getTranslations] Created new translation:`, {
 						key,
+						context,
 						id: newTranslation.id,
 						hasValues: !!newTranslation.values,
 						hasPluralForms: !!newTranslation.plurals
@@ -151,12 +153,13 @@ export const resolvers = {
 				const hasPluralsNow = await translationModel.hasPluralForms(translationId);
 
 				const [translation] = await translationModel.translateBatch([
-					{ key, isPlural: hasPluralsNow }
+					{ key, context, isPlural: hasPluralsNow }
 				]);
 
 				logger.info(`[getTranslations] Final translation for "${key}":`, {
 					id: translation.id,
 					key: translation.key,
+					context: translation.context,
 					isPlural: translation.isPlural,
 					hasValues: !!translation.values,
 					hasPluralForms: !!translation.plurals,
