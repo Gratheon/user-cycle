@@ -17,6 +17,7 @@ const languagesMap = {
 	'es': 'spanish',
 	'ar': 'arabic',
 	'bn': 'bengali',
+	'pt': 'portuguese',
 }
 
 export const translationModel = {

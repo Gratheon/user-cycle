@@ -423,6 +423,7 @@ export const resolvers = {
 				'es': 'spanish',
 				'ar': 'arabic',
 				'bn': 'bengali',
+				'pt': 'portuguese',
 			};
 
 			if (!languagesMap[langCode]) {
