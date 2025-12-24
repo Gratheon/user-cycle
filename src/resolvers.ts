@@ -422,6 +422,7 @@ export const resolvers = {
 				'hi': 'hindi',
 				'es': 'spanish',
 				'ar': 'arabic',
+				'bn': 'bengali',
 			};
 
 			if (!languagesMap[langCode]) {

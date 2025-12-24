@@ -16,6 +16,7 @@ const languagesMap = {
 	'hi': 'hindi',
 	'es': 'spanish',
 	'ar': 'arabic',
+	'bn': 'bengali',
 }
 
 export const translationModel = {
