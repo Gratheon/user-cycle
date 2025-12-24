@@ -420,6 +420,7 @@ export const resolvers = {
 				'fr': 'french',
 				'zh': 'chinese',
 				'hi': 'hindi',
+				'es': 'spanish',
 			};
 
 			if (!languagesMap[langCode]) {
