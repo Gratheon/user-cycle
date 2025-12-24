@@ -15,6 +15,7 @@ const languagesMap = {
 	'zh': 'chinese',
 	'hi': 'hindi',
 	'es': 'spanish',
+	'ar': 'arabic',
 }
 
 export const translationModel = {
