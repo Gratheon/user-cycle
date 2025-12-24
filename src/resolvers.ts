@@ -385,5 +385,139 @@ export const resolvers = {
 
 			return null;
 		},
+
+		batchTranslateLanguage: async (_, { langCode }, ctx) => {
+			if (!ctx.uid) {
+				logger.warn("Authentication required for batchTranslateLanguage");
+				return {
+					success: false,
+					total: 0,
+					processed: 0,
+					skipped: 0,
+					errors: 0,
+					message: "Authentication required"
+				};
+			}
+
+			if (process.env.ENV_ID !== 'dev') {
+				logger.warn("batchTranslateLanguage only allowed in dev mode", { env: process.env.ENV_ID });
+				return {
+					success: false,
+					total: 0,
+					processed: 0,
+					skipped: 0,
+					errors: 0,
+					message: "This operation is only allowed in development mode"
+				};
+			}
+
+			const languagesMap = {
+				'ru': 'russian',
+				'et': 'estonian',
+				'tr': 'turkish',
+				'pl': 'polish',
+				'de': 'german',
+				'fr': 'french',
+				'zh': 'chinese',
+			};
+
+			if (!languagesMap[langCode]) {
+				logger.warn("Unsupported language code", { langCode });
+				return {
+					success: false,
+					total: 0,
+					processed: 0,
+					skipped: 0,
+					errors: 0,
+					message: `Unsupported language code: ${langCode}. Supported: ${Object.keys(languagesMap).join(', ')}`
+				};
+			}
+
+			logger.info(`[batchTranslateLanguage] Starting batch translation for ${languagesMap[langCode]} (${langCode})`);
+
+			const { storage } = require('./storage');
+			const { sql } = require('@databases/mysql');
+
+			try {
+				const allTranslations = await storage().query(
+					sql`SELECT id, \`key\`, context FROM translations ORDER BY id`
+				);
+
+				logger.info(`[batchTranslateLanguage] Found ${allTranslations.length} translation keys to process`);
+
+				const translationsWithPlurals = await storage().query(
+					sql`SELECT DISTINCT translation_id FROM plural_forms`
+				);
+				const pluralSet = new Set(translationsWithPlurals.map(row => row.translation_id));
+
+				let processedCount = 0;
+				let skippedCount = 0;
+				let errorCount = 0;
+
+				for (const translation of allTranslations) {
+					const translationId = translation.id;
+					const key = translation.key;
+					const context = translation.context;
+					const isPlural = pluralSet.has(translationId);
+
+					try {
+						if (isPlural) {
+							const existingPlural = await translationModel.getPluralForms(translationId, langCode);
+							if (existingPlural) {
+								logger.debug(`[batchTranslateLanguage] Skipping plural "${key}" - already exists`);
+								skippedCount++;
+								continue;
+							}
+
+							logger.info(`[batchTranslateLanguage] Translating plural "${key}"...`);
+							const forms = await translationModel.getPluralRules(langCode);
+							const pluralData = await translationModel.generatePluralForms(key, langCode, forms);
+							await translationModel.setPluralForms(translationId, langCode, pluralData);
+							logger.info(`[batchTranslateLanguage] Plural "${key}": ${JSON.stringify(pluralData)}`);
+							processedCount++;
+						} else {
+							const existingValue = await translationModel.getValue(translationId, langCode);
+							if (existingValue) {
+								logger.debug(`[batchTranslateLanguage] Skipping "${key}" - already exists`);
+								skippedCount++;
+								continue;
+							}
+
+							logger.info(`[batchTranslateLanguage] Translating "${key}"...`);
+							const value = await translationModel.generateTranslation(key, langCode, context);
+							await translationModel.setValue(translationId, langCode, value);
+							logger.info(`[batchTranslateLanguage] "${key}" -> "${value}"`);
+							processedCount++;
+						}
+					} catch (error) {
+						logger.error(`[batchTranslateLanguage] Error translating "${key}":`, error);
+						errorCount++;
+					}
+				}
+
+				logger.info(`[batchTranslateLanguage] Complete. Processed: ${processedCount}, Skipped: ${skippedCount}, Errors: ${errorCount}`);
+
+				return {
+					success: true,
+					total: allTranslations.length,
+					processed: processedCount,
+					skipped: skippedCount,
+					errors: errorCount,
+					message: `Successfully processed ${processedCount} translations for ${languagesMap[langCode]}`
+				};
+
+			} catch (error) {
+				logger.error('[batchTranslateLanguage] Fatal error:', error);
+				const errorMessage = error instanceof Error ? error.message : String(error);
+				return {
+					success: false,
+					total: 0,
+					processed: 0,
+					skipped: 0,
+					errors: 1,
+					message: `Error: ${errorMessage}`
+				};
+			}
+		},
 	}
 }

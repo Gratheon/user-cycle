@@ -12,6 +12,7 @@ const languagesMap = {
 	'pl': 'polish',
 	'de': 'german',
 	'fr': 'french',
+	'zh': 'chinese',
 }
 
 export const translationModel = {

@@ -95,6 +95,25 @@ type Mutation {
 	revokeShareToken(token: String!): Error
 
 	updateTranslationValue(key: String!, lang: String!, value: String!): Translation
+	batchTranslateLanguage(langCode: String!): BatchTranslationResult
+}
+
+type BatchTranslationProgress {
+	total: Int!
+	processed: Int!
+	skipped: Int!
+	errors: Int!
+	currentKey: String
+	isComplete: Boolean!
+}
+
+type BatchTranslationResult {
+	success: Boolean!
+	total: Int!
+	processed: Int!
+	skipped: Int!
+	errors: Int!
+	message: String
 }
 
 type TokenUser {
