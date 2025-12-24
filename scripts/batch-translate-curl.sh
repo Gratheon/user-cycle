@@ -6,7 +6,7 @@
 # Configuration
 GRAPHQL_URL="http://localhost:4000/graphql"
 USER_ID="1"  # Change this to your actual user ID
-LANG_CODE="zh"  # Language code: zh, ru, et, tr, pl, de, fr
+LANG_CODE="hi"  # Language code: zh, hi, ru, et, tr, pl, de, fr
 
 echo "=== Batch Translation via GraphQL Mutation ==="
 echo "Language: $LANG_CODE"

@@ -419,6 +419,7 @@ export const resolvers = {
 				'de': 'german',
 				'fr': 'french',
 				'zh': 'chinese',
+				'hi': 'hindi',
 			};
 
 			if (!languagesMap[langCode]) {

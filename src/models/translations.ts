@@ -13,6 +13,7 @@ const languagesMap = {
 	'de': 'german',
 	'fr': 'french',
 	'zh': 'chinese',
+	'hi': 'hindi',
 }
 
 export const translationModel = {
