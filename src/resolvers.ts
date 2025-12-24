@@ -424,6 +424,7 @@ export const resolvers = {
 				'ar': 'arabic',
 				'bn': 'bengali',
 				'pt': 'portuguese',
+				'ja': 'japanese',
 			};
 
 			if (!languagesMap[langCode]) {
