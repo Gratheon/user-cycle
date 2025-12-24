@@ -3,7 +3,7 @@ import { logger } from '../logger';
 import config from '../config';
 
 const NONCE_EXPIRATION_MS = 60 * 60 * 1000;
-const DIFFICULTY = 5;
+const DIFFICULTY = 4;
 const SECRET = config.JWT_KEY;
 
 interface NoncePayload {

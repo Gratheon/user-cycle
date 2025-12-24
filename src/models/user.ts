@@ -87,10 +87,10 @@ export const userModel = {
 		return !result[0] || result[0].date_last_login === null;
 	},
 
-	create: async function (first_name, last_name, email, password, expirationDateString) {
+	create: async function (first_name, last_name, email, password, lang, expirationDateString) {
 		return await storage().query(
-			sql`INSERT INTO account (first_name, last_name, email, password, date_expiration)
-			VALUES(${first_name}, ${last_name}, ${email}, ${sha1(password)}, ${expirationDateString})`
+			sql`INSERT INTO account (first_name, last_name, email, password, lang, date_expiration)
+			VALUES(${first_name}, ${last_name}, ${email}, ${sha1(password)}, ${lang}, ${expirationDateString})`
 		);
 	},
 

@@ -11,7 +11,9 @@ import {createGrafanaUser} from './models/grafana';
 import {sendAdminUserRegisteredMail, sendWelcomeMail} from "./send-mail";
 import {registrationNonceModel} from './models/registration-nonce';
 
-export default async function registerUser(_, {first_name, last_name, email, password, nonce, solution}) {
+export default async function registerUser(_, { input }) {
+  const { first_name, last_name, email, password, lang, nonce, solution } = input;
+
   if (!nonce || !solution) {
     logger.warn(`Registration - MISSING_NONCE`, {email})
     return err(error_code.MISSING_NONCE);
@@ -63,8 +65,7 @@ export default async function registerUser(_, {first_name, last_name, email, pas
     expirationDate.setDate(expirationDate.getDate() + TRIAL_DAYS);
     const expirationDateString = expirationDate.toISOString().substring(0, 19).replace('T', ' ');
 
-    // register
-    await userModel.create(first_name, last_name, email, password, expirationDateString);
+    await userModel.create(first_name, last_name, email, password, lang || 'en', expirationDateString);
     id = await userModel.findByEmailAndPass(email, password)
 
     if (!id) {
@@ -104,8 +105,11 @@ export default async function registerUser(_, {first_name, last_name, email, pas
     'user_id': id
   }, config.JWT_KEY);
 
+  const user = await userModel.getById(id);
+
   return {
     __typename: 'UserSession',
-    key: sessionKey
+    key: sessionKey,
+    user
   }
 }

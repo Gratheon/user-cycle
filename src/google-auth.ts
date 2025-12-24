@@ -62,28 +62,28 @@ export function registerGoogle(app) {
 			}
 
 			// do registration
-			else {
-				logger.info('Google auth - user does not exist, registering');
-				const expirationDate = new Date();
-				expirationDate.setDate(expirationDate.getDate() + TRIAL_DAYS);
-				const expirationDateString = expirationDate.toISOString().substring(0, 19).replace('T', ' ');
+      else {
+        logger.info('Google auth - user does not exist, registering');
+        const expirationDate = new Date();
+        expirationDate.setDate(expirationDate.getDate() + TRIAL_DAYS);
+        const expirationDateString = expirationDate.toISOString().substring(0, 19).replace('T', ' ');
 
-				// generate random password 
-				const password = Math.random().toString(36).substring(2, 15);
-				const email = profile.email;
+        // generate random password
+        const password = Math.random().toString(36).substring(2, 15);
+        const email = profile.email;
 
-				await userModel.create(profile.given_name, profile.family_name, email, password, expirationDateString);
-				id = await userModel.findByEmailAndPass(email, password)
+        await userModel.create(profile.given_name, profile.family_name, email, password, 'en', expirationDateString);
+        id = await userModel.findByEmailAndPass(email, password)
 
-				if (!id) {
-					logger.error(`Registration failure, inconsistent storage`, profile)
-					return res.redirect(config.login_ui_url);
-				}
+        if (!id) {
+          logger.error(`Registration failure, inconsistent storage`, profile)
+          return res.redirect(config.login_ui_url);
+        }
 
-				// add api token
-				logger.info(`Created user, adding API token`, { id, email })
-				await tokenModel.create(id)
-			}
+        // add api token
+        logger.info(`Created user, adding API token`, {id, email})
+        await tokenModel.create(id)
+      }
 
 			// log in
 			const sessionKey = sign({
