@@ -93,11 +93,11 @@ export const resolvers = {
 			const pluralWords = ['hive', 'apiary', 'box', 'frame', 'bee', 'queen', 'worker', 'drone'];
 
 			for (const input of inputs) {
-				const { key, context } = input;
-				logger.info(`[getTranslations] Processing key: "${key}" with context: "${context}"`);
+				const { key, context, namespace } = input;
+				logger.info(`[getTranslations] Processing key: "${key}" with context: "${context}", namespace: "${namespace}"`);
 
-				const translationId = await translationModel.getByKey(key);
-				logger.info(`[getTranslations] Translation ID for "${key}":`, { translationId });
+				const translationId = await translationModel.getByKey(key, namespace || null);
+				logger.info(`[getTranslations] Translation ID for "${key}" (namespace: ${namespace}):`, { translationId });
 
 				if (!translationId) {
 					logger.info(`[getTranslations] No existing translation for "${key}", creating new one with context`);
@@ -109,9 +109,9 @@ export const resolvers = {
 
 					logger.info(`[getTranslations] Word "${key}" needs plural forms:`, { needsPluralForms });
 
-					const [newTranslation] = await translationModel.translateBatch([
-						{ key, context, isPlural: needsPluralForms }
-					]);
+				const [newTranslation] = await translationModel.translateBatch([
+					{ key, context, namespace: namespace || null, isPlural: needsPluralForms }
+				]);
 
 					logger.info(`[getTranslations] Created new translation:`, {
 						key,
@@ -153,7 +153,7 @@ export const resolvers = {
 				const hasPluralsNow = await translationModel.hasPluralForms(translationId);
 
 				const [translation] = await translationModel.translateBatch([
-					{ key, context, isPlural: hasPluralsNow }
+					{ key, context, namespace: namespace || null, isPlural: hasPluralsNow }
 				]);
 
 				logger.info(`[getTranslations] Final translation for "${key}":`, {
@@ -358,7 +358,7 @@ export const resolvers = {
 		},
 		register: registerUser,
 
-		updateTranslationValue: async (_, { key, lang, value }, ctx) => {
+		updateTranslationValue: async (_, { key, lang, value, namespace }, ctx) => {
 			if (!ctx.uid) {
 				logger.warn("Authentication required for updateTranslationValue");
 				return err(error_code.AUTHENTICATION_REQUIRED);
@@ -369,12 +369,12 @@ export const resolvers = {
 				return err(error_code.FORBIDDEN);
 			}
 
-			logger.info(`[updateTranslationValue] Updating translation`, { key, lang, value });
+			logger.info(`[updateTranslationValue] Updating translation`, { key, lang, value, namespace });
 
-			const translationId = await translationModel.getOrCreate(key);
+			const translationId = await translationModel.getOrCreate(key, null, namespace || null);
 			await translationModel.setValue(translationId, lang, value);
 
-			const translation = await translationModel.translateBatch([{ key }]);
+			const translation = await translationModel.translateBatch([{ key, namespace: namespace || null }]);
 
 			if (translation && translation.length > 0) {
 				return {

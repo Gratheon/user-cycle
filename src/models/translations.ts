@@ -22,19 +22,17 @@ const languagesMap = {
 }
 
 export const translationModel = {
-	async getByKey(key: string): Promise<number | null> {
-		logger.debug(`[getByKey] Looking up translation with key: "${key}"`);
+	async getByKey(key: string, namespace: string | null = null): Promise<number | null> {
+		logger.debug(`[getByKey] Looking up translation with key: "${key}", namespace: "${namespace}"`);
 
-		// Try exact match first
 		let result = await storage().query(
-			sql`SELECT id FROM translations WHERE \`key\` = ${key} LIMIT 1`
+			sql`SELECT id FROM translations WHERE \`key\` = ${key} AND namespace <=> ${namespace} LIMIT 1`
 		);
 
-		// If not found, try case-insensitive match
 		if (result.length === 0) {
 			logger.debug(`[getByKey] Exact match not found, trying case-insensitive for "${key}"`);
 			result = await storage().query(
-				sql`SELECT id FROM translations WHERE LOWER(\`key\`) = LOWER(${key}) LIMIT 1`
+				sql`SELECT id FROM translations WHERE LOWER(\`key\`) = LOWER(${key}) AND namespace <=> ${namespace} LIMIT 1`
 			);
 			if (result.length > 0) {
 				logger.debug(`[getByKey] Found case-insensitive match:`, { id: result[0].id });
@@ -42,7 +40,7 @@ export const translationModel = {
 		}
 
 		const translationId = result.length > 0 ? result[0].id : null;
-		logger.debug(`[getByKey] Result for "${key}":`, { translationId });
+		logger.debug(`[getByKey] Result for "${key}", namespace "${namespace}":`, { translationId });
 		return translationId;
 	},
 
@@ -61,9 +59,9 @@ export const translationModel = {
 		return hasPlurals;
 	},
 
-	async getOrCreate(key: string, context: string = null): Promise<number> {
+	async getOrCreate(key: string, context: string = null, namespace: string = null): Promise<number> {
 		const existing = await storage().query(
-			sql`SELECT id FROM translations WHERE \`key\` = ${key} LIMIT 1`
+			sql`SELECT id FROM translations WHERE \`key\` = ${key} AND namespace <=> ${namespace} LIMIT 1`
 		);
 
 		if (existing.length > 0) {
@@ -71,11 +69,11 @@ export const translationModel = {
 		}
 
 		await storage().query(
-			sql`INSERT INTO translations (\`key\`, context) VALUES (${key}, ${context})`
+			sql`INSERT INTO translations (\`key\`, namespace, context) VALUES (${key}, ${namespace}, ${context})`
 		);
 
 		const result = await storage().query(
-			sql`SELECT id FROM translations WHERE \`key\` = ${key} LIMIT 1`
+			sql`SELECT id FROM translations WHERE \`key\` = ${key} AND namespace <=> ${namespace} LIMIT 1`
 		);
 
 		return result[0].id;
@@ -134,7 +132,7 @@ export const translationModel = {
 		return result[0].forms;
 	},
 
-	async translateBatch(requests: Array<{ key: string, context?: string, isPlural?: boolean }>) {
+	async translateBatch(requests: Array<{ key: string, context?: string, isPlural?: boolean, namespace?: string }>) {
 		if (requests.length === 0) return [];
 
 		logger.info(`[translateBatch] Processing ${requests.length} requests`);
@@ -145,15 +143,17 @@ export const translationModel = {
 			logger.info(`[translateBatch] Request:`, {
 				key: request.key,
 				context: request.context,
-				isPlural: request.isPlural
+				isPlural: request.isPlural,
+				namespace: request.namespace
 			});
 
-			const translationId = await this.getOrCreate(request.key, request.context || null);
-			logger.info(`[translateBatch] Translation ID for "${request.key}": ${translationId}`);
+			const translationId = await this.getOrCreate(request.key, request.context || null, request.namespace || null);
+			logger.info(`[translateBatch] Translation ID for "${request.key}" (namespace: ${request.namespace}): ${translationId}`);
 
 			const translation: any = {
 				id: translationId,
 				key: request.key,
+				namespace: request.namespace || null,
 				context: request.context || null,
 				isPlural: request.isPlural || false,
 			};

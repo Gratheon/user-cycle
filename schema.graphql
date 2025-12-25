@@ -5,6 +5,7 @@ scalar URL
 input TranslationInput {
 	key: String!
 	context: String
+	namespace: String
 }
 
 input RegisterInput {
@@ -73,6 +74,7 @@ type Locale {
 type Translation {
 	id: ID!
 	key: String!
+	namespace: String
 	context: String
 	values: JSON
 	plurals: JSON
@@ -104,7 +106,7 @@ type Mutation {
 	revokeApiToken(token: String!): Error
 	revokeShareToken(token: String!): Error
 
-	updateTranslationValue(key: String!, lang: String!, value: String!): Translation
+	updateTranslationValue(key: String!, lang: String!, value: String!, namespace: String): Translation
 	batchTranslateLanguage(langCode: String!): BatchTranslationResult
 }
 
