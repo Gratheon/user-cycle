@@ -17,7 +17,8 @@ RUN npm install --include=dev
 
 # Copy tsconfig so tooling can read it even before volume mount
 COPY src/config ./src/config
+COPY schema.graphql /app/schema.graphql
 
 EXPOSE 4000
 
-# No CMD; docker-compose will supply ts-node-dev command
+CMD npm run dev-in-docker

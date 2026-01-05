@@ -21,6 +21,7 @@ input RegisterInput {
 type Query {
 	user: UserOrError
 	invoices: [Invoice]
+	billingHistory: [BillingHistoryEvent]
 	apiTokens: [APIToken]
 	shareTokens: [ShareToken]
 	translate(en: String, key: String, tc: String): Locale
@@ -57,6 +58,14 @@ type Invoice {
 	currency: String
 	date: DateTime
 	url: URL
+}
+
+type BillingHistoryEvent {
+	id: ID!
+	eventType: String!
+	billingPlan: String
+	details: String
+	createdAt: DateTime!
 }
 
 type Locale {
@@ -99,7 +108,7 @@ type Mutation {
 	generateShareToken(name: String!, scopes: JSON!, sourceUrl: URL!, scopeParams: JSON!): ShareToken
 	validateApiToken(token: String): ValidateTokenResult
 	updateUser(user: UserUpdateInput!): UpdateUserResult
-	createCheckoutSession: URL
+	createCheckoutSession(plan: String, cycle: String): URL
 	cancelSubscription: CancelSubscriptionResult
 	deleteUserSelf: Error
 
@@ -165,7 +174,7 @@ type User {
 
 
 	"""
-	Billing plan: free, base, pro
+	Billing plan: free, starter, professional, addon, enterprise
 	"""
 	billingPlan: String
 }

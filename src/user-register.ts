@@ -6,6 +6,7 @@ import {sleepForSecurity} from './models/sleep';
 import {logger} from './logger';
 import error_code, {err} from './error_code';
 import {tokenModel} from './models/tokens';
+import {billingHistoryModel} from './models/billingHistory';
 import config from './config';
 import {createGrafanaUser} from './models/grafana';
 import {sendAdminUserRegisteredMail, sendWelcomeMail} from "./send-mail";
@@ -74,7 +75,8 @@ export default async function registerUser(_, { input }) {
     }
     logger.info(`Created user with id ${id}`, {email})
 
-    // add api token
+    await billingHistoryModel.addRegistration(id, 'free');
+
     await tokenModel.create(id)
 
     try {

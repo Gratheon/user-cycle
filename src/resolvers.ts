@@ -8,6 +8,7 @@ import { userModel } from './models/user';
 import { shareTokenModel, tokenModel } from './models/tokens';
 import { localeModel } from './models/locales';
 import { translationModel } from './models/translations';
+import { billingHistoryModel } from './models/billingHistory';
 import error_code, { err } from './error_code';
 import { logger } from './logger';
 import registerUser from './user-register';
@@ -32,6 +33,15 @@ export const resolvers = {
 			}
 
 			return await userModel.getInvoices(ctx);
+		},
+
+		billingHistory: async (_, __, ctx) => {
+			if (!ctx.uid) {
+				logger.warn("Authentication required for billingHistory resolver")
+				return err(error_code.AUTHENTICATION_REQUIRED);
+			}
+
+			return await billingHistoryModel.getByUserId(ctx.uid);
 		},
 
 		apiTokens: async (_, __, ctx) => {
@@ -267,6 +277,11 @@ export const resolvers = {
 					email: user.email,
 				})
 
+				await billingHistoryModel.addSubscriptionCancelled(
+					ctx.uid,
+					user.billingPlan || 'starter'
+				);
+
 				return await resolvers.Query.user(null, null, ctx);
 			} catch (e) {
 				logger.error(e);
@@ -274,34 +289,54 @@ export const resolvers = {
 			}
 		},
 		createCheckoutSession: async (parent, args, ctx) => {
+			logger.info(`createCheckoutSession called with args:`, args);
+
+			const { plan = 'starter', cycle = 'monthly' } = args;
+
 			if (!ctx.uid) return err(error_code.AUTHENTICATION_REQUIRED);
 
 			const appUrl = config.stripe.selfUrl;
-
 			const user = await userModel.getById(ctx.uid);
 
-			// Create new Checkout Session for the order
-			// Other optional params include:
-			// [billing_address_collection] - to display billing address details on the page
-			// [customer] - if you have an existing Stripe Customer ID
-			// [customer_email] - lets you prefill the email input in the form
-			// [automatic_tax] - to automatically calculate sales tax, VAT and GST in the checkout page
-			// For full details see https://stripe.com/docs/api/checkout/sessions/create
+			let priceId: string;
+			let mode: 'payment' | 'subscription';
+
+			if (plan === 'addon') {
+				priceId = config.stripe.plans.addon.oneTime;
+				mode = 'payment';
+			} else if (plan === 'starter') {
+				priceId = cycle === 'yearly'
+					? config.stripe.plans.starter.yearly
+					: config.stripe.plans.starter.monthly;
+				mode = 'subscription';
+			} else if (plan === 'professional') {
+				priceId = cycle === 'yearly'
+					? config.stripe.plans.professional.yearly
+					: config.stripe.plans.professional.monthly;
+				mode = 'subscription';
+			} else {
+				logger.error(`Invalid plan: ${plan}`);
+				return null;
+			}
+
+			logger.info(`Creating checkout session for user ${ctx.uid}: plan=${plan}, cycle=${cycle}, priceId=${priceId}`);
+
 			try {
 				const session = await stripe.checkout.sessions.create({
 					customer_email: user.email,
-					mode: "subscription",
+					mode: mode,
 					line_items: [
 						{
-							price: config.stripe.price,
+							price: priceId,
 							quantity: 1,
 						},
 					],
-					// ?session_id={CHECKOUT_SESSION_ID} means the redirect will have the session ID set as a query param
 					success_url: `${appUrl}/account/success`,
-					// success_url: `${domainURL}/account/success?session_id={CHECKOUT_SESSION_ID}`,
 					cancel_url: `${appUrl}/account/cancel`,
-					// automatic_tax: { enabled: true }
+					metadata: {
+						plan: plan,
+						cycle: cycle || 'one-time'
+					}
 				});
 
 				return session.url;

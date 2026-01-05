@@ -7,7 +7,7 @@ import {logger} from './logger';
 import config from './config/index';
 import { storage } from "./storage";
 import { userModel } from './models/user';
-import { Exception } from '@sentry/node';
+import { billingHistoryModel } from './models/billingHistory';
 
 // This is your Stripe CLI webhook secret for testing your endpoint locally.
 const endpointSecret = config.stripe.webhook_secret;
@@ -76,9 +76,30 @@ export function registerStripe(app) {
 						});
 						break;
 					case 'invoice.payment_failed':
-						// The payment failed or the customer does not have a valid payment method.
-						// The subscription becomes past_due. Notify your customer and send them to the
-						// customer portal to update their payment information.
+						logger.warn('Payment failed for email', session.customer_email);
+						const userIdFailed = await storage().query(
+							"SELECT id, billing_plan FROM `account` WHERE `email`=?", [session.customer_email]
+						);
+
+						if (userIdFailed && userIdFailed[0]?.id) {
+							const previousPlan = userIdFailed[0].billing_plan || 'starter';
+
+							await billingHistoryModel.addPaymentFailed(
+								userIdFailed[0].id,
+								previousPlan,
+								'Payment method declined'
+							);
+
+							await storage().query(
+								"UPDATE `account` SET billing_plan='free', stripe_subscription=NULL WHERE `email`=?",
+								[session.customer_email]
+							);
+
+							await billingHistoryModel.addSubscriptionExpired(
+								userIdFailed[0].id,
+								previousPlan
+							);
+						}
 						break;
 
 					// case 'customer.subscription.trial_will_end': break;

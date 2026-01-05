@@ -3,7 +3,6 @@ services:
   user-cycle:
     build:
       dockerfile: Dockerfile.dev
-    command: sh ./dev-entry.sh
     environment:
       - ENV_ID=dev
       - NODE_OPTIONS=--enable-source-maps
@@ -11,8 +10,14 @@ services:
     ports:
       - 4000:4000
     volumes:
-      # Mount source code
-      - .:/app
+      # Mount source code for hot reload
+      - ./config:/app/config
+      - ./emails:/app/emails
+      - ./migrations:/app/migrations
+      - ./package.json:/app/package.json
+      - ./schema.graphql:/app/schema.graphql
+      - ./src:/app/src
+      - ./tmp:/app/tmp
       # Preserve container's node_modules separate from host (avoid overwriting)
       - /app/node_modules
     restart: always
