@@ -34,9 +34,13 @@ async function tryConnect(logger): Promise<boolean> {
       connectionString: `${dsn}${config.mysql.database}`,
       // Connection pool configuration to prevent "packets out of order" warnings
       poolSize: 10, // Maximum number of connections in the pool
-      idleTimeoutMilliseconds: 60_000, // Keep idle connections for 60s (increased from default 30s)
+      maxUses: 50, // Recycle connections after 50 uses to prevent stale connections
+      idleTimeoutMilliseconds: 30_000, // Close idle connections after 30s (before MySQL wait_timeout)
       queueTimeoutMilliseconds: 60_000, // Wait up to 60s for a connection from the pool
       acquireLockTimeoutMilliseconds: 60_000, // Wait up to 60s for connection locks
+      onError: (err) => {
+        logger.error(`MySQL connection pool error: ${err.message}`);
+      },
       onQueryError: (query, { text }, err) => {
         startTimes.delete(query);
         logger.error(
