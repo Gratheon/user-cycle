@@ -3,7 +3,6 @@ import {ApolloServerPluginDrainHttpServer, ApolloServerPluginLandingPageGraphQLP
 import fastify from "fastify";
 import {buildSubgraphSchema} from '@apollo/federation';
 import * as Sentry from '@sentry/node';
-import {RewriteFrames} from "@sentry/integrations";
 import gql from "graphql-tag";
 
 import config from './config/index';
@@ -37,12 +36,6 @@ Sentry.init({
     dsn: config.sentryDsn,
     environment: process.env.ENV_ID,
     tracesSampleRate: 1.0,
-    integrations: [
-        new RewriteFrames({
-            // @ts-ignore
-            root: global.__dirname,
-        }),
-    ],
 });
 
 
@@ -117,9 +110,9 @@ async function startApolloServer(app, typeDefs, resolvers) {
     app.get('/account/cancel', (request, reply) => {
         if (process.env.ENV_ID == 'dev') {
             // web-app is running on
-            reply.redirect(301, 'http://0.0.0.0:8080/account/cancel');
+            reply.redirect('http://0.0.0.0:8080/account/cancel', 301);
         } else {
-            reply.redirect(301, 'https://app.gratheon.com/account/cancel');
+            reply.redirect('https://app.gratheon.com/account/cancel', 301);
         }
     })
 
@@ -146,7 +139,7 @@ async function startApolloServer(app, typeDefs, resolvers) {
         // GOOGLE REST API
         registerGoogle(app);
 
-        await app.listen(4000, '0.0.0.0');
+        await app.listen({port: 4000, host: '0.0.0.0'});
         logger.info(`🧑‍🚀 user-cycle service is ready at http://localhost:4000${path}`);
     } catch (e) {
         console.error(e);

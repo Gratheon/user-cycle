@@ -13,7 +13,7 @@ ENV NODE_ENV=development
 COPY package.json package-lock.json* ./
 
 # Install including dev dependencies explicitly (robust against NODE_ENV mismatches)
-RUN npm install --include=dev
+RUN npm install --include=dev --legacy-peer-deps
 
 # Copy tsconfig so tooling can read it even before volume mount
 COPY src/config ./src/config
