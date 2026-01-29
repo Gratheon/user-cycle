@@ -23,13 +23,20 @@ async function tryConnect(logger): Promise<boolean> {
     const conn = createConnectionPool(dsn);
 
     await conn.query(sql`CREATE DATABASE IF NOT EXISTS \`user-cycle\` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;`);
+    
+    // Dispose of the temporary connection pool to prevent connection leaks
     await conn.dispose();
-
+    
     const startTimes = new Map<SQLQuery, number>();
     let connectionsCount = 0;
 
     db = createConnectionPool({
       connectionString: `${dsn}${config.mysql.database}`,
+      // Connection pool configuration to prevent "packets out of order" warnings
+      poolSize: 10, // Maximum number of connections in the pool
+      idleTimeoutMilliseconds: 60_000, // Keep idle connections for 60s (increased from default 30s)
+      queueTimeoutMilliseconds: 60_000, // Wait up to 60s for a connection from the pool
+      acquireLockTimeoutMilliseconds: 60_000, // Wait up to 60s for connection locks
       onQueryError: (query, { text }, err) => {
         startTimes.delete(query);
         logger.error(
