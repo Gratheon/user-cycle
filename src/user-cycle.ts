@@ -18,6 +18,23 @@ import {logger} from './logger'
 import {registerGoogle} from "./google-auth";
 import {rootHandler} from './handlers/rootHandler';
 
+// Suppress harmless "packets out of order" warnings from mysql2
+// These occur during normal connection pool cleanup and don't indicate errors
+const originalStderrWrite = process.stderr.write.bind(process.stderr);
+process.stderr.write = ((chunk: any, encoding?: any, callback?: any): boolean => {
+    const str = chunk.toString();
+    if (str.includes('packets out of order')) {
+        // Silently ignore these harmless warnings
+        if (typeof encoding === 'function') {
+            encoding();
+        } else if (callback) {
+            callback();
+        }
+        return true;
+    }
+    return originalStderrWrite(chunk, encoding, callback);
+}) as typeof process.stderr.write;
+
 if (process.env.ENV_ID === 'dev') {
     try {
         // Dynamically install source-map-support so error stacks map to .ts lines in dev

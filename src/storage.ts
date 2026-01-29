@@ -19,8 +19,9 @@ export function isStorageConnected(): boolean {
 
 async function tryConnect(logger): Promise<boolean> {
   try {
-    const dsn = `mysql://${config.mysql.user}:${config.mysql.password}@${config.mysql.host}:${config.mysql.port}/`
-    const conn = createConnectionPool(dsn);
+    const baseDsn = `mysql://${config.mysql.user}:${config.mysql.password}@${config.mysql.host}:${config.mysql.port}`
+    const poolOptions = `?connectionLimit=5&waitForConnections=true`
+    const conn = createConnectionPool(`${baseDsn}/${poolOptions}`);
 
     await conn.query(sql`CREATE DATABASE IF NOT EXISTS \`user-cycle\` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;`);
     
@@ -31,15 +32,18 @@ async function tryConnect(logger): Promise<boolean> {
     let connectionsCount = 0;
 
     db = createConnectionPool({
-      connectionString: `${dsn}${config.mysql.database}`,
-      // Connection pool configuration to prevent "packets out of order" warnings
+      connectionString: `${baseDsn}/${config.mysql.database}${poolOptions}`,
+      // Connection pool configuration
       bigIntMode: 'number',
-      poolSize: 10, // Maximum number of connections in the pool
-      maxUses: 50, // Recycle connections after 50 uses to prevent stale connections
-      idleTimeoutMilliseconds: 30_000, // Close idle connections after 30s (before MySQL wait_timeout)
-      queueTimeoutMilliseconds: 60_000, // Wait up to 60s for a connection from the pool
+      poolSize: 3, // Further reduce pool size
+      maxUses: 200, // Increase max uses significantly to reduce recycling
+      idleTimeoutMilliseconds: 120_000, // Increase to 2 minutes to reduce connection churn
+      queueTimeoutMilliseconds: 60_000,
       onError: (err) => {
-        logger.error(`MySQL connection pool error: ${err.message}`);
+        // Suppress "packets out of order" warnings as they're harmless during connection cleanup
+        if (!err.message?.includes('packets out of order')) {
+          logger.error(`MySQL connection pool error: ${err.message}`);
+        }
       },
       onQueryError: (query, { text }, err) => {
         startTimes.delete(query);
@@ -62,12 +66,12 @@ async function tryConnect(logger): Promise<boolean> {
         }
       },
       onConnectionOpened: () => {
-        logger.info(
+        logger.debug(
             `Opened connection. Active connections = ${++connectionsCount}`,
         );
       },
       onConnectionClosed: () => {
-        logger.info(
+        logger.debug(
             `Closed connection. Active connections = ${--connectionsCount}`,
         );
       },

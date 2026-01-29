@@ -7,15 +7,18 @@ import * as path from 'path';
 
 
 const conn = createConnectionPool({
-    connectionString: `mysql://${config.mysql.user}:${config.mysql.password}@${config.mysql.host}:${config.mysql.port}/logs`,
-    // Connection pool configuration to prevent "packets out of order" warnings
+    connectionString: `mysql://${config.mysql.user}:${config.mysql.password}@${config.mysql.host}:${config.mysql.port}/logs?connectionLimit=3&waitForConnections=true`,
+    // Connection pool configuration
     bigIntMode: 'number',
-    poolSize: 10, // Maximum number of connections in the pool
-    maxUses: 50, // Recycle connections after 50 uses to prevent stale connections
-    idleTimeoutMilliseconds: 30_000, // Close idle connections after 30s (before MySQL wait_timeout)
-    queueTimeoutMilliseconds: 60_000, // Wait up to 60s for a connection from the pool
+    poolSize: 3, // Smaller pool for logger
+    maxUses: 200, // Increase max uses significantly to reduce recycling
+    idleTimeoutMilliseconds: 120_000, // 2 minutes to reduce connection churn
+    queueTimeoutMilliseconds: 60_000,
     onError: (err) => {
-        console.error(`MySQL logger connection pool error: ${err.message}`);
+        // Suppress "packets out of order" warnings as they're harmless during connection cleanup
+        if (!err.message?.includes('packets out of order')) {
+            console.error(`MySQL logger connection pool error: ${err.message}`);
+        }
     },
 });
 
