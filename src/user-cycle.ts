@@ -92,8 +92,12 @@ async function startApolloServer(app, typeDefs, resolvers) {
 (async function main() {
     await initStorage(logger);
 
-    // @ts-ignore
-    const app = fastify({logger});
+    // Fastify 5 requires logger to be a boolean or pino config object
+    // We use our custom logger separately, so disable Fastify's built-in logger
+    const app = fastify({
+        logger: false,
+        disableRequestLogging: true
+    });
 
     app.register(require('@fastify/cookie'), {
         secret: "my-secret", // for cookies signature
