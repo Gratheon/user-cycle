@@ -37,11 +37,13 @@ async function tryConnect(logger): Promise<boolean> {
       bigIntMode: 'number',
       poolSize: 3, // Further reduce pool size
       maxUses: 200, // Increase max uses significantly to reduce recycling
-      idleTimeoutMilliseconds: 120_000, // Increase to 2 minutes to reduce connection churn
+      idleTimeoutMilliseconds: 30_000, // Recycle idle connections after 30 seconds (well before MySQL's wait_timeout)
       queueTimeoutMilliseconds: 60_000,
       onError: (err) => {
-        // Suppress "packets out of order" warnings as they're harmless during connection cleanup
-        if (!err.message?.includes('packets out of order')) {
+        // Suppress "packets out of order" and inactivity warnings as they're handled by connection recycling
+        if (!err.message?.includes('packets out of order') && 
+            !err.message?.includes('inactivity') &&
+            !err.message?.includes('wait_timeout')) {
           logger.error(`MySQL connection pool error: ${err.message}`);
         }
       },
