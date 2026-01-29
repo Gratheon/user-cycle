@@ -5,21 +5,65 @@ import jsonStringify from 'fast-safe-stringify'
 import * as fs from 'fs';
 import * as path from 'path';
 
+let conn: any = null;
+let dbInitialized = false;
 
-const conn = createConnectionPool({
-    connectionString: `mysql://${config.mysql.user}:${config.mysql.password}@${config.mysql.host}:${config.mysql.port}/logs?connectionLimit=3&waitForConnections=true`,
-    // Connection pool configuration
-    bigIntMode: 'number',
-    poolSize: 3, // Smaller pool for logger
-    maxUses: 200, // Increase max uses significantly to reduce recycling
-    idleTimeoutMilliseconds: 120_000, // 2 minutes to reduce connection churn
-    queueTimeoutMilliseconds: 60_000,
-    onError: (err) => {
-        // Suppress "packets out of order" warnings as they're harmless during connection cleanup
-        if (!err.message?.includes('packets out of order')) {
-            console.error(`MySQL logger connection pool error: ${err.message}`);
-        }
-    },
+// Initialize database asynchronously
+async function initLogDatabase() {
+    if (dbInitialized) return;
+    
+    try {
+        // First connect without database to create it if needed
+        const tempConn = createConnectionPool({
+            connectionString: `mysql://${config.mysql.user}:${config.mysql.password}@${config.mysql.host}:${config.mysql.port}/?connectionLimit=1&waitForConnections=true`,
+            bigIntMode: 'number',
+        });
+        
+        await tempConn.query(sql`CREATE DATABASE IF NOT EXISTS \`logs\` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;`);
+        await tempConn.dispose();
+        
+        // Now create the main connection pool with the logs database
+        conn = createConnectionPool({
+            connectionString: `mysql://${config.mysql.user}:${config.mysql.password}@${config.mysql.host}:${config.mysql.port}/logs?connectionLimit=3&waitForConnections=true`,
+            // Connection pool configuration
+            bigIntMode: 'number',
+            poolSize: 3, // Smaller pool for logger
+            maxUses: 200, // Increase max uses significantly to reduce recycling
+            idleTimeoutMilliseconds: 30_000, // Recycle idle connections after 30 seconds
+            queueTimeoutMilliseconds: 60_000,
+            onError: (err) => {
+                // Suppress "packets out of order" and inactivity warnings
+                if (!err.message?.includes('packets out of order') && 
+                    !err.message?.includes('inactivity') &&
+                    !err.message?.includes('wait_timeout')) {
+                    console.error(`MySQL logger connection pool error: ${err.message}`);
+                }
+            },
+        });
+        
+        // Create logs table if it doesn't exist
+        await conn.query(sql`
+            CREATE TABLE IF NOT EXISTS \`logs\` (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                level VARCHAR(50),
+                message TEXT,
+                meta TEXT,
+                timestamp DATETIME,
+                INDEX idx_timestamp (timestamp),
+                INDEX idx_level (level)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+        `);
+        
+        dbInitialized = true;
+    } catch (err) {
+        console.error('Failed to initialize logs database:', err);
+        // Don't throw - allow the service to start even if logging DB fails
+    }
+}
+
+// Start initialization immediately but don't wait for it
+initLogDatabase().catch(err => {
+    console.error('Error during log database initialization:', err);
 });
 
 function log(level: string, message: string, meta?: any) {
@@ -68,14 +112,20 @@ function safeMeta(meta: any): any {
 }
 
 function storeInDB(level: string, message: any, meta?: any){
+    if (!conn || !dbInitialized) {
+        // Database not ready yet, skip DB logging
+        return;
+    }
     try {
         const msg = safeToStringMessage(message);
         const metaObj = safeMeta(meta);
         const metaStr = jsonStringify(metaObj).slice(0, 2000);
         // Fire and forget; avoid awaiting in hot path. Catch errors to avoid unhandled rejection.
         conn.query(sql`INSERT INTO \`logs\` (level, message, meta, timestamp) VALUES (${level}, ${msg}, ${metaStr}, NOW())`).catch(e => {
-            // fallback console output only
-            console.error('Failed to persist log to DB', e);
+            // fallback console output only - but don't spam
+            if (process.env.ENV_ID === 'dev') {
+                console.error('Failed to persist log to DB', e);
+            }
         });
     } catch (e) {
         console.error('Unexpected failure preparing log for DB', e);
@@ -250,9 +300,33 @@ export const logger = {
 
 
 process.on('uncaughtException', function (err) {
-    logger.error('UncaughtException', err);
+    // Use console.error directly to ensure we see the error even if logger fails
+    console.error('=== UNCAUGHT EXCEPTION ===');
+    console.error(err);
+    if (err && err.stack) {
+        console.error(err.stack);
+    }
+    // Also try to log through logger if available
+    try {
+        logger.error('UncaughtException', err);
+    } catch (logErr) {
+        console.error('Failed to log uncaught exception:', logErr);
+    }
+    // Exit after a brief delay to allow logs to flush
+    setTimeout(() => process.exit(1), 100);
 });
 
 process.on('unhandledRejection', function (reason: any) {
-    logger.error('UnhandledRejection', reason);
+    // Use console.error directly
+    console.error('=== UNHANDLED REJECTION ===');
+    console.error(reason);
+    if (reason && reason.stack) {
+        console.error(reason.stack);
+    }
+    // Also try to log through logger
+    try {
+        logger.error('UnhandledRejection', reason);
+    } catch (logErr) {
+        console.error('Failed to log unhandled rejection:', logErr);
+    }
 });
