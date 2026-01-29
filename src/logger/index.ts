@@ -296,41 +296,6 @@ export const logger = {
     debug: (message: string, meta?: any) => {
         log('debug', safeToStringMessage(message), safeMeta(meta));
     },
-    
-    // Fastify 5 requires these additional methods
-    fatal: (message: string | Error | any, meta?: any) => {
-        // Treat fatal same as error but exit after logging
-        const metaObj = safeMeta(meta);
-        if (message instanceof Error) {
-            const causeChain = buildCauseChain(message);
-            const enrichedMeta = {stack: message.stack, name: message.name, causeChain, ...metaObj};
-            log('error', `FATAL: ${message.message}`, enrichedMeta);
-            if (message.stack) {
-                printStackEnhanced(message);
-            }
-            if (causeChain.length) {
-                console.log('\x1b[35mCause chain:\x1b[0m ' + causeChain.join(' -> '));
-            }
-            storeInDB('error', `FATAL: ${message.message}`, enrichedMeta);
-        } else {
-            const msgStr = safeToStringMessage(message);
-            log('error', `FATAL: ${msgStr}`, metaObj);
-            storeInDB('error', `FATAL: ${msgStr}`, metaObj);
-        }
-    },
-    
-    trace: (message: string, meta?: any) => {
-        // Trace is more verbose than debug, but we'll treat them the same
-        const metaObj = safeMeta(meta);
-        log('debug', `[trace] ${safeToStringMessage(message)}`, metaObj);
-    },
-    
-    child: (bindings?: any) => {
-        // Return a child logger with the same interface
-        // For simplicity, just return the same logger instance
-        // In a more sophisticated implementation, you'd merge bindings into all subsequent logs
-        return logger;
-    },
 };
 
 

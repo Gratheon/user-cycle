@@ -92,14 +92,10 @@ async function startApolloServer(app, typeDefs, resolvers) {
 (async function main() {
     await initStorage(logger);
 
-    // Fastify 5 requires logger to be a boolean or pino config object
-    // We use our custom logger separately, so disable Fastify's built-in logger
-    const app = fastify({
-        logger: false,
-        disableRequestLogging: true
-    });
+    // @ts-ignore
+    const app = fastify({logger});
 
-    app.register(require('@fastify/cookie'), {
+    app.register(require('fastify-cookie'), {
         secret: "my-secret", // for cookies signature
         parseOptions: {}     // options for parsing cookies
     })
@@ -131,9 +127,9 @@ async function startApolloServer(app, typeDefs, resolvers) {
     app.get('/account/cancel', (request, reply) => {
         if (process.env.ENV_ID == 'dev') {
             // web-app is running on
-            reply.redirect('http://0.0.0.0:8080/account/cancel', 301);
+            reply.status(301).redirect('http://0.0.0.0:8080/account/cancel');
         } else {
-            reply.redirect('https://app.gratheon.com/account/cancel', 301);
+            reply.status(301).redirect('https://app.gratheon.com/account/cancel');
         }
     })
 
