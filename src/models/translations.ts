@@ -268,7 +268,7 @@ export const translationModel = {
 		const USER_ID = 'openai';
 		const APP_ID = 'chat-completion';
 		const MODEL_ID = 'gpt-oss-120b';
-		const MODEL_VERSION_ID = '1d3ee440e48c4e7a94af6acac7d7cdfc';
+		const MODEL_VERSION_ID = 'f1d2ad8c01c74705868f5c8ae4a1ff7c';
 
 		const stub = ClarifaiStub.grpc();
 		const metadata = new grpc.Metadata();
