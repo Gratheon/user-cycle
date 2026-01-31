@@ -6,6 +6,7 @@
     "@apollo/federation": "0.38.1",
     "@aws-sdk/client-ses": "3.913.0",
     "@databases/mysql": "7.0.0",
+    "@gratheon/log-lib": "^2.0.2",
     "@sentry/node": "10.37.0",
     "apollo-server-core": "3.13.0",
     "apollo-server-fastify": "3.13.0",
