@@ -10,7 +10,7 @@
     "@sentry/node": "10.37.0",
     "apollo-server-core": "3.13.0",
     "apollo-server-fastify": "3.13.0",
-    "axios": "1.13.4",
+    "axios": "1.13.5",
     "clarifai-nodejs-grpc": "11.11.0",
     "cross-fetch": "4.0.0",
     "deep-email-validator": "0.1.21",
