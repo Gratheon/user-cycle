@@ -1,5 +1,5 @@
 # Development Dockerfile (no build step, uses ts-node-dev via docker-compose)
-FROM node:22-alpine
+FROM node:25-slim
 
 WORKDIR /app
 
