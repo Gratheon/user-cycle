@@ -1,5 +1,5 @@
 # Development Dockerfile (no build step, uses ts-node-dev via docker-compose)
-FROM node:25-slim
+FROM platformatic/node-caged:25-slim
 
 WORKDIR /app
 
@@ -7,7 +7,7 @@ WORKDIR /app
 ENV NODE_ENV=development
 
 # Optional: install build tools if native modules are needed later
-# RUN apk add --no-cache python3 make g++
+# RUN apk add --no-cache python3 make g++:
 
 # Copy manifests for better caching
 COPY package.json package-lock.json* ./
