@@ -1,219 +1,203 @@
-import {expect} from '@jest/globals';
-// import fetch from 'node-fetch';
+import crypto from 'crypto';
 
-// port from docker-compose.test.yml
 const URL = 'http://localhost:4000/graphql';
 
-describe('register', () => {
-    it('should register a user', async () => {
+const REGISTER_MUTATION = `
+mutation register($input: RegisterInput!) {
+  register(input: $input) {
+    __typename
+    ... on Error {
+      code
+    }
+    ... on UserSession {
+      key
+      user {
+        id
+        email
+      }
+    }
+  }
+}
+`;
 
-        let email = "artkurapov+"+ new Date().getTime() + "@gmail.com"
+const NONCE_QUERY = `
+query registrationNonce {
+  registrationNonce {
+    nonce
+    challenge
+    difficulty
+  }
+}
+`;
 
-        // register first time
-        let body = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'internal-router-signature': 'test-signature',
-            },
-            body: JSON.stringify({
-                operationName: 'register',
-                query: "mutation register($first_name: String, $last_name: String, $email: String!, $password: String!) {\n  register(\n    first_name: $first_name\n    last_name: $last_name\n    email: $email\n    password: $password\n  ) {\n    __typename\n    ... on Error {\n      code\n    }\n    ... on UserSession {\n      key\n    }\n  }\n}",
-                variables: {
-                    "email": email, // <-- valid email
-                    "first_name": "james",
-                    "last_name": "bond",
-                    "password": "Test1234"
-                }
-            })
-        }
+async function gqlRequest(query: string, variables?: Record<string, unknown>) {
+  const response = await fetch(URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'internal-router-signature': 'test-signature',
+    },
+    body: JSON.stringify({ query, variables }),
+  });
 
-        let response = await fetch(URL, body);
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
 
-        const result = await response.json();
+  return response.json();
+}
 
+function solvePow(challenge: string, difficulty: number): string {
+  const prefix = '0'.repeat(difficulty);
 
-        // Check if the response was successful
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+  for (let i = 0; i < 1_500_000; i++) {
+    const solution = i.toString(16);
+    const hash = crypto
+      .createHash('sha256')
+      .update(challenge + solution)
+      .digest('hex');
 
+    if (hash.startsWith(prefix)) {
+      return solution;
+    }
+  }
 
-        // @ts-ignore
-        expect(result?.data.register.key).toBeDefined()
+  throw new Error('Could not solve registration proof-of-work challenge');
+}
+
+async function getNonceAndSolution() {
+  const nonceResult = await gqlRequest(NONCE_QUERY);
+  const noncePayload = nonceResult?.data?.registrationNonce;
+
+  if (!noncePayload) {
+    throw new Error('registrationNonce query returned no payload');
+  }
+
+  return {
+    nonce: noncePayload.nonce as string,
+    solution: solvePow(noncePayload.challenge as string, noncePayload.difficulty as number),
+  };
+}
+
+async function register(input: {
+  email: string;
+  password: string;
+  first_name?: string;
+  last_name?: string;
+  lang?: string;
+  nonce?: string;
+  solution?: string;
+}) {
+  const nonceData = input.nonce && input.solution
+    ? { nonce: input.nonce, solution: input.solution }
+    : await getNonceAndSolution();
+
+  return gqlRequest(REGISTER_MUTATION, {
+    input: {
+      first_name: input.first_name ?? 'james',
+      last_name: input.last_name ?? 'bond',
+      lang: input.lang ?? 'en',
+      email: input.email,
+      password: input.password,
+      nonce: nonceData.nonce,
+      solution: nonceData.solution,
+    },
+  });
+}
+
+describe('register integration', () => {
+  it('registers a user', async () => {
+    const email = `artkurapov+${Date.now()}@gmail.com`;
+    const result = await register({ email, password: 'Test1234' });
+
+    expect(result?.data?.register?.__typename).toBe('UserSession');
+    expect(result?.data?.register?.key).toBeDefined();
+    expect(result?.data?.register?.user?.email).toBe(email);
+  });
+
+  it('logs in on duplicate registration with same password', async () => {
+    const email = `artkurapov+${Date.now()}@gmail.com`;
+
+    await register({ email, password: 'Test1234' });
+    const result = await register({ email, password: 'Test1234' });
+
+    expect(result?.data?.register?.__typename).toBe('UserSession');
+    expect(result?.data?.register?.key).toBeDefined();
+  });
+
+  it('fails with INVALID_EMAIL on invalid email', async () => {
+    const result = await register({ email: 'artk@aa', password: 'Test1234' });
+
+    expect(result?.data).toEqual({
+      register: {
+        __typename: 'Error',
+        code: 'INVALID_EMAIL',
+      },
+    });
+  });
+
+  it('fails with SIMPLE_PASSWORD on empty password', async () => {
+    const email = `artkurapov+${Date.now()}@gmail.com`;
+    const result = await register({ email, password: '' });
+
+    expect(result?.data).toEqual({
+      register: {
+        __typename: 'Error',
+        code: 'SIMPLE_PASSWORD',
+      },
+    });
+  });
+
+  it('fails with EMAIL_TAKEN when email is reused with different password', async () => {
+    const email = `artkurapov+${Date.now()}@gmail.com`;
+
+    await register({ email, password: 'Test1234' });
+    const result = await register({ email, password: 'Test5678' });
+
+    expect(result?.data).toEqual({
+      register: {
+        __typename: 'Error',
+        code: 'EMAIL_TAKEN',
+      },
+    });
+  });
+
+  it('fails with MISSING_NONCE when nonce is omitted', async () => {
+    const result = await gqlRequest(REGISTER_MUTATION, {
+      input: {
+        first_name: 'james',
+        last_name: 'bond',
+        lang: 'en',
+        email: `artkurapov+${Date.now()}@gmail.com`,
+        password: 'Test1234',
+        nonce: '',
+        solution: '',
+      },
     });
 
-    it('should login on duplicate registration', async () => {
+    expect(result?.data).toEqual({
+      register: {
+        __typename: 'Error',
+        code: 'MISSING_NONCE',
+      },
+    });
+  });
 
-        let email = "artkurapov+"+ new Date().getTime() + "@gmail.com"
+  it('fails with INVALID_PROOF_OF_WORK on bad solution', async () => {
+    const { nonce } = await getNonceAndSolution();
 
-        // register first time
-        let body = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'internal-router-signature': 'test-signature',
-            },
-            body: JSON.stringify({
-                operationName: 'register',
-                query: "mutation register($first_name: String, $last_name: String, $email: String!, $password: String!) {\n  register(\n    first_name: $first_name\n    last_name: $last_name\n    email: $email\n    password: $password\n  ) {\n    __typename\n    ... on Error {\n      code\n    }\n    ... on UserSession {\n      key\n    }\n  }\n}",
-                variables: {
-                    "email": email, // <-- valid email
-                    "first_name": "james",
-                    "last_name": "bond",
-                    "password": "Test1234"
-                }
-            })
-        }
-        await fetch(URL, body);
-        let response = await fetch(URL, body);
-
-        const result = await response.json();
-
-
-        // Check if the response was successful
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-
-        // @ts-ignore
-        expect(result?.data.register.key).toBeDefined()
+    const result = await register({
+      email: `artkurapov+${Date.now()}@gmail.com`,
+      password: 'Test1234',
+      nonce,
+      solution: 'invalid-solution',
     });
 
-    it('should fail with INVALID_EMAIL on invalid email', async () => {
-        // make POST request
-        // Send a POST request to the API endpoint
-        const response = await fetch(URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'internal-router-signature': 'test-signature',
-            },
-            body: JSON.stringify({
-                operationName: 'register',
-                query: "mutation register($first_name: String, $last_name: String, $email: String!, $password: String!) {\n  register(\n    first_name: $first_name\n    last_name: $last_name\n    email: $email\n    password: $password\n  ) {\n    __typename\n    ... on Error {\n      code\n    }\n    ... on UserSession {\n      key\n    }\n  }\n}",
-                variables: {
-                    "email": "artk@aa", // <-- invalid email
-                    "first_name": "james",
-                    "last_name": "bond",
-                    "password": "aaaa123"}
-            })
-        });
-
-        // Check if the response was successful
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        // Parse the response data as JSON
-        const result = await response.json();
-
-        // @ts-ignore
-        expect(result?.data).toEqual({
-            "register": {
-                "__typename": "Error",
-                "code": "INVALID_EMAIL",
-            },
-        });
+    expect(result?.data).toEqual({
+      register: {
+        __typename: 'Error',
+        code: 'INVALID_PROOF_OF_WORK',
+      },
     });
-
-    it('should fail with SIMPLE_PASSWORD on empty password', async () => {
-        // make POST request
-        // Send a POST request to the API endpoint
-        const response = await fetch(URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'internal-router-signature': 'test-signature',
-            },
-            body: JSON.stringify({
-                operationName: 'register',
-                query: "mutation register($first_name: String, $last_name: String, $email: String!, $password: String!) {\n  register(\n    first_name: $first_name\n    last_name: $last_name\n    email: $email\n    password: $password\n  ) {\n    __typename\n    ... on Error {\n      code\n    }\n    ... on UserSession {\n      key\n    }\n  }\n}",
-                variables: {
-                    "email": "artkurapov+valid-test@gmail.com",
-                    "first_name": "james",
-                    "last_name": "bond",
-                    "password": "" // <-- empty password
-                }
-            })
-        });
-
-        // Check if the response was successful
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        // Parse the response data as JSON
-        const result = await response.json();
-
-        // @ts-ignore
-        expect(result?.data).toEqual({
-            "register": {
-                "__typename": "Error",
-                "code": "SIMPLE_PASSWORD",
-            },
-        });
-    });
-
-    it('should fail with EMAIL_TAKEN if email already registered', async () => {
-
-        let email = "artkurapov+"+ new Date().getTime() + "@gmail.com"
-
-        // register first time
-        await fetch(URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'internal-router-signature': 'test-signature',
-            },
-            body: JSON.stringify({
-                operationName: 'register',
-                query: "mutation register($first_name: String, $last_name: String, $email: String!, $password: String!) {\n  register(\n    first_name: $first_name\n    last_name: $last_name\n    email: $email\n    password: $password\n  ) {\n    __typename\n    ... on Error {\n      code\n    }\n    ... on UserSession {\n      key\n    }\n  }\n}",
-                variables: {
-                    "email": email, // <-- valid email
-                    "first_name": "james",
-                    "last_name": "bond",
-                    "password": "Test1234"
-                }
-            })
-        });
-
-        // try to register second time
-
-        const response = await fetch(URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'internal-router-signature': 'test-signature',
-            },
-            body: JSON.stringify({
-                operationName: 'register',
-                query: "mutation register($first_name: String, $last_name: String, $email: String!, $password: String!) {\n  register(\n    first_name: $first_name\n    last_name: $last_name\n    email: $email\n    password: $password\n  ) {\n    __typename\n    ... on Error {\n      code\n    }\n    ... on UserSession {\n      key\n    }\n  }\n}",
-                variables: {
-                    "email": email,
-                    "first_name": "james",
-                    "last_name": "bond",
-                    "password": "Test5678" // <-- different password to not get logged in
-                }
-            })
-        });
-
-        const result = await response.json();
-
-
-        // Check if the response was successful
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-
-        // @ts-ignore
-        expect(result?.data).toEqual({
-            "register": {
-                "__typename": "Error",
-                "code": "EMAIL_TAKEN",
-            },
-        });
-    });
+  });
 });
