@@ -1,0 +1,17 @@
+module.exports = {
+  rootDir: '../../',
+  resetMocks: true,
+  restoreMocks: true,
+  maxWorkers: 1,
+  transform: {
+    '^.+\\.ts$': [
+      'ts-jest',
+      {
+        tsconfig: '<rootDir>/test/tsconfig.test.json',
+      },
+    ],
+  },
+  testMatch: ['<rootDir>/test/integration/*.test.(ts|js)'],
+  testTimeout: 10000,
+  collectCoverage: false,
+};

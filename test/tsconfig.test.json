@@ -1,7 +1,7 @@
 {
 	"extends": "../src/config/tsconfig.json",
 	"compilerOptions": {
-	  "types": ["jest"]
+	  "types": ["jest", "node"]
 	},
 	"exclude": ["../src"],
 	"include": ["../test/**/*"]
