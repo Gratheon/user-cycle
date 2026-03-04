@@ -1,4 +1,4 @@
-# Development Dockerfile (no build step, uses ts-node-dev via docker-compose)
+# Development Dockerfile
 FROM platformatic/node-caged:25-slim
 
 WORKDIR /app
@@ -6,14 +6,14 @@ WORKDIR /app
 # Ensure dev dependencies are installed
 ENV NODE_ENV=development
 
-# Optional: install build tools if native modules are needed later
-# RUN apk add --no-cache python3 make g++:
-
 # Copy manifests for better caching
-COPY package.json package-lock.json* ./
+COPY package.json pnpm-lock.yaml* ./
+
+# Install pnpm explicitly (base image does not include corepack)
+RUN npm install -g pnpm@10.29.2
 
 # Install including dev dependencies explicitly (robust against NODE_ENV mismatches)
-RUN npm install --include=dev --legacy-peer-deps
+RUN pnpm install --frozen-lockfile
 
 # Copy tsconfig so tooling can read it even before volume mount
 COPY src/config ./src/config
@@ -21,4 +21,4 @@ COPY schema.graphql /app/schema.graphql
 
 EXPOSE 4000
 
-CMD npm run dev-in-docker
+CMD sh -lc "pnpm install --frozen-lockfile && pnpm run dev-in-docker"

@@ -19,7 +19,9 @@
     "fastify-cookie": "5.7.0",
     "fastify-raw-body": "3.2.0",
     "graphql": "15.8.0",
+    "graphql-tag": "2.12.6",
     "jwt-encode": "1.0.1",
+    "prom-client": "^15.1.3",
     "sha1": "1.1.1",
     "stripe": "10.15.0",
     "uuid": "9.0.1"
@@ -35,7 +37,7 @@
     "dev": "ENV_ID=dev nodemon app/user-cycle.js",
     "start": "ENV_ID=prod node app/user-cycle.js",
     "dev:ts": "ENV_ID=${ENV_ID:-dev} ts-node-dev --respawn --transpile-only --prefer-ts --exit-child --project src/config/tsconfig.json src/user-cycle.ts",
-    "dev-in-docker": "ts-node-dev --respawn --transpile-only --prefer-ts --exit-child --project src/config/tsconfig.json src/user-cycle.ts",
+    "dev-in-docker": "tsc-watch --project ./src/config/tsconfig.json --onSuccess \"node ./app/user-cycle.js\"",
     "prepare": "husky || true"
   },
   "repository": {

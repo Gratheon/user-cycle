@@ -17,6 +17,9 @@ import {registerSchema} from "./schema-registry";
 import {logger} from './logger'
 import {registerGoogle} from "./google-auth";
 import {rootHandler} from './handlers/rootHandler';
+import {metricsContentType, recordHttpRequest, renderMetrics} from "./metrics";
+
+const requestStartTimes = new WeakMap<object, bigint>();
 
 // Suppress harmless "packets out of order" warnings from mysql2
 // These occur during normal connection pool cleanup and don't indicate errors
@@ -116,6 +119,27 @@ async function startApolloServer(app, typeDefs, resolvers) {
         reply.status(500).send({error: "Something went wrong"});
     });
 
+    app.addHook('onRequest', async (request) => {
+        requestStartTimes.set(request.raw, process.hrtime.bigint());
+    });
+
+    app.addHook('onResponse', async (request, reply) => {
+        const start = requestStartTimes.get(request.raw);
+        if (!start) return;
+        requestStartTimes.delete(request.raw);
+
+        const elapsedNanoseconds = Number(process.hrtime.bigint() - start);
+        const durationSeconds = elapsedNanoseconds / 1_000_000_000;
+        const route = request.routerPath || request.raw.url?.split('?')[0] || 'unknown';
+
+        recordHttpRequest({
+            method: request.method,
+            route,
+            statusCode: reply.statusCode,
+            durationSeconds,
+        });
+    });
+
     app.get('/', rootHandler);
 
     app.get('/health', (request, reply) => {
@@ -124,6 +148,11 @@ async function startApolloServer(app, typeDefs, resolvers) {
             mysql: isStorageConnected() ? 'connected' : 'disconnected'
         })
     })
+
+    app.get('/metrics', async (request, reply) => {
+        reply.type(metricsContentType);
+        return renderMetrics();
+    });
     app.get('/account/cancel', (request, reply) => {
         if (process.env.ENV_ID == 'dev') {
             // web-app is running on

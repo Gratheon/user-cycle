@@ -177,6 +177,7 @@ npm run typecheck     # TypeScript type checking
 | POST   | /graphql                 | GraphQL API (Apollo Server)    |
 | POST   | /webhook                 | Stripe webhook handler         |
 | GET    | /health                  | Health check (MySQL status)    |
+| GET    | /metrics                 | Prometheus metrics endpoint    |
 | GET    | /auth/google             | Initiate Google OAuth flow     |
 | GET    | /auth/google/callback    | OAuth callback handler         |
 | GET    | /account/cancel          | Redirect from Stripe UI        |
