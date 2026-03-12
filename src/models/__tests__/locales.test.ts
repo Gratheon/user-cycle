@@ -1,29 +1,17 @@
 import { localeModel } from '../locales';
+import { generateGeminiText } from '../gemini';
 import { storage } from '../../storage';
 import { logger } from '../../logger';
 
 jest.mock('../../storage');
 jest.mock('../../logger');
-jest.mock('clarifai-nodejs-grpc', () => ({
-  ClarifaiStub: {
-    grpc: jest.fn(() => ({
-      PostModelOutputs: jest.fn((request, metadata, callback) => {
-        callback(null, {
-          status: { code: 10000 },
-          outputs: [{ data: { text: { raw: 'mocked translation' } } }]
-        });
-      })
-    }))
-  },
-  grpc: {
-    Metadata: jest.fn(() => ({
-      set: jest.fn()
-    }))
-  }
+jest.mock('../gemini', () => ({
+  generateGeminiText: jest.fn().mockResolvedValue('mocked translation')
 }));
 
 const mockStorage = storage as jest.MockedFunction<typeof storage>;
 const mockLogger = logger as jest.Mocked<typeof logger>;
+const mockGenerateGeminiText = generateGeminiText as jest.MockedFunction<typeof generateGeminiText>;
 
 mockLogger.debug = jest.fn();
 mockLogger.info = jest.fn();
@@ -296,8 +284,6 @@ describe('localeModel.translate', () => {
     });
 
     it('should include plural form hints in LLM prompt', async () => {
-      const ClarifaiStub = require('clarifai-nodejs-grpc').ClarifaiStub;
-
       const queryMock = jest.fn()
         .mockResolvedValueOnce([])
         .mockResolvedValue([{
@@ -322,12 +308,10 @@ describe('localeModel.translate', () => {
         tc: 'plural:few (genitive singular - for counts like 2, 3, 4...)'
       });
 
-      expect(ClarifaiStub.grpc).toHaveBeenCalled();
-      const mockGrpc = ClarifaiStub.grpc.mock.results[0].value;
-      const callArgs = mockGrpc.PostModelOutputs.mock.calls[0];
-      const requestData = callArgs[0];
-      expect(requestData.inputs[0].data.text.raw).toContain('PLURAL FORM');
-      expect(requestData.inputs[0].data.text.raw).toContain('genitive singular');
+      expect(mockGenerateGeminiText).toHaveBeenCalled();
+      const [prompt] = mockGenerateGeminiText.mock.calls[0];
+      expect(prompt).toContain('PLURAL FORM');
+      expect(prompt).toContain('genitive singular');
     });
   });
 });
