@@ -2,8 +2,7 @@ import { sql } from "@databases/mysql";
 import { storage } from "../storage";
 import { logger } from "../logger";
 import config from "../config/index";
-
-const { ClarifaiStub, grpc } = require("clarifai-nodejs-grpc");
+import { generateGeminiText } from "./gemini";
 
 function parsePositiveInteger(value: string | undefined, fallback: number): number {
 	const parsed = Number(value);
@@ -371,49 +370,10 @@ export const translationModel = {
 	},
 
 	async callLLM(prompt: string): Promise<string> {
-		const PAT = config.clarifai.translation_PAT;
-		const USER_ID = 'openai';
-		const APP_ID = 'chat-completion';
-		const MODEL_ID = 'gpt-oss-120b';
-		const MODEL_VERSION_ID = 'f1d2ad8c01c74705868f5c8ae4a1ff7c';
-
-		const stub = ClarifaiStub.grpc();
-		const metadata = new grpc.Metadata();
-		metadata.set("authorization", "Key " + PAT);
-
-		return new Promise((resolve, reject) => {
-			stub.PostModelOutputs(
-				{
-					user_app_id: {
-						"user_id": USER_ID,
-						"app_id": APP_ID
-					},
-					model_id: MODEL_ID,
-					version_id: MODEL_VERSION_ID,
-					inputs: [{
-						"data": {
-							"text": {
-								"raw": prompt
-							}
-						}
-					}]
-				},
-				metadata,
-				(err, response) => {
-					if (err) {
-						logger.error("Translation error", { err });
-						return reject(err);
-					}
-
-					if (response.status.code !== 10000) {
-						logger.error("Translation error - status code not 10000", response);
-						return reject("Post model outputs failed, status: " + response.status.description);
-					}
-
-					const output = response.outputs[0];
-					resolve(output.data.text.raw);
-				}
-			);
+		return generateGeminiText(prompt, {
+			model: config.gemini?.translationModel || process.env.GEMINI_TRANSLATION_MODEL || "gemini-2.5-pro",
+			systemInstruction: "You are an expert translator for a beekeeping monitoring app. Reply only with translated text.",
+			temperature: 0.05,
 		});
 	},
 	clearCachesForTests(): void {
