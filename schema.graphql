@@ -174,7 +174,7 @@ type User {
 
 
 	"""
-	Billing plan: free, starter, professional, addon, enterprise
+	Billing plan: free, hobbyist, starter, professional, addon, enterprise
 	"""
 	billingPlan: String
 }

@@ -279,7 +279,7 @@ export const resolvers = {
 
 				await billingHistoryModel.addSubscriptionCancelled(
 					ctx.uid,
-					user.billingPlan || 'starter'
+					user.billingPlan || 'hobbyist'
 				);
 
 				return await resolvers.Query.user(null, null, ctx);
@@ -291,7 +291,7 @@ export const resolvers = {
 		createCheckoutSession: async (parent, args, ctx) => {
 			logger.info(`createCheckoutSession called with args:`, args);
 
-			const { plan = 'starter', cycle = 'monthly' } = args;
+			const { plan = 'hobbyist', cycle = 'monthly' } = args;
 
 			if (!ctx.uid) return err(error_code.AUTHENTICATION_REQUIRED);
 
@@ -304,6 +304,9 @@ export const resolvers = {
 			if (plan === 'addon') {
 				priceId = config.stripe.plans.addon.oneTime;
 				mode = 'payment';
+			} else if (plan === 'hobbyist') {
+				priceId = config.stripe.plans.hobbyist.monthly;
+				mode = 'subscription';
 			} else if (plan === 'starter') {
 				priceId = cycle === 'yearly'
 					? config.stripe.plans.starter.yearly

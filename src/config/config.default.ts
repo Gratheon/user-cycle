@@ -29,6 +29,9 @@ const config = {
     webhook_secret: '',
 
     plans: {
+      hobbyist: {
+        monthly: 'price_hobbyist_monthly_placeholder'
+      },
       starter: {
         monthly: 'price_1Sm0eIHe2QIxNzEc2BQwdPL3',
         yearly: 'price_1Sm0eIHe2QIxNzEcvDZEpjDa'

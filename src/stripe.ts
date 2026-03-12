@@ -82,7 +82,7 @@ export function registerStripe(app) {
 						);
 
 						if (userIdFailed && userIdFailed[0]?.id) {
-							const previousPlan = userIdFailed[0].billing_plan || 'starter';
+							const previousPlan = userIdFailed[0].billing_plan || 'hobbyist';
 
 							await billingHistoryModel.addPaymentFailed(
 								userIdFailed[0].id,
