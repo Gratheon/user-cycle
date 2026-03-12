@@ -5,6 +5,17 @@ import config from "../config/index";
 
 const { ClarifaiStub, grpc } = require("clarifai-nodejs-grpc");
 
+function parsePositiveInteger(value: string | undefined, fallback: number): number {
+	const parsed = Number(value);
+	if (!Number.isFinite(parsed) || parsed <= 0) {
+		return fallback;
+	}
+	return Math.floor(parsed);
+}
+
+const translationCacheTtlMs = parsePositiveInteger(process.env.TRANSLATION_CACHE_TTL_MS, 5 * 60 * 1000);
+const translationCacheMaxEntries = parsePositiveInteger(process.env.TRANSLATION_CACHE_MAX_ENTRIES, 10_000);
+
 const languagesMap = {
 	'ru': 'russian',
 	'et': 'estonian',
@@ -21,9 +32,74 @@ const languagesMap = {
 	'ja': 'japanese',
 }
 
+type CacheEntry<T> = {
+	value: T;
+	expiresAt: number;
+};
+
+class BoundedTtlCache<T> {
+	private store = new Map<string, CacheEntry<T>>();
+
+	get(key: string): T | undefined {
+		const entry = this.store.get(key);
+		if (!entry) {
+			return undefined;
+		}
+
+		if (entry.expiresAt <= Date.now()) {
+			this.store.delete(key);
+			return undefined;
+		}
+
+		// Keep hottest keys in the end of insertion order for simple LRU-style eviction.
+		this.store.delete(key);
+		this.store.set(key, entry);
+
+		return entry.value;
+	}
+
+	set(key: string, value: T): void {
+		const expiresAt = Date.now() + translationCacheTtlMs;
+		this.store.set(key, { value, expiresAt });
+
+		while (this.store.size > translationCacheMaxEntries) {
+			const oldestKey = this.store.keys().next().value;
+			if (!oldestKey) break;
+			this.store.delete(oldestKey);
+		}
+	}
+
+	delete(key: string): void {
+		this.store.delete(key);
+	}
+
+	clear(): void {
+		this.store.clear();
+	}
+}
+
+const translationIdByKeyCache = new BoundedTtlCache<number | null>();
+const hasPluralFormsCache = new BoundedTtlCache<boolean>();
+const translationValueCache = new BoundedTtlCache<string | null>();
+const pluralFormsCache = new BoundedTtlCache<any | null>();
+
+function keyWithNamespace(key: string, namespace: string | null): string {
+	return `${namespace ?? "__NULL__"}:${key}`;
+}
+
+function translationLangKey(translationId: number, lang: string): string {
+	return `${translationId}:${lang}`;
+}
+
 export const translationModel = {
 	async getByKey(key: string, namespace: string | null = null): Promise<number | null> {
 		logger.debug(`[getByKey] Looking up translation with key: "${key}", namespace: "${namespace}"`);
+		const cacheKey = keyWithNamespace(key, namespace);
+		const cachedId = translationIdByKeyCache.get(cacheKey);
+		if (cachedId !== undefined) {
+			logger.debug(`[getByKey] Cache hit for "${key}", namespace "${namespace}":`, { translationId: cachedId });
+			return cachedId;
+		}
 
 		let result = await storage().query(
 			sql`SELECT id FROM translations WHERE \`key\` = ${key} AND namespace <=> ${namespace} LIMIT 1`
@@ -40,17 +116,25 @@ export const translationModel = {
 		}
 
 		const translationId = result.length > 0 ? result[0].id : null;
+		translationIdByKeyCache.set(cacheKey, translationId);
 		logger.debug(`[getByKey] Result for "${key}", namespace "${namespace}":`, { translationId });
 		return translationId;
 	},
 
 	async hasPluralForms(translationId: number): Promise<boolean> {
 		logger.debug(`[hasPluralForms] Checking plural forms for translationId: ${translationId}`);
+		const cacheKey = String(translationId);
+		const cachedHasPlurals = hasPluralFormsCache.get(cacheKey);
+		if (cachedHasPlurals !== undefined) {
+			return cachedHasPlurals;
+		}
+
 		const result = await storage().query(
 			sql`SELECT COUNT(*) as count FROM plural_forms WHERE translation_id = ${translationId} LIMIT 1`
 		);
 
 		const hasPlurals = result.length > 0 && result[0].count > 0;
+		hasPluralFormsCache.set(cacheKey, hasPlurals);
 		logger.debug(`[hasPluralForms] Result for translationId ${translationId}:`, {
 			count: result[0]?.count || 0,
 			hasPlurals
@@ -60,32 +144,45 @@ export const translationModel = {
 	},
 
 	async getOrCreate(key: string, context: string = null, namespace: string = null): Promise<number> {
-		const existing = await storage().query(
-			sql`SELECT id FROM translations WHERE \`key\` = ${key} AND namespace <=> ${namespace} LIMIT 1`
-		);
+		const cacheKey = keyWithNamespace(key, namespace);
+		const cachedId = translationIdByKeyCache.get(cacheKey);
+		if (cachedId !== undefined && cachedId !== null) {
+			return cachedId;
+		}
 
-		if (existing.length > 0) {
-			return existing[0].id;
+		const existingId = await this.getByKey(key, namespace);
+		if (existingId !== null) {
+			return existingId;
 		}
 
 		await storage().query(
 			sql`INSERT INTO translations (\`key\`, namespace, context) VALUES (${key}, ${namespace}, ${context})`
 		);
 
-		const result = await storage().query(
-			sql`SELECT id FROM translations WHERE \`key\` = ${key} AND namespace <=> ${namespace} LIMIT 1`
-		);
+		translationIdByKeyCache.delete(cacheKey);
+		const createdId = await this.getByKey(key, namespace);
+		if (createdId === null) {
+			throw new Error(`Failed to create translation key "${key}" in namespace "${namespace}"`);
+		}
 
-		return result[0].id;
+		return createdId;
 	},
 
 	async getValue(translationId: number, lang: string): Promise<string | null> {
+		const cacheKey = translationLangKey(translationId, lang);
+		const cachedValue = translationValueCache.get(cacheKey);
+		if (cachedValue !== undefined) {
+			return cachedValue;
+		}
+
 		const result = await storage().query(
 			sql`SELECT value FROM translation_values 
 				WHERE translation_id = ${translationId} AND lang = ${lang} LIMIT 1`
 		);
 
-		return result.length > 0 ? result[0].value : null;
+		const value = result.length > 0 ? result[0].value : null;
+		translationValueCache.set(cacheKey, value);
+		return value;
 	},
 
 	async setValue(translationId: number, lang: string, value: string): Promise<void> {
@@ -94,16 +191,24 @@ export const translationModel = {
 				VALUES (${translationId}, ${lang}, ${value})
 				ON DUPLICATE KEY UPDATE value = ${value}, date_updated = NOW()`
 		);
+		translationValueCache.set(translationLangKey(translationId, lang), value);
 	},
 
 	async getPluralForms(translationId: number, lang: string): Promise<any | null> {
 		logger.debug(`[getPluralForms] Fetching for translationId: ${translationId}, lang: ${lang}`);
+		const cacheKey = translationLangKey(translationId, lang);
+		const cachedPluralData = pluralFormsCache.get(cacheKey);
+		if (cachedPluralData !== undefined) {
+			return cachedPluralData;
+		}
+
 		const result = await storage().query(
 			sql`SELECT plural_data FROM plural_forms 
 				WHERE translation_id = ${translationId} AND lang = ${lang} LIMIT 1`
 		);
 
 		const pluralData = result.length > 0 ? result[0].plural_data : null;
+		pluralFormsCache.set(cacheKey, pluralData);
 		logger.debug(`[getPluralForms] Result for translationId ${translationId}, lang ${lang}:`, {
 			found: !!pluralData,
 			data: pluralData
@@ -118,6 +223,8 @@ export const translationModel = {
 				VALUES (${translationId}, ${lang}, ${jsonData})
 				ON DUPLICATE KEY UPDATE plural_data = ${jsonData}, date_updated = NOW()`
 		);
+		pluralFormsCache.set(translationLangKey(translationId, lang), pluralData);
+		hasPluralFormsCache.set(String(translationId), true);
 	},
 
 	async getPluralRules(lang: string): Promise<string[]> {
@@ -308,6 +415,11 @@ export const translationModel = {
 				}
 			);
 		});
+	},
+	clearCachesForTests(): void {
+		translationIdByKeyCache.clear();
+		hasPluralFormsCache.clear();
+		translationValueCache.clear();
+		pluralFormsCache.clear();
 	}
 };
-
