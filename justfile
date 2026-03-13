@@ -14,6 +14,7 @@ export-translations:
 	COMPOSE_PROJECT_NAME=gratheon docker compose -f docker-compose.dev.yml exec -T user-cycle sh -lc "mkdir -p /app/scripts /app/translations"
 	COMPOSE_PROJECT_NAME=gratheon docker compose -f docker-compose.dev.yml cp ./scripts/translation-sync.js user-cycle:/app/scripts/translation-sync.js
 	COMPOSE_PROJECT_NAME=gratheon docker compose -f docker-compose.dev.yml exec -T user-cycle node /app/scripts/translation-sync.js export /app/translations/user-cycle-translations.json
+	COMPOSE_PROJECT_NAME=gratheon docker compose -f docker-compose.dev.yml cp user-cycle:/app/translations/user-cycle-translations.json ./translations/user-cycle-translations.json
 import-translations:
 	COMPOSE_PROJECT_NAME=gratheon docker compose -f docker-compose.dev.yml exec -T user-cycle sh -lc "mkdir -p /app/scripts /app/translations"
 	COMPOSE_PROJECT_NAME=gratheon docker compose -f docker-compose.dev.yml cp ./scripts/translation-sync.js user-cycle:/app/scripts/translation-sync.js
