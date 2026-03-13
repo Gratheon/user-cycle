@@ -15,11 +15,13 @@ services:
       - ./config:/app/config
       - ./emails:/app/emails
       - ./migrations:/app/migrations
+      - ./scripts:/app/scripts
       - ./package.json:/app/package.json
       - ./pnpm-lock.yaml:/app/pnpm-lock.yaml
       - ./schema.graphql:/app/schema.graphql
       - ./src:/app/src
       - ./tmp:/app/tmp
+      - ./translations:/app/translations
       # Preserve container's node_modules separate from host (avoid overwriting)
       - /app/node_modules
     restart: always
