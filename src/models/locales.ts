@@ -13,6 +13,26 @@ const languagesMap = {
 	'de': 'german',
 	'fr': 'french',
 }
+const languageCodes = Object.keys(languagesMap);
+
+function parseJsonObjectFromLlm(raw: string): Record<string, any> | null {
+	if (!raw) return null;
+	const trimmed = raw.trim();
+	const withoutCodeFence = trimmed
+		.replace(/^```(?:json)?\s*/i, '')
+		.replace(/\s*```$/i, '')
+		.trim();
+
+	try {
+		const parsed = JSON.parse(withoutCodeFence);
+		if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+			return parsed as Record<string, any>;
+		}
+		return null;
+	} catch {
+		return null;
+	}
+}
 
 export const localeModel = {
 	translate: async function ({ en, key, tc }) {
@@ -28,8 +48,8 @@ export const localeModel = {
 
 		let translation = result[0]
 
-		if (process.env.ENV_ID == 'dev') {
-			if (!translation) {
+			if (process.env.ENV_ID == 'dev') {
+				if (!translation) {
 				logger.info(`[translate] Creating new translation entry: key="${key}" (${key?.length} chars), en="${en}"`);
 				await storage().query(sql`INSERT INTO locales (\`key\`, translation_context, en) VALUES(${key}, ${tc}, ${en})`);
 
@@ -38,53 +58,42 @@ export const localeModel = {
 				} else {
 					result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr FROM locales WHERE en=${en} LIMIT 1`);
 				}
-				translation = result[0]
-			}
+					translation = result[0]
+				}
 
-			if (!translation['ru']) {
-				let ru = await translate('ru', translation, tc) as string
-				logger.debug(`[translate] Generated RU translation: "${ru}" (${ru?.length} chars) for en="${translation.en}"`);
-				translation['ru'] = ru
+				const missingLangCodes = languageCodes.filter((langCode) => !translation[langCode]);
+				if (missingLangCodes.length > 0) {
+					const updates: Record<string, string> = {};
 
-				await storage().query(sql`UPDATE locales SET ru=${ru} WHERE id=${translation.id}`);
-			}
+					try {
+						const batched = await translateMany(missingLangCodes, translation, tc);
+						for (const langCode of missingLangCodes) {
+							const value = batched[langCode];
+							if (value) {
+								updates[langCode] = value;
+							}
+						}
+					} catch (error) {
+						logger.warn('[translate] Batched translation failed, using per-language fallback', { error });
+					}
 
-			if (!translation['et']) {
-				let et = await translate('et', translation, tc) as string
-				logger.debug(`[translate] Generated ET translation: "${et}" (${et?.length} chars)`);
-				translation['et'] = et
+					for (const langCode of missingLangCodes) {
+						if (!updates[langCode]) {
+							updates[langCode] = await translate(langCode, translation, tc) as string;
+						}
+					}
 
-				await storage().query(sql`UPDATE locales SET et=${et} WHERE id=${translation.id}`);
-			}
-
-			if (!translation['tr']) {
-				let tr = await translate('tr', translation, tc) as string
-				logger.debug(`[translate] Generated TR translation: "${tr}" (${tr?.length} chars)`);
-				translation['tr'] = tr
-
-				await storage().query(sql`UPDATE locales SET tr=${tr} WHERE id=${translation.id}`);
-			}
-
-			if (!translation['pl']) {
-				let pl = await translate('pl', translation, tc) as string
-				logger.debug(`[translate] Generated PL translation: "${pl}" (${pl?.length} chars)`);
-				translation['pl'] = pl
-
-				await storage().query(sql`UPDATE locales SET pl=${pl} WHERE id=${translation.id}`);
-			}
-			if (!translation['de']) {
-				let de = await translate('de', translation, tc) as string
-				logger.debug(`[translate] Generated DE translation: "${de}" (${de?.length} chars)`);
-				translation['de'] = de
-				await storage().query(sql`UPDATE locales SET de=${de} WHERE id=${translation.id}`);
-			}
-
-			if (!translation['fr']) {
-				let fr = await translate('fr', translation, tc) as string
-				logger.debug(`[translate] Generated FR translation: "${fr}" (${fr?.length} chars)`);
-				translation['fr'] = fr
-				await storage().query(sql`UPDATE locales SET fr=${fr} WHERE id=${translation.id}`);
-			}
+					for (const [langCode, value] of Object.entries(updates)) {
+						translation[langCode] = value;
+						logger.debug(`[translate] Generated ${langCode.toUpperCase()} translation: "${value}" (${value?.length} chars)`);
+						if (langCode === 'ru') await storage().query(sql`UPDATE locales SET ru=${value} WHERE id=${translation.id}`);
+						if (langCode === 'et') await storage().query(sql`UPDATE locales SET et=${value} WHERE id=${translation.id}`);
+						if (langCode === 'tr') await storage().query(sql`UPDATE locales SET tr=${value} WHERE id=${translation.id}`);
+						if (langCode === 'pl') await storage().query(sql`UPDATE locales SET pl=${value} WHERE id=${translation.id}`);
+						if (langCode === 'de') await storage().query(sql`UPDATE locales SET de=${value} WHERE id=${translation.id}`);
+						if (langCode === 'fr') await storage().query(sql`UPDATE locales SET fr=${value} WHERE id=${translation.id}`);
+					}
+				}
 
 			if (key) {
 				result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr FROM locales WHERE \`key\`=${key} LIMIT 1`);
@@ -200,30 +209,26 @@ export const localeModel = {
 
 			for (const { translation, needsUpdate } of translationsToUpdate) {
 				const updates: any = {};
+				const missingLangCodes = languageCodes.filter((langCode) => needsUpdate[langCode]);
 
-				if (needsUpdate.ru) {
-					updates['ru'] = await translate('ru', translation, needsUpdate.tc) as string;
-					logger.debug(`[translateBatch] Generated RU: "${updates['ru']}" (${updates['ru']?.length} chars) for en="${translation.en}"`);
-				}
-				if (needsUpdate.et) {
-					updates['et'] = await translate('et', translation, needsUpdate.tc) as string;
-					logger.debug(`[translateBatch] Generated ET: "${updates['et']}" (${updates['et']?.length} chars)`);
-				}
-				if (needsUpdate.tr) {
-					updates['tr'] = await translate('tr', translation, needsUpdate.tc) as string;
-					logger.debug(`[translateBatch] Generated TR: "${updates['tr']}" (${updates['tr']?.length} chars)`);
-				}
-				if (needsUpdate.pl) {
-					updates['pl'] = await translate('pl', translation, needsUpdate.tc) as string;
-					logger.debug(`[translateBatch] Generated PL: "${updates['pl']}" (${updates['pl']?.length} chars)`);
-				}
-				if (needsUpdate.de) {
-					updates['de'] = await translate('de', translation, needsUpdate.tc) as string;
-					logger.debug(`[translateBatch] Generated DE: "${updates['de']}" (${updates['de']?.length} chars)`);
-				}
-				if (needsUpdate.fr) {
-					updates['fr'] = await translate('fr', translation, needsUpdate.tc) as string;
-					logger.debug(`[translateBatch] Generated FR: "${updates['fr']}" (${updates['fr']?.length} chars)`);
+				if (missingLangCodes.length > 0) {
+					try {
+						const batched = await translateMany(missingLangCodes, translation, needsUpdate.tc);
+						for (const langCode of missingLangCodes) {
+							const value = batched[langCode];
+							if (value) {
+								updates[langCode] = value;
+							}
+						}
+					} catch (error) {
+						logger.warn('[translateBatch] Batched translation failed, using per-language fallback', { error });
+					}
+
+					for (const langCode of missingLangCodes) {
+						if (!updates[langCode]) {
+							updates[langCode] = await translate(langCode, translation, needsUpdate.tc) as string;
+						}
+					}
 				}
 
 				if (Object.keys(updates).length > 0) {
@@ -323,4 +328,52 @@ async function translate(targetLangCode, translation, tc) {
 		systemInstruction: "You are an expert translator for a beekeeping monitoring app. Reply only with translated text.",
 		temperature: 0.05,
 	});
+}
+
+async function translateMany(targetLangCodes: string[], translation: any, tc: string): Promise<Record<string, string>> {
+	const validLangCodes = [...new Set(targetLangCodes)].filter((langCode) => languagesMap[langCode]);
+	if (validLangCodes.length === 0) {
+		return {};
+	}
+
+	let RAW_TEXT = `You are an expert translator. You need to translate from English. Used in beekeeping and monitoring web app.`;
+
+	if (tc) {
+		RAW_TEXT += ` The translation context is "${tc}".`;
+		if (tc.includes('plural:')) {
+			RAW_TEXT += ` This is a PLURAL FORM translation. Translate each target language to match the grammatical form used with the counts specified in the context.`;
+			if (tc.includes('plural:one')) {
+				RAW_TEXT += ` Use singular-equivalent form for each language where count = 1.`;
+			} else if (tc.includes('plural:few')) {
+				RAW_TEXT += ` For languages like Russian/Polish, use genitive singular-equivalent form for counts like 2, 3, 4.`;
+			} else if (tc.includes('plural:many')) {
+				RAW_TEXT += ` For languages like Russian/Polish, use genitive plural-equivalent form for counts like 5 and above.`;
+			}
+		}
+	}
+
+	RAW_TEXT += ` Translate phrase "${translation['en']}" to these languages: `;
+	RAW_TEXT += validLangCodes.map((langCode) => `${langCode} (${languagesMap[langCode]})`).join(', ');
+	RAW_TEXT += `. Respond ONLY with valid JSON object where keys are language codes and values are translations.`;
+	RAW_TEXT += ` Example: {"ru":"...","et":"..."}.`;
+
+	const rawResponse = await generateGeminiText(RAW_TEXT, {
+		model: config.gemini?.translationModel || process.env.GEMINI_TRANSLATION_MODEL || "gemini-2.5-pro",
+		systemInstruction: "You are an expert translator for a beekeeping monitoring app. Reply only with translated text.",
+		temperature: 0.05,
+	});
+
+	const parsed = parseJsonObjectFromLlm(rawResponse);
+	if (!parsed) {
+		throw new Error('Failed to parse batched translation JSON from LLM response');
+	}
+
+	const translations: Record<string, string> = {};
+	for (const langCode of validLangCodes) {
+		const value = parsed[langCode];
+		if (typeof value === 'string' && value.trim().length > 0) {
+			translations[langCode] = value.trim();
+		}
+	}
+	return translations;
 }

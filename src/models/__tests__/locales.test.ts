@@ -313,6 +313,58 @@ describe('localeModel.translate', () => {
       expect(prompt).toContain('PLURAL FORM');
       expect(prompt).toContain('genitive singular');
     });
+
+    it('should batch missing language translations in a single LLM request', async () => {
+      mockGenerateGeminiText.mockResolvedValueOnce(JSON.stringify({
+        ru: 'Семья',
+        et: 'Pere',
+        tr: 'Aile',
+        pl: 'Rodzina',
+        de: 'Familie',
+        fr: 'Famille'
+      }));
+
+      const queryMock = jest.fn()
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([{
+          id: 104,
+          key: null,
+          en: 'Family',
+          ru: null,
+          et: null,
+          tr: null,
+          pl: null,
+          de: null,
+          fr: null
+        }])
+        .mockResolvedValue([{
+          id: 104,
+          key: null,
+          en: 'Family',
+          ru: 'Семья',
+          et: 'Pere',
+          tr: 'Aile',
+          pl: 'Rodzina',
+          de: 'Familie',
+          fr: 'Famille'
+        }]);
+
+      mockStorage.mockReturnValue({
+        query: queryMock
+      } as any);
+
+      const result = await localeModel.translate({
+        en: 'Family',
+        key: null,
+        tc: 'simple noun'
+      });
+
+      expect(result.en).toBe('Family');
+      expect(result.ru).toBe('Семья');
+      expect(result.fr).toBe('Famille');
+      expect(mockGenerateGeminiText).toHaveBeenCalledTimes(1);
+    });
   });
 });
 

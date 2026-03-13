@@ -1,9 +1,13 @@
 import { translationModel } from '../translations';
 import { storage } from '../../storage';
 import { logger } from '../../logger';
+import { generateGeminiText } from '../gemini';
 
 jest.mock('../../storage');
 jest.mock('../../logger');
+jest.mock('../gemini', () => ({
+	generateGeminiText: jest.fn(),
+}));
 jest.mock('clarifai-nodejs-grpc', () => ({
 	ClarifaiStub: {
 		grpc: jest.fn(() => ({
@@ -19,6 +23,7 @@ jest.mock('clarifai-nodejs-grpc', () => ({
 
 const mockStorage = storage as jest.MockedFunction<typeof storage>;
 const mockLogger = logger as jest.Mocked<typeof logger>;
+const mockGenerateGeminiText = generateGeminiText as jest.MockedFunction<typeof generateGeminiText>;
 
 mockLogger.debug = jest.fn();
 mockLogger.info = jest.fn();
@@ -83,5 +88,38 @@ describe('translationModel caching', () => {
 		expect(before).toBe(false);
 		expect(after).toBe(true);
 		expect(query).toHaveBeenCalledTimes(2);
+	});
+
+	it('generates multiple language translations from one LLM call', async () => {
+		mockGenerateGeminiText.mockResolvedValueOnce(JSON.stringify({
+			ru: 'Улей',
+			de: 'Bienenstock',
+		}));
+
+		const result = await translationModel.generateTranslations('hive', ['ru', 'de']);
+
+		expect(result).toEqual({
+			ru: 'Улей',
+			de: 'Bienenstock',
+		});
+		expect(mockGenerateGeminiText).toHaveBeenCalledTimes(1);
+	});
+
+	it('generates plural forms for multiple languages from one LLM call', async () => {
+		mockGenerateGeminiText.mockResolvedValueOnce(JSON.stringify({
+			ru: { one: 'улей', few: 'улья', many: 'ульев' },
+			de: { one: 'Bienenstock', other: 'Bienenstöcke' }
+		}));
+
+		const result = await translationModel.generatePluralFormsForLanguages('hive', {
+			ru: ['one', 'few', 'many'],
+			de: ['one', 'other'],
+		});
+
+		expect(result).toEqual({
+			ru: { one: 'улей', few: 'улья', many: 'ульев' },
+			de: { one: 'Bienenstock', other: 'Bienenstöcke' }
+		});
+		expect(mockGenerateGeminiText).toHaveBeenCalledTimes(1);
 	});
 });

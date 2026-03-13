@@ -30,6 +30,7 @@ const languagesMap = {
 	'pt': 'portuguese',
 	'ja': 'japanese',
 }
+const languageCodes = Object.keys(languagesMap);
 
 type CacheEntry<T> = {
 	value: T;
@@ -88,6 +89,25 @@ function keyWithNamespace(key: string, namespace: string | null): string {
 
 function translationLangKey(translationId: number, lang: string): string {
 	return `${translationId}:${lang}`;
+}
+
+function parseJsonObjectFromLlm(raw: string): Record<string, any> | null {
+	if (!raw) return null;
+	const trimmed = raw.trim();
+	const withoutCodeFence = trimmed
+		.replace(/^```(?:json)?\s*/i, '')
+		.replace(/\s*```$/i, '')
+		.trim();
+
+	try {
+		const parsed = JSON.parse(withoutCodeFence);
+		if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+			return parsed as Record<string, any>;
+		}
+		return null;
+	} catch {
+		return null;
+	}
 }
 
 export const translationModel = {
@@ -267,22 +287,45 @@ export const translationModel = {
 			if (request.isPlural) {
 				logger.info(`[translateBatch] Fetching plural forms for "${request.key}" (id: ${translationId})`);
 				translation.plurals = {};
+				const missingPluralRules: Record<string, string[]> = {};
 
-				for (const lang of Object.keys(languagesMap)) {
+				for (const lang of languageCodes) {
 					let pluralForms = await this.getPluralForms(translationId, lang);
 					logger.debug(`[translateBatch] Existing plural forms for ${lang}:`, { pluralForms });
 
 					if (!pluralForms && process.env.ENV_ID === 'dev') {
-						logger.info(`[translateBatch] No plural forms found for ${lang}, generating via LLM`);
-						const forms = await this.getPluralRules(lang);
-						pluralForms = await this.generatePluralForms(request.key, lang, forms);
-						await this.setPluralForms(translationId, lang, pluralForms);
-						logger.info(`[translateBatch] Generated and stored plural forms for ${lang}:`, { pluralForms });
+						missingPluralRules[lang] = await this.getPluralRules(lang);
 					}
 
 					if (pluralForms) {
 						translation.plurals[lang] = pluralForms;
-					} else {
+					}
+				}
+
+				if (process.env.ENV_ID === 'dev' && Object.keys(missingPluralRules).length > 0) {
+					let batchedPluralForms: Record<string, Record<string, string>> = {};
+					try {
+						batchedPluralForms = await this.generatePluralFormsForLanguages(request.key, missingPluralRules);
+					} catch (error) {
+						logger.warn('[translateBatch] Batched plural generation failed, falling back to per-language', { error });
+					}
+
+					for (const [lang, forms] of Object.entries(missingPluralRules)) {
+						let pluralForms = batchedPluralForms[lang] || null;
+						if (!pluralForms) {
+							logger.info(`[translateBatch] Falling back to per-language plural generation for ${lang}`);
+							pluralForms = await this.generatePluralForms(request.key, lang, forms);
+						}
+						if (pluralForms) {
+							await this.setPluralForms(translationId, lang, pluralForms);
+							translation.plurals[lang] = pluralForms;
+							logger.info(`[translateBatch] Generated and stored plural forms for ${lang}:`, { pluralForms });
+						}
+					}
+				}
+
+				for (const lang of languageCodes) {
+					if (!translation.plurals[lang]) {
 						logger.warn(`[translateBatch] No plural forms available for ${lang}`);
 					}
 				}
@@ -294,16 +337,37 @@ export const translationModel = {
 			} else {
 				logger.info(`[translateBatch] Fetching regular values for "${request.key}" (id: ${translationId})`);
 				translation.values = {};
-				for (const lang of Object.keys(languagesMap)) {
+				const missingLangs: string[] = [];
+
+				for (const lang of languageCodes) {
 					let value = await this.getValue(translationId, lang);
 					if (!value && process.env.ENV_ID === 'dev') {
-						logger.info(`[translateBatch] No value found for ${lang}, generating via LLM`);
-						value = await this.generateTranslation(request.key, lang, request.context);
-						await this.setValue(translationId, lang, value);
-						logger.debug(`[translateBatch] Generated and stored value for ${lang}: "${value}"`);
+						missingLangs.push(lang);
 					}
 					if (value) {
 						translation.values[lang] = value;
+					}
+				}
+
+				if (process.env.ENV_ID === 'dev' && missingLangs.length > 0) {
+					let batchedValues: Record<string, string> = {};
+					try {
+						batchedValues = await this.generateTranslations(request.key, missingLangs, request.context);
+					} catch (error) {
+						logger.warn('[translateBatch] Batched translation generation failed, falling back to per-language', { error });
+					}
+
+					for (const lang of missingLangs) {
+						let value = batchedValues[lang] || null;
+						if (!value) {
+							logger.info(`[translateBatch] Falling back to per-language generation for ${lang}`);
+							value = await this.generateTranslation(request.key, lang, request.context);
+						}
+						if (value) {
+							await this.setValue(translationId, lang, value);
+							translation.values[lang] = value;
+							logger.debug(`[translateBatch] Generated and stored value for ${lang}: "${value}"`);
+						}
 					}
 				}
 
@@ -333,6 +397,39 @@ export const translationModel = {
 		RAW_TEXT += ` Do not write anything else but the translation in the target language (no extra notes or other languages) of the following phrase: ${text}`;
 
 		return this.callLLM(RAW_TEXT);
+	},
+
+	async generateTranslations(text: string, targetLangCodes: string[], context: string = null): Promise<Record<string, string>> {
+		const validLangCodes = [...new Set(targetLangCodes)].filter((langCode) => languagesMap[langCode]);
+		if (validLangCodes.length === 0) {
+			return {};
+		}
+
+		let RAW_TEXT = `You are an expert translator. You need to translate from English. Used in beekeeping and monitoring web app.`;
+		if (context) {
+			RAW_TEXT += ` The translation context is "${context}".`;
+		}
+
+		const languageList = validLangCodes.map((code) => `${code} (${languagesMap[code]})`).join(', ');
+		RAW_TEXT += ` Translate the phrase "${text}" to the following languages: ${languageList}.`;
+		RAW_TEXT += ` Respond ONLY with a valid JSON object where keys are language codes and values are translations.`;
+		RAW_TEXT += ` Example format: {"ru":"...","de":"..."}.`;
+
+		const rawResponse = await this.callLLM(RAW_TEXT);
+		const parsed = parseJsonObjectFromLlm(rawResponse);
+		if (!parsed) {
+			throw new Error('Failed to parse batched translations JSON from LLM response');
+		}
+
+		const translations: Record<string, string> = {};
+		for (const langCode of validLangCodes) {
+			const value = parsed[langCode];
+			if (typeof value === 'string' && value.trim().length > 0) {
+				translations[langCode] = value.trim();
+			}
+		}
+
+		return translations;
 	},
 
 	async generatePluralForms(text: string, targetLangCode: string, forms: string[]): Promise<any> {
@@ -367,6 +464,50 @@ export const translationModel = {
 		}
 
 		return pluralData;
+	},
+
+	async generatePluralFormsForLanguages(text: string, formsByLanguage: Record<string, string[]>): Promise<Record<string, Record<string, string>>> {
+		const validEntries = Object.entries(formsByLanguage)
+			.filter(([langCode, forms]) => languagesMap[langCode] && Array.isArray(forms) && forms.length > 0);
+
+		if (validEntries.length === 0) {
+			return {};
+		}
+
+		let RAW_TEXT = `You are an expert translator. You need to translate from English. Used in beekeeping and monitoring web app.`;
+		RAW_TEXT += ` Translate the word "${text}" for pluralization across multiple languages.`;
+		RAW_TEXT += ` Respond ONLY with valid JSON in this format: {"ru":{"one":"...","few":"..."},"de":{"one":"...","other":"..."}}.`;
+		RAW_TEXT += ` Do not include explanations.`;
+		RAW_TEXT += ` Required plural forms: `;
+		RAW_TEXT += validEntries
+			.map(([langCode, forms]) => `${langCode} (${languagesMap[langCode]}): [${forms.join(', ')}]`)
+			.join('; ');
+		RAW_TEXT += ` Use linguistically correct forms for each plural category.`;
+
+		const rawResponse = await this.callLLM(RAW_TEXT);
+		const parsed = parseJsonObjectFromLlm(rawResponse);
+		if (!parsed) {
+			throw new Error('Failed to parse batched plural JSON from LLM response');
+		}
+
+		const pluralTranslations: Record<string, Record<string, string>> = {};
+		for (const [langCode, forms] of validEntries) {
+			const langValue = parsed[langCode];
+			if (!langValue || typeof langValue !== 'object' || Array.isArray(langValue)) {
+				continue;
+			}
+			for (const form of forms) {
+				const value = langValue[form];
+				if (typeof value === 'string' && value.trim().length > 0) {
+					if (!pluralTranslations[langCode]) {
+						pluralTranslations[langCode] = {};
+					}
+					pluralTranslations[langCode][form] = value.trim();
+				}
+			}
+		}
+
+		return pluralTranslations;
 	},
 
 	async callLLM(prompt: string): Promise<string> {
