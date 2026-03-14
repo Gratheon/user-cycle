@@ -121,7 +121,11 @@ export const translationModel = {
 		}
 
 		let result = await storage().query(
-			sql`SELECT id FROM translations WHERE \`key\` = ${key} AND namespace <=> ${namespace} LIMIT 1`
+			sql`SELECT id FROM translations
+				WHERE key_hash = SHA2(${key}, 256)
+				  AND \`key\` = ${key}
+				  AND namespace <=> ${namespace}
+				LIMIT 1`
 		);
 
 		if (result.length === 0) {
@@ -174,9 +178,19 @@ export const translationModel = {
 			return existingId;
 		}
 
-		await storage().query(
-			sql`INSERT INTO translations (\`key\`, namespace, context) VALUES (${key}, ${namespace}, ${context})`
-		);
+		try {
+			await storage().query(
+				sql`INSERT INTO translations (\`key\`, namespace, context) VALUES (${key}, ${namespace}, ${context})`
+			);
+		} catch (error) {
+			if ((error as any)?.code === 'ER_DUP_ENTRY') {
+				const duplicatedId = await this.getByKey(key, namespace);
+				if (duplicatedId !== null) {
+					return duplicatedId;
+				}
+			}
+			throw error;
+		}
 
 		translationIdByKeyCache.delete(cacheKey);
 		const createdId = await this.getByKey(key, namespace);
