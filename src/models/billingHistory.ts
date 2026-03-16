@@ -30,6 +30,11 @@ export const billingHistoryModel = {
 		await this.addEvent(userId, 'registration', billingPlan, 'Account created');
 	},
 
+	addTrialStarted: async function (userId: number, billingPlan: string, days: number) {
+		const details = `Started ${days}-day ${billingPlan} trial`;
+		await this.addEvent(userId, 'tier_changed', billingPlan, details);
+	},
+
 	addSubscriptionCreated: async function (userId: number, billingPlan: string, cycle: string) {
 		const details = `Subscribed to ${billingPlan} (${cycle})`;
 		await this.addEvent(userId, 'subscription_created', billingPlan, details);
@@ -41,7 +46,7 @@ export const billingHistoryModel = {
 	},
 
 	addSubscriptionExpired: async function (userId: number, previousPlan: string) {
-		const details = `Subscription expired, moved to free tier`;
+		const details = `Subscription expired, moved from ${previousPlan} to free tier`;
 		await this.addEvent(userId, 'subscription_expired', 'free', details);
 	},
 
@@ -58,4 +63,3 @@ export const billingHistoryModel = {
 		await this.addEvent(userId, 'payment_failed', billingPlan, reason);
 	}
 };
-

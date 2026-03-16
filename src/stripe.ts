@@ -56,16 +56,57 @@ export function registerStripe(app) {
 				]
 				);
 
-				// Handle the event
-				switch (event.type) {
-					case 'checkout.session.completed':
-						// Payment is successful and the subscription is created.
-						// You should provision the subscription and save the customer ID to your database.
-						await userModel.updateSubscription({
-							subscription: session.subscription,
-							email: session.customer_email
-						});
-						break;
+					// Handle the event
+					switch (event.type) {
+						case 'checkout.session.completed':
+							// Payment is successful and the checkout session is completed.
+							// Provision subscription and billing tier if the session carries a known plan.
+							if (session.subscription) {
+								await userModel.updateSubscription({
+									subscription: session.subscription,
+									email: session.customer_email
+								});
+							}
+
+							{
+								const sessionPlan = String(session?.metadata?.plan || '').toLowerCase();
+								const sessionCycle = String(session?.metadata?.cycle || 'one-time').toLowerCase();
+								const paidPlan = ['hobbyist', 'starter', 'professional'].includes(sessionPlan)
+									? sessionPlan
+									: null;
+
+								if (paidPlan) {
+									const userRows = await storage().query(
+										"SELECT id, billing_plan FROM `account` WHERE `email`=? LIMIT 1",
+										[session.customer_email]
+									);
+
+									if (userRows && userRows[0]?.id) {
+										const userId = userRows[0].id;
+										const previousPlan = userRows[0].billing_plan || 'free';
+
+										await storage().query(
+											"UPDATE `account` SET billing_plan=? WHERE `email`=?",
+											[paidPlan, session.customer_email]
+										);
+
+										await billingHistoryModel.addSubscriptionCreated(
+											userId,
+											paidPlan,
+											sessionCycle
+										);
+
+										if (previousPlan !== paidPlan) {
+											await billingHistoryModel.addTierChanged(
+												userId,
+												paidPlan,
+												`Checkout completed (${sessionCycle})`
+											);
+										}
+									}
+								}
+							}
+							break;
 					case 'invoice.paid':
 						// Continue to provision the subscription as payments continue to be made.
 						// Store the status in your database and check when a user accesses your service.

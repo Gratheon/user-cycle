@@ -5,6 +5,37 @@ import { storage } from "../storage";
 export const TRIAL_DAYS = 14; // should not affect free billing_plan
 
 export const userModel = {
+	expireToFreeIfNeeded: async function (uid: number): Promise<string | null> {
+		const result = await storage().tx(async (dbi) => {
+			const rows = await dbi.query(
+				sql`SELECT id, billing_plan as billingPlan
+				FROM account
+				WHERE id=${uid}
+					AND billing_plan <> 'free'
+					AND stripe_subscription IS NULL
+					AND date_expiration IS NOT NULL
+					AND date_expiration < NOW()
+				LIMIT 1
+				FOR UPDATE`
+			);
+
+			if (!rows[0]?.billingPlan) {
+				return null;
+			}
+
+			const previousPlan = rows[0].billingPlan;
+
+			await dbi.query(
+				sql`UPDATE account
+				SET billing_plan='free'
+				WHERE id=${uid}`
+			);
+
+			return previousPlan;
+		});
+
+		return result;
+	},
 	extendAccountExpirationByOneMonth: async ({ email }) => {
 		// extend subscriptions where date_expiration is in the future
 		await storage().query(
@@ -87,10 +118,10 @@ export const userModel = {
 		return !result[0] || result[0].date_last_login === null;
 	},
 
-	create: async function (first_name, last_name, email, password, lang, expirationDateString) {
+	create: async function (first_name, last_name, email, password, lang, expirationDateString, billingPlan = 'professional') {
 		return await storage().query(
-			sql`INSERT INTO account (first_name, last_name, email, password, lang, date_expiration)
-			VALUES(${first_name}, ${last_name}, ${email}, ${sha1(password)}, ${lang}, ${expirationDateString})`
+			sql`INSERT INTO account (first_name, last_name, email, password, lang, date_expiration, billing_plan)
+			VALUES(${first_name}, ${last_name}, ${email}, ${sha1(password)}, ${lang}, ${expirationDateString}, ${billingPlan})`
 		);
 	},
 

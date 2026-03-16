@@ -66,7 +66,7 @@ export default async function registerUser(_, { input }) {
     expirationDate.setDate(expirationDate.getDate() + TRIAL_DAYS);
     const expirationDateString = expirationDate.toISOString().substring(0, 19).replace('T', ' ');
 
-    await userModel.create(first_name, last_name, email, password, lang || 'en', expirationDateString);
+    await userModel.create(first_name, last_name, email, password, lang || 'en', expirationDateString, 'professional');
     id = await userModel.findByEmailAndPass(email, password)
 
     if (!id) {
@@ -75,7 +75,8 @@ export default async function registerUser(_, { input }) {
     }
     logger.info(`Created user with id ${id}`, {email})
 
-    await billingHistoryModel.addRegistration(id, 'free');
+    await billingHistoryModel.addRegistration(id, 'professional');
+    await billingHistoryModel.addTrialStarted(id, 'professional', TRIAL_DAYS);
 
     await tokenModel.create(id)
 

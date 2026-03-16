@@ -6,6 +6,7 @@ import { logger } from './logger'
 import { TRIAL_DAYS, userModel } from "./models/user";
 import { tokenModel } from "./models/tokens";
 import { sendAdminUserRegisteredMail, sendWelcomeMail } from "./send-mail";
+import { billingHistoryModel } from "./models/billingHistory";
 
 export function registerGoogle(app) {
 	// Initiates the Google Login flow
@@ -72,18 +73,20 @@ export function registerGoogle(app) {
         const password = Math.random().toString(36).substring(2, 15);
         const email = profile.email;
 
-        await userModel.create(profile.given_name, profile.family_name, email, password, 'en', expirationDateString);
-        id = await userModel.findByEmailAndPass(email, password)
+	        await userModel.create(profile.given_name, profile.family_name, email, password, 'en', expirationDateString, 'professional');
+	        id = await userModel.findByEmailAndPass(email, password)
 
         if (!id) {
           logger.error(`Registration failure, inconsistent storage`, profile)
           return res.redirect(config.login_ui_url);
         }
 
-        // add api token
-        logger.info(`Created user, adding API token`, {id, email})
-        await tokenModel.create(id)
-      }
+	        // add api token
+	        logger.info(`Created user, adding API token`, {id, email})
+	        await tokenModel.create(id)
+	        await billingHistoryModel.addRegistration(id, 'professional');
+	        await billingHistoryModel.addTrialStarted(id, 'professional', TRIAL_DAYS);
+	      }
 
 			// log in
 			const sessionKey = sign({

@@ -66,6 +66,11 @@ export const resolvers = {
 				return err(error_code.AUTHENTICATION_REQUIRED);
 			}
 
+			const expiredPlan = await userModel.expireToFreeIfNeeded(ctx.uid);
+			if (expiredPlan) {
+				await billingHistoryModel.addSubscriptionExpired(ctx.uid, expiredPlan);
+			}
+
 			const user = await userModel.getById(ctx.uid)
 			logger.info("user", user)
 			if (user) {
@@ -368,7 +373,6 @@ export const resolvers = {
 		},
 		login: async (_, { email, password }) => {
 			const id = await userModel.findByEmailAndPass(email, password)
-			const user = await userModel.getById(id)
 
 			if (!id) {
 				await sleepForSecurity()
@@ -377,6 +381,13 @@ export const resolvers = {
 				})
 				return err(error_code.INVALID_USERNAME_PASSWORD)
 			}
+
+			const expiredPlan = await userModel.expireToFreeIfNeeded(id);
+			if (expiredPlan) {
+				await billingHistoryModel.addSubscriptionExpired(id, expiredPlan);
+			}
+
+			const user = await userModel.getById(id)
 
 			await userModel.updateLastLogin(id)
 
