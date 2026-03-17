@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "exportedAt": "2026-03-13T22:22:52.333Z",
+  "exportedAt": "2026-03-17T22:34:57.822Z",
   "translations": [
     {
       "key": "About the price of a cup of coffee",
@@ -255,6 +255,27 @@
       "plurals": {}
     },
     {
+      "key": "Add empty frame",
+      "namespace": null,
+      "context": "this is a button that adds new frame into a beehive, but it has no cells or wax inside, only wooden frame",
+      "values": {
+        "ar": "إضافة إطار فارغ",
+        "bn": "খালি ফ্রেম যোগ করুন",
+        "de": "Leeren Rähmchen hinzufügen",
+        "es": "Añadir marco vacío",
+        "et": "Lisa tühi raam",
+        "fr": "Ajouter un cadre vide",
+        "hi": "खाली फ्रेम जोड़ें",
+        "ja": "空の巣枠を追加",
+        "pl": "Dodaj pustą ramkę",
+        "pt": "Adicionar quadro vazio",
+        "ru": "Добавить пустую рамку",
+        "tr": "Boş çerçeve ekle",
+        "zh": "添加空巢框"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Add entrance",
       "namespace": null,
       "context": "this is a button to add new section of beehive, specifically holes, an entrance",
@@ -272,6 +293,27 @@
         "ru": "Добавить леток",
         "tr": "Uçuş deliği ekle",
         "zh": "添加巢门"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Add entry",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "إضافة إدخال",
+        "bn": "এন্ট্রি যোগ করুন",
+        "de": "Eintrag hinzufügen",
+        "es": "Añadir entrada",
+        "et": "Lisa kirje",
+        "fr": "Ajouter une entrée",
+        "hi": "प्रविष्टि जोड़ें",
+        "ja": "記録を追加",
+        "pl": "Dodaj wpis",
+        "pt": "Adicionar entrada",
+        "ru": "Добавить запись",
+        "tr": "Kayıt ekle",
+        "zh": "新增记录"
       },
       "plurals": {}
     },
@@ -300,7 +342,21 @@
       "key": "Add foundation",
       "namespace": null,
       "context": "this is a button that adds new frame into a beehive which has a layer of wax added for bees to build cells upon",
-      "values": {},
+      "values": {
+        "ar": "إضافة أساس شمعي",
+        "bn": "মোমের ভিত্তি যোগ করুন",
+        "de": "Mittelwand hinzufügen",
+        "es": "Añadir cera estampada",
+        "et": "Lisa kärjepõhi",
+        "fr": "Ajouter une cire gaufrée",
+        "hi": "मोम की शीट जोड़ें",
+        "ja": "巣礎を追加",
+        "pl": "Dodaj węzę",
+        "pt": "Adicionar cera alveolada",
+        "ru": "Добавить вощину",
+        "tr": "Temel petek ekle",
+        "zh": "添加巢础"
+      },
       "plurals": {}
     },
     {
@@ -363,6 +419,27 @@
         "ru": "Добавить подкрышник",
         "tr": "İç Kapak Ekle",
         "zh": "添加内盖"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Add partition",
+      "namespace": null,
+      "context": "this is a button that adds new frame-like separator made of wood into a beehive to reduce available space for bees",
+      "values": {
+        "ar": "إضافة حاجز",
+        "bn": "পার্টিশন যোগ করুন",
+        "de": "Schied hinzufügen",
+        "es": "Añadir separador",
+        "et": "Lisa vahesein",
+        "fr": "Ajouter une partition",
+        "hi": "विभाजन जोड़ें",
+        "ja": "隔壁を追加",
+        "pl": "Dodaj zatwór",
+        "pt": "Adicionar partição",
+        "ru": "Добавить перегородку",
+        "tr": "Bölme Ekle",
+        "zh": "添加隔板"
       },
       "plurals": {}
     },
@@ -475,7 +552,21 @@
       "key": "Add treatment",
       "namespace": null,
       "context": null,
-      "values": {},
+      "values": {
+        "ar": "إضافة علاج",
+        "bn": "চিকিৎসা যোগ করুন",
+        "de": "Behandlung hinzufügen",
+        "es": "Añadir tratamiento",
+        "et": "Lisa ravi",
+        "fr": "Ajouter un traitement",
+        "hi": "उपचार जोड़ें",
+        "ja": "処理を追加",
+        "pl": "Dodaj leczenie",
+        "pt": "Adicionar tratamento",
+        "ru": "Добавить обработку",
+        "tr": "Tedavi ekle",
+        "zh": "添加治疗"
+      },
       "plurals": {}
     },
     {
@@ -496,6 +587,27 @@
         "ru": "Добавить дерево",
         "tr": "Ağaç Ekle",
         "zh": "添加树木"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Add vertical feeder",
+      "namespace": null,
+      "context": "this is a button that adds new vertical frame-like container into a beehive, for sugar syrup to be poured in, to feed the bees",
+      "values": {
+        "ar": "إضافة غذاية إطارية",
+        "bn": "ফ্রেম ফিডার যোগ করুন",
+        "de": "Futtertasche hinzufügen",
+        "es": "Añadir alimentador de cuadro",
+        "et": "Lisa raamsöötja",
+        "fr": "Ajouter un nourrisseur cadre",
+        "hi": "फ़्रेम फीडर जोड़ें",
+        "ja": "巣枠式給餌器を追加",
+        "pl": "Dodaj podkarmiaczkę ramkową",
+        "pt": "Adicionar alimentador de quadro",
+        "ru": "Добавить рамочную кормушку",
+        "tr": "Çerçeve Yemlik Ekle",
+        "zh": "添加框式饲喂器"
       },
       "plurals": {}
     },
@@ -591,6 +703,27 @@
       "plurals": {}
     },
     {
+      "key": "AI detection sensitivity",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "حساسية الكشف بالذكاء الاصطناعي",
+        "bn": "এআই শনাক্তকরণ সংবেদনশীলতা",
+        "de": "Empfindlichkeit der KI-Erkennung",
+        "es": "Sensibilidad de detección de IA",
+        "et": "Tehisintellekti tuvastamise tundlikkus",
+        "fr": "Sensibilité de la détection par IA",
+        "hi": "एआई डिटेक्शन संवेदनशीलता",
+        "ja": "AI検出感度",
+        "pl": "Czułość wykrywania AI",
+        "pt": "Sensibilidade de detecção de IA",
+        "ru": "Чувствительность обнаружения ИИ",
+        "tr": "Yapay Zeka algılama hassasiyeti",
+        "zh": "人工智能检测灵敏度"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Air Quality",
       "namespace": null,
       "context": null,
@@ -682,6 +815,27 @@
       "plurals": {}
     },
     {
+      "key": "Alerts illustration",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "رسم توضيحي للتنبيهات",
+        "bn": "সতর্কবার্তার চিত্রণ",
+        "de": "Warnmeldungen-Illustration",
+        "es": "Ilustración de alertas",
+        "et": "Hoiatuste illustratsioon",
+        "fr": "Illustration des alertes",
+        "hi": "अलर्ट का चित्रण",
+        "ja": "アラートのイラスト",
+        "pl": "Ilustracja alertów",
+        "pt": "Ilustração de alertas",
+        "ru": "Иллюстрация оповещений",
+        "tr": "Uyarılar illüstrasyonu",
+        "zh": "警报图示"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Alerts service is currently unavailable.",
       "namespace": null,
       "context": null,
@@ -727,6 +881,27 @@
         "ru": "Все ульи в",
         "tr": "Konumdaki tüm kovanlar",
         "zh": "所有蜂箱在"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Allow camera access",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "السماح بالوصول إلى الكاميرا",
+        "bn": "ক্যামেরা অ্যাক্সেসের অনুমতি দিন",
+        "de": "Kamerazugriff erlauben",
+        "es": "Permitir acceso a la cámara",
+        "et": "Luba juurdepääs kaamerale",
+        "fr": "Autoriser l'accès à la caméra",
+        "hi": "कैमरा एक्सेस की अनुमति दें",
+        "ja": "カメラへのアクセスを許可",
+        "pl": "Zezwól na dostęp do kamery",
+        "pt": "Permitir acesso à câmera",
+        "ru": "Разрешить доступ к камере",
+        "tr": "Kamera erişimine izin ver",
+        "zh": "允许访问摄像头"
       },
       "plurals": {}
     },
@@ -931,14 +1106,42 @@
       "key": "Are you sure you want to remove this box?",
       "namespace": null,
       "context": null,
-      "values": {},
+      "values": {
+        "ar": "هل أنت متأكد أنك تريد إزالة هذا الصندوق؟",
+        "bn": "আপনি কি নিশ্চিত যে আপনি এই বাক্সটি সরাতে চান?",
+        "de": "Möchten Sie diese Zarge wirklich entfernen?",
+        "es": "¿Está seguro de que quiere eliminar esta alza?",
+        "et": "Kas olete kindel, et soovite selle korpuse eemaldada?",
+        "fr": "Êtes-vous sûr de vouloir supprimer cette hausse ?",
+        "hi": "क्या आप वाकई इस बक्से को हटाना चाहते हैं?",
+        "ja": "この巣箱を本当に削除しますか？",
+        "pl": "Czy na pewno chcesz usunąć ten korpus?",
+        "pt": "Tem certeza que deseja remover esta alça?",
+        "ru": "Вы уверены, что хотите удалить этот корпус?",
+        "tr": "Bu katı kaldırmak istediğinizden emin misiniz?",
+        "zh": "您确定要移除这个蜂箱吗？"
+      },
       "plurals": {}
     },
     {
       "key": "Are you sure you want to remove this frame?",
       "namespace": null,
       "context": null,
-      "values": {},
+      "values": {
+        "ar": "هل أنت متأكد أنك تريد إزالة هذا الإطار؟",
+        "bn": "আপনি কি নিশ্চিত যে আপনি এই ফ্রেমটি সরাতে চান?",
+        "de": "Möchten Sie diesen Rahmen wirklich entfernen?",
+        "es": "¿Estás seguro de que quieres eliminar este cuadro?",
+        "et": "Kas olete kindel, et soovite selle raami eemaldada?",
+        "fr": "Voulez-vous vraiment supprimer ce cadre ?",
+        "hi": "क्या आप वाकई इस फ़्रेम को हटाना चाहते हैं?",
+        "ja": "この巣枠を本当に削除しますか？",
+        "pl": "Czy na pewno chcesz usunąć tę ramkę?",
+        "pt": "Tem certeza que deseja remover este quadro?",
+        "ru": "Вы уверены, что хотите удалить эту рамку?",
+        "tr": "Bu çerçeveyi kaldırmak istediğinizden emin misiniz?",
+        "zh": "您确定要移除此巢框吗？"
+      },
       "plurals": {}
     },
     {
@@ -991,6 +1194,27 @@
       "plurals": {}
     },
     {
+      "key": "Available Hives",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "الخلايا المتاحة",
+        "bn": "উপলব্ধ মৌচাক",
+        "de": "Verfügbare Bienenstöcke",
+        "es": "Colmenas disponibles",
+        "et": "Saadaval tarud",
+        "fr": "Ruches disponibles",
+        "hi": "उपलब्ध छत्ते",
+        "ja": "利用可能な巣箱",
+        "pl": "Dostępne ule",
+        "pt": "Colmeias disponíveis",
+        "ru": "Доступные ульи",
+        "tr": "Mevcut Kovanlar",
+        "zh": "可用蜂箱"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Available in warehouse",
       "namespace": null,
       "context": null,
@@ -1008,6 +1232,27 @@
         "ru": "В наличии на складе",
         "tr": "Depoda mevcut",
         "zh": "仓库有货"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Average and P95 bee flight speeds (pixels per frame)",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "متوسط سرعة طيران النحل وP95 (بكسل لكل إطار)",
+        "bn": "গড় এবং P95 মৌমাছির উড়ার গতি (পিক্সেল প্রতি ফ্রেম)",
+        "de": "Durchschnittliche und P95-Fluggeschwindigkeit der Bienen (Pixel pro Frame)",
+        "es": "Velocidad promedio y P95 del vuelo de las abejas (píxeles por fotograma)",
+        "et": "Mesilaste lennu keskmine ja P95 kiirus (pikslit kaadri kohta)",
+        "fr": "Vitesses de vol moyennes et P95 des abeilles (pixels par image)",
+        "hi": "औसत और P95 मधुमक्खी उड़ान गति (पिक्सेल प्रति फ्रेम)",
+        "ja": "平均およびP95のミツバチ飛行速度 (ピクセル/フレーム)",
+        "pl": "Średnia i P95 prędkości lotu pszczół (pikseli na klatkę)",
+        "pt": "Velocidade de voo média e P95 das abelhas (píxeis por frame)",
+        "ru": "Средняя и P95 скорость полёта пчёл (пикселей в кадре)",
+        "tr": "Ortalama ve P95 arı uçuş hızları (kare başına piksel)",
+        "zh": "平均和P95蜜蜂飞行速度 (像素/帧)"
       },
       "plurals": {}
     },
@@ -1117,6 +1362,48 @@
       "plurals": {}
     },
     {
+      "key": "Bee count",
+      "namespace": null,
+      "context": "table header of beekeeping app, start with uppercase latter",
+      "values": {
+        "ar": "عدد النحل",
+        "bn": "মৌমাছির সংখ্যা",
+        "de": "Bienenanzahl",
+        "es": "Conteo de abejas",
+        "et": "Mesilaste arv",
+        "fr": "Nombre d'abeilles",
+        "hi": "मधुमक्खियों की संख्या",
+        "ja": "蜂の数",
+        "pl": "Liczba pszczół",
+        "pt": "Contagem de abelhas",
+        "ru": "Количество пчел",
+        "tr": "Arı sayısı",
+        "zh": "蜜蜂数量"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Bee entrance movement was not reported this week.",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "لم يتم الإبلاغ عن أي حركة عند مدخل الخلية هذا الأسبوع.",
+        "bn": "এই সপ্তাহে মৌমাছির প্রবেশপথে কোনো গতিবিধি রিপোর্ট করা হয়নি।",
+        "de": "In dieser Woche wurde keine Bewegung am Flugloch gemeldet.",
+        "es": "No se ha registrado movimiento en la piquera esta semana.",
+        "et": "Sel nädalal ei ole mesilaste liikumist lennuaval registreeritud.",
+        "fr": "Aucun mouvement à l'entrée de la ruche n'a été signalé cette semaine.",
+        "hi": "इस सप्ताह मधुमक्खी के प्रवेश द्वार पर कोई हलचल दर्ज नहीं की गई।",
+        "ja": "今週は巣門での蜂の動きは報告されませんでした。",
+        "pl": "W tym tygodniu nie odnotowano ruchu pszczół przy wylotku.",
+        "pt": "Não foi relatado movimento na entrada da colmeia esta semana.",
+        "ru": "Движение у летка на этой неделе не зарегистрировано.",
+        "tr": "Bu hafta kovan girişinde arı hareketi raporlanmadı.",
+        "zh": "本周未报告蜂巢入口活动。"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Bee Interactions",
       "namespace": null,
       "context": null,
@@ -1218,6 +1505,105 @@
         "ru": "Сотовая рамка",
         "tr": "Petekli çerçeve",
         "zh": "巢脾框"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Bees",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "نحل",
+        "bn": "মৌমাছি",
+        "de": "Bienen",
+        "es": "Abejas",
+        "et": "Mesilased",
+        "fr": "Abeilles",
+        "hi": "मधुमक्खियाँ",
+        "ja": "ミツバチ",
+        "pl": "Pszczoły",
+        "pt": "Abelhas",
+        "ru": "Пчёлы",
+        "tr": "Arılar",
+        "zh": "蜜蜂"
+      },
+      "plurals": {
+        "ar": {
+          "few": "نحلات",
+          "one": "نحلة",
+          "two": "نحلتان",
+          "many": "نحل",
+          "zero": "لا نحل",
+          "other": "نحل"
+        },
+        "bn": {
+          "one": "মৌমাছি",
+          "other": "মৌমাছিরা"
+        },
+        "de": {
+          "one": "Biene",
+          "other": "Bienen"
+        },
+        "es": {
+          "one": "abeja",
+          "other": "abejas"
+        },
+        "et": {
+          "one": "Mesilane",
+          "other": "Mesilased"
+        },
+        "fr": {
+          "one": "Abeille",
+          "other": "Abeilles"
+        },
+        "hi": {
+          "one": "मधुमक्खी",
+          "other": "मधुमक्खियाँ"
+        },
+        "ja": {
+          "other": "ミツバチ"
+        },
+        "pl": {
+          "few": "Pszczoły",
+          "one": "Pszczoła",
+          "many": "pszczół"
+        },
+        "pt": {
+          "one": "abelha",
+          "other": "abelhas"
+        },
+        "ru": {
+          "few": "Пчелы",
+          "one": "Пчела",
+          "many": "пчёл"
+        },
+        "tr": {
+          "one": "Arılar",
+          "other": "Arılar"
+        },
+        "zh": {
+          "other": "蜜蜂"
+        }
+      }
+    },
+    {
+      "key": "Bees with minimal movement (guard bees, orientation flights)",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "نحل بحركة ضئيلة (النحل الحارس، رحلات استطلاعية)",
+        "bn": "ন্যূনতম নড়াচড়ার মৌমাছি (প্রহরী মৌমাছি, দিকনির্ণয় ফ্লাইট)",
+        "de": "Bienen mit minimaler Bewegung (Wächterbienen, Orientierungsflüge)",
+        "es": "Abejas con movimiento mínimo (abejas guardianas, vuelos de orientación)",
+        "et": "Minimaalse liikumisega mesilased (valvemesilased, orienteerumislennud)",
+        "fr": "Abeilles avec un mouvement minimal (gardiennes, vols d'orientation)",
+        "hi": "न्यूनतम हलचल वाली मधुमक्खियाँ (रक्षक मधुमक्खियाँ, दिशा ज्ञान उड़ानें)",
+        "ja": "動きが最小限のミツバチ（門番蜂、定位飛行）",
+        "pl": "Pszczoły o minimalnym ruchu (pszczoły strażniczki, loty orientacyjne)",
+        "pt": "Abelhas com movimento mínimo (abelhas de guarda, voos de orientação)",
+        "ru": "Пчёлы с минимальным движением (сторожевые пчёлы, ориентировочные облёты)",
+        "tr": "Minimum hareketli arılar (bekçi arılar, oryantasyon uçuşları)",
+        "zh": "活动量极少的蜜蜂（守卫蜂、认巢飞行）"
       },
       "plurals": {}
     },
@@ -1327,6 +1713,27 @@
       "plurals": {}
     },
     {
+      "key": "Both queens are kept alive. The strongest one will win.",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "يتم الإبقاء على كلتا الملكتين على قيد الحياة. والأقوى هي التي ستفوز.",
+        "bn": "দুটি রানীকেই বাঁচিয়ে রাখা হয়। সবচেয়ে শক্তিশালী রানীটিই জিতবে।",
+        "de": "Beide Königinnen werden am Leben gelassen. Die Stärkere wird gewinnen.",
+        "es": "Ambas reinas se mantienen con vida. La más fuerte ganará.",
+        "et": "Mõlemad emad jäetakse ellu. Tugevaim võidab.",
+        "fr": "Les deux reines sont maintenues en vie. La plus forte l'emportera.",
+        "hi": "दोनों रानियों को जीवित रखा जाता है। सबसे ताकतवर ही जीतेगी।",
+        "ja": "両方の女王蜂を生かしておきます。最終的に強い方が勝ち残ります。",
+        "pl": "Obie matki są utrzymywane przy życiu. Silniejsza wygra.",
+        "pt": "Ambas as rainhas são mantidas vivas. A mais forte vencerá.",
+        "ru": "Обеих маток оставляют в живых. Сильнейшая победит.",
+        "tr": "Her iki ana arı da hayatta bırakılır. En güçlü olan kazanacaktır.",
+        "zh": "两只蜂王都会被保留下来。最强壮的那只会获胜。"
+      },
+      "plurals": {}
+    },
+    {
       "key": "bottom",
       "namespace": null,
       "context": "this is the bottom board of the beehive used for varroa monitoring",
@@ -1369,6 +1776,27 @@
       "plurals": {}
     },
     {
+      "key": "Bottom board - Varroa monitoring requires Starter plan or higher.",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "قاعدة الخلية - مراقبة الفاروا تتطلب خطة المبتدئين أو أعلى.",
+        "bn": "বটম বোর্ড - ভ্যারোয়া পর্যবেক্ষণের জন্য স্টার্টার প্ল্যান বা উচ্চতর সংস্করণ প্রয়োজন।",
+        "de": "Unterboden - Das Varroa-Monitoring erfordert den Starter-Plan oder höher.",
+        "es": "Fondo de colmena - El monitoreo de varroa requiere el plan Starter o superior.",
+        "et": "Vaatluspõhi - Varroa seire nõuab Stardipaketti või kõrgemat.",
+        "fr": "Plancher de ruche - Le suivi du varroa nécessite le plan Starter ou supérieur.",
+        "hi": "तल बोर्ड - वरोआ निगरानी के लिए स्टार्टर प्लान या उच्चतर की आवश्यकता है।",
+        "ja": "巣箱の底板 - バロアモニタリングにはスタータープラン以上が必要です。",
+        "pl": "Dennica - Monitoring warrozy wymaga planu Starter lub wyższego.",
+        "pt": "Fundo da colmeia - O monitoramento de varroa requer o plano Starter ou superior.",
+        "ru": "Поддон - Мониторинг клеща Варроа требует тарифного плана «Стартовый» или выше.",
+        "tr": "Kovan tabanı - Varroa takibi için Başlangıç planı veya üstü gereklidir.",
+        "zh": "巢底板 - 瓦螨监测需要入门版或更高级别的套餐。"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Bottom boards used as the base of the hive.",
       "namespace": null,
       "context": null,
@@ -1388,6 +1816,70 @@
         "zh": "用作蜂箱底部的底板。"
       },
       "plurals": {}
+    },
+    {
+      "key": "Box",
+      "namespace": null,
+      "context": null,
+      "values": {},
+      "plurals": {
+        "ar": {
+          "few": "عاسلات",
+          "one": "عاسلة",
+          "two": "عاسلتان",
+          "many": "عاسلة",
+          "zero": "عاسلات",
+          "other": "عاسلة"
+        },
+        "bn": {
+          "one": "বাক্স",
+          "other": "বাক্স"
+        },
+        "de": {
+          "one": "Zarge",
+          "other": "Zargen"
+        },
+        "es": {
+          "one": "alza",
+          "other": "alzas"
+        },
+        "et": {
+          "one": "korpus",
+          "other": "korpust"
+        },
+        "fr": {
+          "one": "hausse",
+          "other": "hausses"
+        },
+        "hi": {
+          "one": "बक्सा",
+          "other": "बक्से"
+        },
+        "ja": {
+          "other": "巣箱"
+        },
+        "pl": {
+          "few": "korpusy",
+          "one": "korpus",
+          "many": "korpusów"
+        },
+        "pt": {
+          "one": "alça",
+          "other": "alças"
+        },
+        "ru": {
+          "few": "корпуса",
+          "one": "корпус",
+          "many": "корпусов"
+        },
+        "tr": {
+          "one": "Kat",
+          "other": "Kat"
+        },
+        "zh": {
+          "other": "蜂箱"
+        }
+      }
     },
     {
       "key": "boxes",
@@ -1495,6 +1987,27 @@
       "plurals": {}
     },
     {
+      "key": "Camera",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "كاميرا",
+        "bn": "ক্যামেরা",
+        "de": "Kamera",
+        "es": "Cámara",
+        "et": "Kaamera",
+        "fr": "Caméra",
+        "hi": "कैमरा",
+        "ja": "カメラ",
+        "pl": "Kamera",
+        "pt": "Câmera",
+        "ru": "Камера",
+        "tr": "Kamera",
+        "zh": "摄像头"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Cancel",
       "namespace": null,
       "context": null,
@@ -1516,6 +2029,27 @@
       "plurals": {}
     },
     {
+      "key": "Cancel focused dialog action",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "إلغاء الإجراء المحدد",
+        "bn": "নির্বাচিত অ্যাকশন বাতিল করুন",
+        "de": "Ausgewählte Aktion abbrechen",
+        "es": "Cancelar acción seleccionada",
+        "et": "Tühista valitud toiming",
+        "fr": "Annuler l'action sélectionnée",
+        "hi": "चयनित क्रिया रद्द करें",
+        "ja": "選択中の操作をキャンセル",
+        "pl": "Anuluj wybraną akcję",
+        "pt": "Cancelar ação selecionada",
+        "ru": "Отменить выбранное действие",
+        "tr": "Seçili eylemi iptal et",
+        "zh": "取消选中的操作"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Canvas not supported.",
       "namespace": null,
       "context": null,
@@ -1533,6 +2067,27 @@
         "ru": "Canvas не поддерживается.",
         "tr": "Canvas desteklenmiyor.",
         "zh": "不支持 Canvas"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Change history",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "سجل التغييرات",
+        "bn": "পরিবর্তনের ইতিহাস",
+        "de": "Änderungsverlauf",
+        "es": "Historial de cambios",
+        "et": "Muudatuste ajalugu",
+        "fr": "Historique des modifications",
+        "hi": "बदलाव का इतिहास",
+        "ja": "変更履歴",
+        "pl": "Historia zmian",
+        "pt": "Histórico de alterações",
+        "ru": "История изменений",
+        "tr": "Değişiklik geçmişi",
+        "zh": "变更记录"
       },
       "plurals": {}
     },
@@ -1663,6 +2218,27 @@
       "plurals": {}
     },
     {
+      "key": "Close",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "إغلاق",
+        "bn": "বন্ধ করুন",
+        "de": "Schließen",
+        "es": "Cerrar",
+        "et": "Sule",
+        "fr": "Fermer",
+        "hi": "बंद करें",
+        "ja": "閉じる",
+        "pl": "Zamknij",
+        "pt": "Fechar",
+        "ru": "Закрыть",
+        "tr": "Kapat",
+        "zh": "关闭"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Close AI Advisor",
       "namespace": null,
       "context": null,
@@ -1701,6 +2277,27 @@
         "ru": "Закрыть панель ИИ-советника",
         "tr": "Yapay Zeka Danışmanı panelini kapat",
         "zh": "关闭AI顾问抽屉"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Close proximity events between bees (guarding, trophallaxis, collisions)",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "أحداث التقارب الشديد بين النحل (الحراسة، تروفالاكسيس، الاصطدامات)",
+        "bn": "মৌমাছিদের মধ্যে ঘনিষ্ঠ নৈকট্যের ঘটনা (পাহারাদারি, ট্রোফ্যালাক্সিস, সংঘর্ষ)",
+        "de": "Nahkontaktereignisse zwischen Bienen (Bewachen, Trophallaxis, Kollisionen)",
+        "es": "Interacciones cercanas entre abejas (guardia, trofalaxis, colisiones)",
+        "et": "Mesilastevahelised lähikontaktsed sündmused (valvamine, trofallaksis, kokkupõrked)",
+        "fr": "Interactions de proximité entre abeilles (gardiennage, trophallaxie, collisions)",
+        "hi": "मधुमक्खियों के बीच निकट संपर्क की घटनाएँ (पहरेदारी, ट्रॉफलैक्सिस, टकराव)",
+        "ja": "ミツバチ間の近接イベント（警備、栄養交換、衝突）",
+        "pl": "Zdarzenia bliskiego kontaktu między pszczołami (strzeżenie, trofalaksja, kolizje)",
+        "pt": "Eventos de proximidade entre abelhas (guarda, trofalaxia, colisões)",
+        "ru": "Взаимодействия пчёл на близком расстоянии (охрана, трофаллаксис, столкновения)",
+        "tr": "Arılar arasındaki yakın temas olayları (koruma, trofalaksi, çarpışmalar)",
+        "zh": "蜜蜂之间的近距离接触事件（守卫、交哺、碰撞）"
       },
       "plurals": {}
     },
@@ -1757,7 +2354,21 @@
       "key": "Colony Lifecycle",
       "namespace": null,
       "context": null,
-      "values": {},
+      "values": {
+        "ar": "دورة حياة المستعمرة",
+        "bn": "কলোনির জীবনচক্র",
+        "de": "Lebenszyklus des Bienenvolks",
+        "es": "Ciclo de vida de la colonia",
+        "et": "Mesilaspere elutsükkel",
+        "fr": "Cycle de vie de la colonie",
+        "hi": "कॉलोनी का जीवन चक्र",
+        "ja": "コロニーのライフサイクル",
+        "pl": "Cykl życia rodziny pszczelej",
+        "pt": "Ciclo de vida da colônia",
+        "ru": "Жизненный цикл колонии",
+        "tr": "Koloni Yaşam Döngüsü",
+        "zh": "蜂群生命周期"
+      },
       "plurals": {}
     },
     {
@@ -1778,6 +2389,27 @@
         "ru": "Популяция семьи",
         "tr": "Koloni Popülasyonu",
         "zh": "蜂群数量"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Colony status",
+      "namespace": null,
+      "context": "table header of beekeeping app, this is a bee colony information, start with uppercase latter",
+      "values": {
+        "ar": "حالة الطائفة",
+        "bn": "কলোনির অবস্থা",
+        "de": "Volkstatus",
+        "es": "Estado de la colonia",
+        "et": "Mesilaspere staatus",
+        "fr": "Statut de la colonie",
+        "hi": "कॉलोनी की स्थिति",
+        "ja": "コロニーの状態",
+        "pl": "Status rodziny",
+        "pt": "Estado da colónia",
+        "ru": "Статус колонии",
+        "tr": "Koloni durumu",
+        "zh": "蜂群状态"
       },
       "plurals": {}
     },
@@ -1849,6 +2481,48 @@
       "namespace": null,
       "context": null,
       "values": {},
+      "plurals": {}
+    },
+    {
+      "key": "Compare net bee flow across multiple hives",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "قارن صافي تدفق النحل عبر عدة خلايا",
+        "bn": "একাধিক মৌচাকের মধ্যে নেট মৌমাছির প্রবাহ তুলনা করুন",
+        "de": "Vergleichen Sie den Netto-Bienenfluss über mehrere Bienenstöcke hinweg",
+        "es": "Compare el flujo neto de abejas entre varias colmenas",
+        "et": "Võrdle mesilaste netovoolu mitmes tarus",
+        "fr": "Comparez le flux net d'abeilles entre plusieurs ruches",
+        "hi": "कई छत्तों में निवल मधुमक्खी प्रवाह की तुलना करें",
+        "ja": "複数の巣箱の正味の蜂の出入りを比較する",
+        "pl": "Porównaj przepływ netto pszczół w wielu ulach",
+        "pt": "Compare o fluxo líquido de abelhas entre várias colmeias",
+        "ru": "Сравните чистый поток пчёл в нескольких ульях",
+        "tr": "Birden fazla kovandaki net arı akışını karşılaştırın",
+        "zh": "比较多个蜂箱的净蜜蜂流量"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Compare weight across multiple hives",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "مقارنة الوزن عبر عدة خلايا نحل",
+        "bn": "একাধিক মৌচাকের ওজন তুলনা করুন",
+        "de": "Gewicht mehrerer Bienenstöcke vergleichen",
+        "es": "Comparar el peso de varias colmenas",
+        "et": "Võrdle mitme taru kaalu",
+        "fr": "Comparer le poids de plusieurs ruches",
+        "hi": "कई छत्तों के वज़न की तुलना करें",
+        "ja": "複数の巣箱の重量を比較する",
+        "pl": "Porównaj wagę wielu uli",
+        "pt": "Comparar o peso de várias colmeias",
+        "ru": "Сравнить вес нескольких ульев",
+        "tr": "Birden fazla kovanın ağırlığını karşılaştır",
+        "zh": "比较多个蜂箱的重量"
+      },
       "plurals": {}
     },
     {
@@ -1971,6 +2645,27 @@
       "plurals": {}
     },
     {
+      "key": "Connected device",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "جهاز متصل",
+        "bn": "সংযুক্ত ডিভাইস",
+        "de": "Verbundenes Gerät",
+        "es": "Dispositivo conectado",
+        "et": "Ühendatud seade",
+        "fr": "Appareil connecté",
+        "hi": "जुड़ा हुआ उपकरण",
+        "ja": "接続中のデバイス",
+        "pl": "Podłączone urządzenie",
+        "pt": "Dispositivo conectado",
+        "ru": "Подключенное устройство",
+        "tr": "Bağlı cihaz",
+        "zh": "已连接的设备"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Consider flight patterns - hives should not be in line with each other",
       "namespace": null,
       "context": null,
@@ -2013,6 +2708,27 @@
       "plurals": {}
     },
     {
+      "key": "Count",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "العدد",
+        "bn": "গণনা",
+        "de": "Anzahl",
+        "es": "Conteo",
+        "et": "Arv",
+        "fr": "Nombre",
+        "hi": "गिनती",
+        "ja": "カウント",
+        "pl": "Liczba",
+        "pt": "Contagem",
+        "ru": "Количество",
+        "tr": "Sayı",
+        "zh": "数量"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Create",
       "namespace": null,
       "context": null,
@@ -2030,6 +2746,27 @@
         "ru": "Создать",
         "tr": "Oluştur",
         "zh": "创建"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Create hive system",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "إنشاء نظام خلايا نحل",
+        "bn": "মৌচাক সিস্টেম তৈরি করুন",
+        "de": "Bienenstock-System erstellen",
+        "es": "Crear sistema de colmenas",
+        "et": "Loo tarusüsteem",
+        "fr": "Créer un système de ruches",
+        "hi": "छत्ता प्रणाली बनाएं",
+        "ja": "巣箱システムを作成",
+        "pl": "Utwórz system uli",
+        "pt": "Criar sistema de colmeias",
+        "ru": "Создать систему ульев",
+        "tr": "Kovan sistemi oluştur",
+        "zh": "创建蜂箱系统"
       },
       "plurals": {}
     },
@@ -2055,10 +2792,52 @@
       "plurals": {}
     },
     {
+      "key": "Create new account",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "إنشاء حساب جديد",
+        "bn": "নতুন অ্যাকাউন্ট তৈরি করুন",
+        "de": "Neues Konto erstellen",
+        "es": "Crear nueva cuenta",
+        "et": "Loo uus konto",
+        "fr": "Créer un nouveau compte",
+        "hi": "नया खाता बनाएँ",
+        "ja": "新規アカウント作成",
+        "pl": "Utwórz nowe konto",
+        "pt": "Criar nova conta",
+        "ru": "Создать новый аккаунт",
+        "tr": "Yeni hesap oluştur",
+        "zh": "创建新帐户"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Create New Queen",
       "namespace": null,
       "context": null,
       "values": {},
+      "plurals": {}
+    },
+    {
+      "key": "CSV",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "CSV",
+        "bn": "CSV",
+        "de": "CSV",
+        "es": "CSV",
+        "et": "CSV",
+        "fr": "CSV",
+        "hi": "CSV",
+        "ja": "CSV",
+        "pl": "CSV",
+        "pt": "CSV",
+        "ru": "CSV",
+        "tr": "CSV",
+        "zh": "CSV"
+      },
       "plurals": {}
     },
     {
@@ -2146,6 +2925,27 @@
       "plurals": {}
     },
     {
+      "key": "Date format preview",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "معاينة تنسيق التاريخ",
+        "bn": "তারিখ বিন্যাসের পূর্বরূপ",
+        "de": "Vorschau des Datumsformats",
+        "es": "Vista previa del formato de fecha",
+        "et": "Kuupäevavormingu eelvaade",
+        "fr": "Aperçu du format de date",
+        "hi": "दिनांक प्रारूप पूर्वावलोकन",
+        "ja": "日付形式のプレビュー",
+        "pl": "Podgląd formatu daty",
+        "pt": "Pré-visualização do formato de data",
+        "ru": "Предпросмотр формата даты",
+        "tr": "Tarih formatı önizlemesi",
+        "zh": "日期格式预览"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Deep sections",
       "namespace": null,
       "context": null,
@@ -2163,6 +2963,27 @@
         "ru": "Глубокие корпуса",
         "tr": "Derin katlar",
         "zh": "深继箱"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Default",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "افتراضي",
+        "bn": "ডিফল্ট",
+        "de": "Standard",
+        "es": "Predeterminado",
+        "et": "Vaikimisi",
+        "fr": "Par défaut",
+        "hi": "पूर्वनिर्धारित",
+        "ja": "デフォルト",
+        "pl": "Domyślny",
+        "pt": "Padrão",
+        "ru": "По умолчанию",
+        "tr": "Varsayılan",
+        "zh": "默认"
       },
       "plurals": {}
     },
@@ -2233,7 +3054,21 @@
       "key": "Delete Obstacle",
       "namespace": null,
       "context": null,
-      "values": {},
+      "values": {
+        "ar": "حذف العائق",
+        "bn": "বাধা মুছে ফেলুন",
+        "de": "Hindernis löschen",
+        "es": "Eliminar obstáculo",
+        "et": "Kustuta takistus",
+        "fr": "Supprimer l'obstacle",
+        "hi": "बाधा हटाएं",
+        "ja": "障害物を削除",
+        "pl": "Usuń przeszkodę",
+        "pt": "Excluir obstáculo",
+        "ru": "Удалить препятствие",
+        "tr": "Engeli Sil",
+        "zh": "删除障碍"
+      },
       "plurals": {}
     },
     {
@@ -2275,6 +3110,111 @@
         "ru": "Удалить правило",
         "tr": "Kuralı sil",
         "zh": "删除规则"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Delete selected device",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "حذف الجهاز المحدد",
+        "bn": "নির্বাচিত ডিভাইসটি মুছুন",
+        "de": "Ausgewähltes Gerät löschen",
+        "es": "Eliminar dispositivo seleccionado",
+        "et": "Kustuta valitud seade",
+        "fr": "Supprimer l'appareil sélectionné",
+        "hi": "चयनित डिवाइस हटाएं",
+        "ja": "選択したデバイスを削除",
+        "pl": "Usuń wybrane urządzenie",
+        "pt": "Excluir dispositivo selecionado",
+        "ru": "Удалить выбранное устройство",
+        "tr": "Seçili cihazı sil",
+        "zh": "删除所选设备"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Delete selected frame or section",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "حذف الإطار أو القسم المحدد",
+        "bn": "নির্বাচিত ফ্রেম বা বিভাগ মুছে ফেলুন",
+        "de": "Ausgewählten Rahmen oder Abschnitt löschen",
+        "es": "Eliminar el cuadro o la sección seleccionada",
+        "et": "Kustuta valitud raam või sektsioon",
+        "fr": "Supprimer le cadre ou la section sélectionné",
+        "hi": "चयनित फ़्रेम या सेक्शन हटाएं",
+        "ja": "選択したフレームまたはセクションを削除",
+        "pl": "Usuń wybraną ramkę lub sekcję",
+        "pt": "Excluir o quadro ou a seção selecionada",
+        "ru": "Удалить выбранную рамку или секцию",
+        "tr": "Seçili çerçeveyi veya bölümü sil",
+        "zh": "删除选定的巢框或区域"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Delete selected hive frame",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "حذف الإطار المحدد",
+        "bn": "নির্বাচিত ফ্রেমটি মুছুন",
+        "de": "Ausgewähltes Rähmchen löschen",
+        "es": "Eliminar marco seleccionado",
+        "et": "Kustuta valitud raam",
+        "fr": "Supprimer le cadre sélectionné",
+        "hi": "चयनित हाइव फ्रेम हटाएं",
+        "ja": "選択した巣枠を削除",
+        "pl": "Usuń wybraną ramkę",
+        "pt": "Excluir quadro selecionado",
+        "ru": "Удалить выбранную рамку",
+        "tr": "Seçili çerçeveyi sil",
+        "zh": "删除选定的蜂巢框"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Delete selected hive section",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "حذف قسم الخلية المحدد",
+        "bn": "নির্বাচিত মৌচাকের অংশটি মুছুন",
+        "de": "Ausgewählten Beutenteil löschen",
+        "es": "Eliminar la sección de colmena seleccionada",
+        "et": "Kustuta valitud taruosa",
+        "fr": "Supprimer la section de ruche sélectionnée",
+        "hi": "चयनित छत्ते के भाग को हटाएँ",
+        "ja": "選択した巣箱セクションを削除",
+        "pl": "Usuń wybraną sekcję ula",
+        "pt": "Excluir seção da colmeia selecionada",
+        "ru": "Удалить выбранную секцию улья",
+        "tr": "Seçili kovan bölümünü sil",
+        "zh": "删除选定的蜂箱部分"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Delete selected warehouse queen",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "حذف ملكة المستودع المحددة",
+        "bn": "নির্বাচিত ওয়্যারহাউস রানী ডিলিট করুন",
+        "de": "Ausgewählte Königin aus dem Lager löschen",
+        "es": "Eliminar la reina de reserva seleccionada",
+        "et": "Kustuta valitud varuema",
+        "fr": "Supprimer la reine de réserve sélectionnée",
+        "hi": "चयनित वेयरहाउस रानी को हटाएँ",
+        "ja": "選択した保管女王蜂を削除",
+        "pl": "Usuń wybraną matkę z magazynu",
+        "pt": "Excluir rainha de reserva selecionada",
+        "ru": "Удалить выбранную матку со склада",
+        "tr": "Seçili depo ana arısını sil",
+        "zh": "删除所选的库存蜂王"
       },
       "plurals": {}
     },
@@ -2454,6 +3394,48 @@
       "plurals": {}
     },
     {
+      "key": "Device list view",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "عرض قائمة الأجهزة",
+        "bn": "ডিভাইস তালিকা দৃশ্য",
+        "de": "Gerätelistenansicht",
+        "es": "Vista de lista de dispositivos",
+        "et": "Seadmete nimekiri",
+        "fr": "Vue de la liste des appareils",
+        "hi": "डिवाइस सूची दृश्य",
+        "ja": "デバイス一覧表示",
+        "pl": "Widok listy urządzeń",
+        "pt": "Visualização da lista de dispositivos",
+        "ru": "Список устройств",
+        "tr": "Cihaz Listesi Görünümü",
+        "zh": "设备列表视图"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Device list with keyboard row selection and deletion flow.",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "قائمة الأجهزة مع تحديد وحذف الصفوف بلوحة المفاتيح.",
+        "bn": "কীবোর্ড দিয়ে সারি নির্বাচন এবং মুছে ফেলার প্রক্রিয়া সহ ডিভাইসের তালিকা।",
+        "de": "Geräteliste mit Zeilenauswahl per Tastatur und Löschvorgang.",
+        "es": "Lista de dispositivos con selección y eliminación de filas mediante el teclado.",
+        "et": "Seadmete loend: ridade valimine ja kustutamine klaviatuuriga.",
+        "fr": "Liste des appareils avec sélection et suppression de lignes au clavier.",
+        "hi": "कीबोर्ड से पंक्ति चयन और हटाने की प्रक्रिया वाली डिवाइस सूची।",
+        "ja": "キーボードによる行選択と削除フローを備えたデバイスリスト。",
+        "pl": "Lista urządzeń z wyborem i usuwaniem wierszy za pomocą klawiatury.",
+        "pt": "Lista de dispositivos com seleção e exclusão de linhas pelo teclado.",
+        "ru": "Список устройств с выбором и удалением строк с помощью клавиатуры.",
+        "tr": "Klavye ile satır seçimi ve silme akışına sahip cihaz listesi.",
+        "zh": "支持键盘行选择和删除流程的设备列表。"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Device name",
       "namespace": null,
       "context": null,
@@ -2492,6 +3474,27 @@
         "ru": "Устройства",
         "tr": "Cihazlar",
         "zh": "设备"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Devices requires Professional plan or higher.",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "تتطلب الأجهزة الخطة الاحترافية أو أعلى.",
+        "bn": "ডিভাইসগুলির জন্য প্রফেশনাল প্ল্যান বা উচ্চতর সংস্করণ প্রয়োজন।",
+        "de": "Für Geräte ist der Professional-Plan oder höher erforderlich.",
+        "es": "Los dispositivos requieren el plan Profesional o superior.",
+        "et": "Seadmete kasutamiseks on vajalik pakett „Professional“ või kõrgem.",
+        "fr": "Les appareils nécessitent un forfait Professionnel ou supérieur.",
+        "hi": "डिवाइसेस के लिए प्रोफेशनल प्लान या उच्चतर की आवश्यकता है।",
+        "ja": "デバイスの利用には、プロフェッショナルプラン以上が必要です。",
+        "pl": "Urządzenia wymagają planu Profesjonalnego lub wyższego.",
+        "pt": "Os dispositivos requerem o plano Profissional ou superior.",
+        "ru": "Для использования устройств требуется план «Профессиональный» или выше.",
+        "tr": "Cihazlar, Profesyonel plan veya üstünü gerektirir.",
+        "zh": "设备需要专业版或更高级别的套餐。"
       },
       "plurals": {}
     },
@@ -2622,6 +3625,27 @@
       "plurals": {}
     },
     {
+      "key": "Drag and drop image here or click to select",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "اسحب الصورة وأفلتها هنا أو انقر للاختيار",
+        "bn": "ছবিটি এখানে টেনে এনে ছাড়ুন বা নির্বাচন করতে ক্লিক করুন",
+        "de": "Bild hierher ziehen oder zum Auswählen klicken",
+        "es": "Arrastra y suelta una imagen aquí o haz clic para seleccionar",
+        "et": "Lohista pilt siia või klõpsa valimiseks",
+        "fr": "Glissez-déposez une image ici ou cliquez pour sélectionner",
+        "hi": "छवि को यहां खींचें और छोड़ें या चुनने के लिए क्लिक करें",
+        "ja": "ここに画像をドラッグ＆ドロップするか、クリックして選択してください",
+        "pl": "Przeciągnij i upuść obraz tutaj lub kliknij, aby wybrać",
+        "pt": "Arraste e solte uma imagem aqui ou clique para selecionar",
+        "ru": "Перетащите изображение сюда или нажмите, чтобы выбрать",
+        "tr": "Resmi buraya sürükleyip bırakın veya seçmek için tıklayın",
+        "zh": "拖放图片到此处或点击选择"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Drag the sun icon ☀️ around the compass to change sun position",
       "namespace": null,
       "context": null,
@@ -2664,10 +3688,45 @@
       "plurals": {}
     },
     {
+      "key": "Drone Bees",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "ذكور النحل",
+        "bn": "পুরুষ মৌমাছি",
+        "de": "Drohnen",
+        "es": "Zánganos",
+        "et": "Lesed",
+        "fr": "Faux-bourdons",
+        "hi": "नर मधुमक्खियाँ",
+        "ja": "雄蜂",
+        "pl": "Trutnie",
+        "pt": "Zangões",
+        "ru": "Трутни",
+        "tr": "Erkek arılar",
+        "zh": "雄蜂"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Drones",
       "namespace": null,
       "context": "toggle drones visibility",
-      "values": {},
+      "values": {
+        "ar": "ذكور النحل",
+        "bn": "পুরুষ মৌমাছি",
+        "de": "Drohnen",
+        "es": "Zánganos",
+        "et": "Lesed",
+        "fr": "Faux-bourdons",
+        "hi": "नर मधुमक्खियाँ",
+        "ja": "雄バチ",
+        "pl": "Trutnie",
+        "pt": "Zangões",
+        "ru": "Трутни",
+        "tr": "Erkek arılar",
+        "zh": "雄蜂"
+      },
       "plurals": {
         "ar": {
           "few": "ذكور",
@@ -2808,6 +3867,27 @@
         "ru": "Редактировать основную информацию об улье",
         "tr": "Kovan ana bilgilerini düzenle",
         "zh": "编辑蜂箱主要信息"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "elevation",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "ارتفاع",
+        "bn": "উচ্চতা",
+        "de": "Höhe",
+        "es": "Altitud",
+        "et": "Kõrgus",
+        "fr": "Altitude",
+        "hi": "ऊंचाई",
+        "ja": "標高",
+        "pl": "Wysokość",
+        "pt": "Altitude",
+        "ru": "Высота",
+        "tr": "Rakım",
+        "zh": "海拔"
       },
       "plurals": {}
     },
@@ -2955,6 +4035,48 @@
         "ru": "Включено",
         "tr": "Etkin",
         "zh": "已启用"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Enter name for queen",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "أدخل اسم الملكة",
+        "bn": "রানির নাম লিখুন",
+        "de": "Namen für die Königin eingeben",
+        "es": "Introduzca el nombre de la reina",
+        "et": "Sisesta mesilasema nimi",
+        "fr": "Saisir le nom de la reine",
+        "hi": "रानी का नाम दर्ज करें",
+        "ja": "女王蜂の名前を入力",
+        "pl": "Wprowadź imię matki",
+        "pt": "Insira o nome da rainha",
+        "ru": "Введите имя матки",
+        "tr": "Ana arı için isim girin",
+        "zh": "输入蜂王名称"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "entrance",
+      "namespace": null,
+      "context": "this is part of the beehive where bees enter or exit",
+      "values": {
+        "ar": "مدخل",
+        "bn": "প্রবেশদ্বার",
+        "de": "Flugloch",
+        "es": "Piquera",
+        "et": "Lennuava",
+        "fr": "Entrée",
+        "hi": "प्रवेश द्वार",
+        "ja": "巣門",
+        "pl": "Wlotek",
+        "pt": "Alvado",
+        "ru": "Леток",
+        "tr": "Giriş",
+        "zh": "巢门"
       },
       "plurals": {}
     },
@@ -3373,6 +4495,27 @@
       "plurals": {}
     },
     {
+      "key": "Go to apiary view",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "الانتقال إلى عرض المنحل",
+        "bn": "মৌ-খামারের দৃশ্যে যান",
+        "de": "Zur Bienenstand-Ansicht",
+        "es": "Ir a la vista del apiario",
+        "et": "Mine mesila vaatesse",
+        "fr": "Aller à la vue du rucher",
+        "hi": "मधुवाटिका दृश्य पर जाएं",
+        "ja": "養蜂場ビューに移動",
+        "pl": "Przejdź do widoku pasieki",
+        "pt": "Ir para a vista do apiário",
+        "ru": "Перейти к пасеке",
+        "tr": "Arılık görünümüne git",
+        "zh": "前往蜂场视图"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Go to hive list view",
       "namespace": null,
       "context": null,
@@ -3390,6 +4533,27 @@
         "ru": "Перейти к списку ульев",
         "tr": "Kovan listesine git",
         "zh": "前往蜂箱列表视图"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Go to left menu item by number",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "اذهب إلى عنصر القائمة اليسرى حسب الرقم",
+        "bn": "নম্বর অনুযায়ী বাম মেনু আইটেমে যান",
+        "de": "Gehe zum linken Menüpunkt nach Nummer",
+        "es": "Ir al elemento del menú izquierdo por número",
+        "et": "Mine vasaku menüü üksusele numbri järgi",
+        "fr": "Aller à l'élément du menu de gauche par numéro",
+        "hi": "नंबर से बाएं मेनू आइटम पर जाएं",
+        "ja": "番号で左のメニュー項目に移動",
+        "pl": "Przejdź do pozycji lewego menu według numeru",
+        "pt": "Ir para o item do menu esquerdo pelo número",
+        "ru": "Перейти к пункту левого меню по номеру",
+        "tr": "Numaraya göre sol menü öğesine gidin",
+        "zh": "按编号转到左侧菜单项"
       },
       "plurals": {}
     },
@@ -3587,7 +4751,21 @@
       "key": "Hive #",
       "namespace": null,
       "context": "table header - hive number",
-      "values": {},
+      "values": {
+        "ar": "رقم الخلية",
+        "bn": "মৌচাক নং",
+        "de": "Bienenstock Nr.",
+        "es": "Colmena N.º",
+        "et": "Taru nr",
+        "fr": "Ruche n°",
+        "hi": "छत्ता #",
+        "ja": "巣箱番号",
+        "pl": "Ul nr",
+        "pt": "Colmeia N.º",
+        "ru": "Улей №",
+        "tr": "Kovan No",
+        "zh": "蜂箱编号"
+      },
       "plurals": {}
     },
     {
@@ -3724,6 +4902,27 @@
       "plurals": {}
     },
     {
+      "key": "Hive part",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "جزء الخلية",
+        "bn": "মৌচাকের অংশ",
+        "de": "Beuteteil",
+        "es": "Parte de la colmena",
+        "et": "Taru osa",
+        "fr": "Partie de la ruche",
+        "hi": "छत्ते का हिस्सा",
+        "ja": "巣箱の部品",
+        "pl": "Część ula",
+        "pt": "Parte da colmeia",
+        "ru": "Часть улья",
+        "tr": "Kovan parçası",
+        "zh": "蜂箱部件"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Hive parts",
       "namespace": null,
       "context": null,
@@ -3783,6 +4982,27 @@
         "ru": "Обзор размещения ульев",
         "tr": "Kovan yerleşimine genel bakış",
         "zh": "蜂箱位置概览"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Hive Placement requires Hobbyist plan or higher.",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "يتطلب تحديد موقع الخلية خطة الهاوي أو أعلى.",
+        "bn": "মৌচাকের অবস্থানের জন্য হবিস্ট প্ল্যান বা উচ্চতর প্ল্যান প্রয়োজন।",
+        "de": "Für die Platzierung des Bienenstocks ist der Hobby-Plan oder ein höherer erforderlich.",
+        "es": "La ubicación de la colmena requiere el plan Aficionado o superior.",
+        "et": "Taru paigutus nõuab Harrastaja paketti või kõrgemat.",
+        "fr": "L'emplacement de la ruche requiert le forfait Amateur ou supérieur.",
+        "hi": "छत्ते के स्थान के लिए हॉबीस्ट प्लान या उच्चतर की आवश्यकता है।",
+        "ja": "巣箱の配置機能には、ホビイストプラン以上が必要です。",
+        "pl": "Lokalizacja ula wymaga planu Hobbysta lub wyższego.",
+        "pt": "A Localização da Colmeia requer o plano Amador ou superior.",
+        "ru": "Для размещения улья требуется план «Любитель» или выше.",
+        "tr": "Kovan Yerleşimi, Hobi planı veya üstünü gerektirir.",
+        "zh": "蜂箱位置功能需要“爱好者”或更高级别的计划。"
       },
       "plurals": {}
     },
@@ -3857,6 +5077,48 @@
       "plurals": {}
     },
     {
+      "key": "Hive system",
+      "namespace": null,
+      "context": "table header - hive system",
+      "values": {
+        "ar": "نظام الخلية",
+        "bn": "মৌচাক সিস্টেম",
+        "de": "Beutensystem",
+        "es": "Sistema de colmena",
+        "et": "Taru süsteem",
+        "fr": "Système de ruche",
+        "hi": "छत्ता प्रणाली",
+        "ja": "巣箱システム",
+        "pl": "System ula",
+        "pt": "Sistema da colmeia",
+        "ru": "Система улья",
+        "tr": "Kovan sistemi",
+        "zh": "蜂箱系统"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Hive systems",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "أنظمة خلايا النحل",
+        "bn": "মৌচাক সিস্টেম",
+        "de": "Bienenstock-Systeme",
+        "es": "Sistemas de colmenas",
+        "et": "Tarusüsteemid",
+        "fr": "Systèmes de ruche",
+        "hi": "छत्ता प्रणाली",
+        "ja": "巣箱システム",
+        "pl": "Systemy uli",
+        "pt": "Sistemas de colmeias",
+        "ru": "Системы ульев",
+        "tr": "Kovan sistemleri",
+        "zh": "蜂箱系统"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Hive Temperature Comparison",
       "namespace": null,
       "context": null,
@@ -3874,6 +5136,27 @@
         "ru": "Сравнение температур ульев",
         "tr": "Kovan Sıcaklık Karşılaştırması",
         "zh": "蜂箱温度对比"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Hive temperature was not reported this week.",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "لم يتم الإبلاغ عن درجة حرارة الخلية هذا الأسبوع.",
+        "bn": "এই সপ্তাহে মৌচাকের তাপমাত্রা জানানো হয়নি।",
+        "de": "Die Stocktemperatur wurde diese Woche nicht gemeldet.",
+        "es": "La temperatura de la colmena no se reportó esta semana.",
+        "et": "Taru temperatuuri sel nädalal ei registreeritud.",
+        "fr": "La température de la ruche n'a pas été signalée cette semaine.",
+        "hi": "इस सप्ताह छत्ते के तापमान की सूचना नहीं दी गई।",
+        "ja": "今週は巣箱の温度が報告されませんでした。",
+        "pl": "Temperatura w ulu nie została zgłoszona w tym tygodniu.",
+        "pt": "A temperatura da colmeia não foi reportada esta semana.",
+        "ru": "Температура в улье на этой неделе не сообщалась.",
+        "tr": "Bu hafta kovan sıcaklığı bildirilmedi.",
+        "zh": "本周未报告蜂箱温度。"
       },
       "plurals": {}
     },
@@ -3923,6 +5206,27 @@
         "ru": "Сравнение веса ульев",
         "tr": "Kovan Ağırlığı Karşılaştırması",
         "zh": "蜂箱重量比较"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Hive weight was not reported this week.",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "لم يتم الإبلاغ عن وزن الخلية هذا الأسبوع.",
+        "bn": "এই সপ্তাহে মৌচাকের ওজন রিপোর্ট করা হয়নি।",
+        "de": "Das Stockgewicht wurde diese Woche nicht gemeldet.",
+        "es": "El peso de la colmena no se reportó esta semana.",
+        "et": "Taru kaalu sel nädalal ei edastatud.",
+        "fr": "Le poids de la ruche n'a pas été communiqué cette semaine.",
+        "hi": "इस सप्ताह छत्ते के वज़न की रिपोर्ट नहीं की गई।",
+        "ja": "今週、巣箱の重量は報告されませんでした。",
+        "pl": "Waga ula nie została zgłoszona w tym tygodniu.",
+        "pt": "O peso da colmeia não foi reportado esta semana.",
+        "ru": "Вес улья не был зарегистрирован на этой неделе.",
+        "tr": "Bu hafta kovan ağırlığı bildirilmedi.",
+        "zh": "本周蜂箱重量未上报。"
       },
       "plurals": {}
     },
@@ -4012,6 +5316,13 @@
       }
     },
     {
+      "key": "hives in use",
+      "namespace": null,
+      "context": null,
+      "values": {},
+      "plurals": {}
+    },
+    {
       "key": "Hold Shift or use Right/Middle mouse button to pan the canvas",
       "namespace": null,
       "context": null,
@@ -4029,6 +5340,48 @@
         "ru": "Удерживайте Shift или используйте правую/среднюю кнопку мыши для перемещения по холсту.",
         "tr": "Tuvali kaydırmak için Shift tuşunu basılı tutun veya farenin Sağ/Orta düğmesini kullanın.",
         "zh": "按住 Shift 键或使用鼠标右键/中键来平移画布。"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Ideal Curve",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "المنحنى المثالي",
+        "bn": "আদর্শ বক্ররেখা",
+        "de": "Idealkurve",
+        "es": "Curva ideal",
+        "et": "Ideaalne kõver",
+        "fr": "Courbe idéale",
+        "hi": "आदर्श वक्र",
+        "ja": "理想曲線",
+        "pl": "Idealna krzywa",
+        "pt": "Curva ideal",
+        "ru": "Идеальная кривая",
+        "tr": "İdeal Eğri",
+        "zh": "理想曲线"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Ideal Population",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "التعداد المثالي",
+        "bn": "আদর্শ জনসংখ্যা",
+        "de": "Ideale Volksstärke",
+        "es": "Población ideal",
+        "et": "Ideaalne populatsioon",
+        "fr": "Population idéale",
+        "hi": "आदर्श जनसंख्या",
+        "ja": "理想的な個体数",
+        "pl": "Idealna populacja",
+        "pt": "População ideal",
+        "ru": "Идеальная популяция",
+        "tr": "İdeal Popülasyon",
+        "zh": "理想种群"
       },
       "plurals": {}
     },
@@ -4138,6 +5491,27 @@
       "plurals": {}
     },
     {
+      "key": "Inspection is a snapshot state of beehive at specific time. Inspection can be created from hive view",
+      "namespace": null,
+      "context": "this is an error message that explains why no inspections are viewed",
+      "values": {
+        "ar": "الفحص هو لقطة لحالة خلية النحل في وقت محدد. يمكن إنشاء الفحص من عرض الخلية.",
+        "bn": "পরিদর্শন হল একটি নির্দিষ্ট সময়ে মৌচাকের অবস্থার একটি রেকর্ড। পরিদর্শন মৌচাকের দৃশ্য থেকে তৈরি করা যেতে পারে।",
+        "de": "Eine Stockdurchsicht ist eine Momentaufnahme des Zustands des Bienenstocks zu einem bestimmten Zeitpunkt. Eine Stockdurchsicht kann in der Stockansicht erstellt werden.",
+        "es": "Una inspección es una instantánea del estado de la colmena en un momento específico. La inspección se puede crear desde la vista de la colmena.",
+        "et": "Ülevaatus on hetktõmmis mesitaru seisundist kindlal ajahetkel. Ülevaatuse saab luua taru vaates.",
+        "fr": "Une inspection est un instantané de l'état de la ruche à un moment précis. Une inspection peut être créée depuis la vue de la ruche.",
+        "hi": "निरीक्षण किसी विशिष्ट समय पर मधुमक्खी के छत्ते की स्थिति का एक रिकॉर्ड है। निरीक्षण को छत्ते के दृश्य से बनाया जा सकता है।",
+        "ja": "内検とは、特定の時点における巣箱の状態のスナップショットです。内検は巣箱ビューから作成できます。",
+        "pl": "Przegląd to migawka stanu ula w określonym czasie. Przegląd można utworzyć z widoku ula.",
+        "pt": "Uma inspeção é um retrato do estado da colmeia em um momento específico. A inspeção pode ser criada na visualização da colmeia.",
+        "ru": "Осмотр — это снимок состояния улья в определенный момент времени. Осмотр можно создать на странице улья.",
+        "tr": "Kontrol, belirli bir zamandaki kovan durumunun anlık bir görüntüsüdür. Kontrol, kovan görünümünden oluşturulabilir.",
+        "zh": "检查是特定时间蜂箱状态的快照。可以从蜂箱视图创建检查。"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Inspection share URL generated and copied to clipboard",
       "namespace": null,
       "context": null,
@@ -4166,6 +5540,27 @@
       "plurals": {}
     },
     {
+      "key": "Install new queen",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "إدخال ملكة جديدة",
+        "bn": "নতুন রানী স্থাপন করুন",
+        "de": "Neue Königin einsetzen",
+        "es": "Introducir nueva reina",
+        "et": "Paigalda uus ema",
+        "fr": "Introduire une nouvelle reine",
+        "hi": "नई रानी डालें",
+        "ja": "新しい女王蜂を導入する",
+        "pl": "Poddać nową matkę",
+        "pt": "Introduzir nova rainha",
+        "ru": "Подсадить новую матку",
+        "tr": "Yeni ana arı ekle",
+        "zh": "引入新蜂王"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Introduce New Queen",
       "namespace": null,
       "context": null,
@@ -4190,7 +5585,21 @@
       "key": "Invalid email or password",
       "namespace": null,
       "context": null,
-      "values": {},
+      "values": {
+        "ar": "البريد الإلكتروني أو كلمة المرور غير صالحة",
+        "bn": "ভুল ইমেল বা পাসওয়ার্ড",
+        "de": "Ungültige E-Mail-Adresse oder Passwort",
+        "es": "Correo electrónico o contraseña inválidos",
+        "et": "Vale e-posti aadress või parool",
+        "fr": "Adresse e-mail ou mot de passe invalide",
+        "hi": "अमान्य ईमेल या पासवर्ड",
+        "ja": "無効なメールアドレスまたはパスワードです",
+        "pl": "Nieprawidłowy adres e-mail lub hasło",
+        "pt": "E-mail ou senha inválidos",
+        "ru": "Неверный адрес электронной почты или пароль",
+        "tr": "Geçersiz e-posta veya şifre",
+        "zh": "无效的电子邮件或密码"
+      },
       "plurals": {}
     },
     {
@@ -4211,6 +5620,90 @@
         "ru": "IoT-датчик",
         "tr": "IoT sensörü",
         "zh": "物联网传感器"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Item",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "عنصر",
+        "bn": "আইটেম",
+        "de": "Element",
+        "es": "Elemento",
+        "et": "Üksus",
+        "fr": "Élément",
+        "hi": "मद",
+        "ja": "項目",
+        "pl": "Pozycja",
+        "pt": "Item",
+        "ru": "Элемент",
+        "tr": "Öğe",
+        "zh": "项目"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Join Colonies",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "دمج الطوائف",
+        "bn": "কলোনি একত্রিত করুন",
+        "de": "Völker vereinigen",
+        "es": "Unir colonias",
+        "et": "Ühenda pered",
+        "fr": "Réunir les colonies",
+        "hi": "कॉलोनियों को मिलाएं",
+        "ja": "コロニーを結合",
+        "pl": "Połącz rodziny",
+        "pt": "Unir Colônias",
+        "ru": "Объединить семьи",
+        "tr": "Kolonileri Birleştir",
+        "zh": "合并蜂群"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Join Colonies requires Hobbyist plan or higher.",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "دمج الطوائف يتطلب خطة Hobbyist أو أعلى.",
+        "bn": "কলোনি একত্রিত করার জন্য Hobbyist প্ল্যান বা উচ্চতর প্রয়োজন।",
+        "de": "Das Vereinigen von Völkern erfordert den Hobbyist-Plan oder höher.",
+        "es": "Unir colonias requiere el plan Hobbyist o superior.",
+        "et": "Peride ühendamine nõuab Hobbyist paketti või kõrgemat.",
+        "fr": "La réunion de colonies requiert le forfait Hobbyist ou supérieur.",
+        "hi": "कॉलोनियों को जोड़ने के लिए हॉबीस्ट प्लान या उच्चतर की आवश्यकता है।",
+        "ja": "コロニーの統合には、ホビイストプラン以上が必要です。",
+        "pl": "Łączenie rodzin wymaga planu Hobbyist lub wyższego.",
+        "pt": "Unir colônias requer o plano Hobbyist ou superior.",
+        "ru": "Для объединения семей требуется тариф «Hobbyist» или выше.",
+        "tr": "Kolonileri Birleştirme, Hobbyist planı veya üstünü gerektirir.",
+        "zh": "合并蜂群功能需要Hobbyist套餐或更高级别。"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Join Colony",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "انضم إلى الخلية",
+        "bn": "কলোনিতে যোগ দিন",
+        "de": "Volk beitreten",
+        "es": "Unirse a la colonia",
+        "et": "Liitu perega",
+        "fr": "Rejoindre une colonie",
+        "hi": "कॉलोनी में शामिल हों",
+        "ja": "コロニーに参加する",
+        "pl": "Dołącz do kolonii",
+        "pt": "Entrar na colônia",
+        "ru": "Присоединиться к колонии",
+        "tr": "Koloniye Katıl",
+        "zh": "加入蜂群"
       },
       "plurals": {}
     },
@@ -4239,7 +5732,21 @@
       "key": "kg",
       "namespace": null,
       "context": "Shortest label for the unit of weight in kilograms",
-      "values": {},
+      "values": {
+        "ar": "كجم",
+        "bn": "কেজি",
+        "de": "kg",
+        "es": "kg",
+        "et": "kg",
+        "fr": "kg",
+        "hi": "किग्रा",
+        "ja": "kg",
+        "pl": "kg",
+        "pt": "kg",
+        "ru": "кг",
+        "tr": "kg",
+        "zh": "kg"
+      },
       "plurals": {}
     },
     {
@@ -4390,6 +5897,48 @@
       "plurals": {}
     },
     {
+      "key": "Last inspection",
+      "namespace": null,
+      "context": "table header of beekeeping app, this column is about time when hive was checked, in amount of days, start with uppercase latter",
+      "values": {
+        "ar": "آخر فحص",
+        "bn": "শেষ পরিদর্শন",
+        "de": "Letzte Kontrolle",
+        "es": "Última inspección",
+        "et": "Viimane ülevaatus",
+        "fr": "Dernière inspection",
+        "hi": "पिछला निरीक्षण",
+        "ja": "最終点検",
+        "pl": "Ostatni przegląd",
+        "pt": "Última inspeção",
+        "ru": "Последний осмотр",
+        "tr": "Son denetim",
+        "zh": "上次检查"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Last treatment",
+      "namespace": null,
+      "context": "table header of beekeeping app, this column is about anti-varroa mite treatment, in amount of days, start with uppercase latter",
+      "values": {
+        "ar": "آخر علاج",
+        "bn": "শেষ চিকিৎসা",
+        "de": "Letzte Behandlung",
+        "es": "Último tratamiento",
+        "et": "Viimane töötlus",
+        "fr": "Dernier traitement",
+        "hi": "पिछला उपचार",
+        "ja": "前回の処理",
+        "pl": "Ostatni zabieg",
+        "pt": "Último tratamento",
+        "ru": "Последняя обработка",
+        "tr": "Son uygulama",
+        "zh": "上次处理"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Last year",
       "namespace": null,
       "context": null,
@@ -4407,6 +5956,27 @@
         "ru": "Прошлый год",
         "tr": "Geçen yıl",
         "zh": "去年"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Link this device to a hive entrance section before starting the stream.",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "اربط هذا الجهاز بقسم مدخل خلية النحل قبل بدء البث.",
+        "bn": "স্ট্রিম শুরু করার আগে এই ডিভাইসটি মৌচাকের একটি প্রবেশদ্বার বিভাগের সাথে সংযুক্ত করুন।",
+        "de": "Verbinden Sie dieses Gerät mit einem Flugloch-Abschnitt, bevor Sie den Stream starten.",
+        "es": "Vincule este dispositivo a una sección de la piquera antes de iniciar la transmisión.",
+        "et": "Seo see seade taru lennuava sektsiooniga enne voogesituse alustamist.",
+        "fr": "Associez cet appareil à une section d'entrée de ruche avant de démarrer le flux.",
+        "hi": "स्ट्रीम शुरू करने से पहले, इस डिवाइस को छत्ते के प्रवेश खंड से जोड़ें।",
+        "ja": "ストリームを開始する前に、このデバイスを巣箱の入り口部分に関連付けてください。",
+        "pl": "Połącz to urządzenie z sekcją wlotu do ula przed rozpoczęciem transmisji.",
+        "pt": "Associe este dispositivo a uma secção do alvado antes de iniciar a transmissão.",
+        "ru": "Привяжите это устройство к секции летка улья перед запуском трансляции.",
+        "tr": "Akışı başlatmadan önce bu cihazı bir kovan giriş bölümüne bağlayın.",
+        "zh": "在开始直播前，请将此设备关联到一个蜂箱入口部分。"
       },
       "plurals": {}
     },
@@ -4579,10 +6149,52 @@
       "plurals": {}
     },
     {
+      "key": "Locale",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "الإعدادات الإقليمية",
+        "bn": "আঞ্চলিক বিন্যাস",
+        "de": "Gebietsschema",
+        "es": "Configuración regional",
+        "et": "Piirkondlikud seaded",
+        "fr": "Paramètres régionaux",
+        "hi": "क्षेत्रीय सेटिंग",
+        "ja": "地域設定",
+        "pl": "Ustawienia regionalne",
+        "pt": "Localidade",
+        "ru": "Локализация",
+        "tr": "Yerel Ayar",
+        "zh": "区域设置"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Locate me",
       "namespace": null,
       "context": null,
       "values": {},
+      "plurals": {}
+    },
+    {
+      "key": "Log In",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "تسجيل الدخول",
+        "bn": "লগ ইন করুন",
+        "de": "Anmelden",
+        "es": "Iniciar sesión",
+        "et": "Logi sisse",
+        "fr": "Se connecter",
+        "hi": "लॉग इन करें",
+        "ja": "ログイン",
+        "pl": "Zaloguj się",
+        "pt": "Entrar",
+        "ru": "Войти",
+        "tr": "Giriş yap",
+        "zh": "登录"
+      },
       "plurals": {}
     },
     {
@@ -4603,6 +6215,27 @@
         "ru": "Выйти",
         "tr": "Çıkış yap",
         "zh": "登出"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Login with Google",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "تسجيل الدخول باستخدام جوجل",
+        "bn": "Google দিয়ে লগইন করুন",
+        "de": "Mit Google anmelden",
+        "es": "Iniciar sesión con Google",
+        "et": "Logi sisse Google'iga",
+        "fr": "Se connecter avec Google",
+        "hi": "Google से लॉग इन करें",
+        "ja": "Googleでログイン",
+        "pl": "Zaloguj się przez Google",
+        "pt": "Entrar com o Google",
+        "ru": "Войти через Google",
+        "tr": "Google ile giriş yap",
+        "zh": "使用谷歌登录"
       },
       "plurals": {}
     },
@@ -4649,6 +6282,27 @@
       "plurals": {}
     },
     {
+      "key": "Manage available hive systems used in warehouse and hive workflows.",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "إدارة أنظمة الخلايا المتاحة المستخدمة في المستودعات وسير عمل الخلايا.",
+        "bn": "গুদাম এবং হাইভ কর্মপ্রবাহে ব্যবহৃত উপলব্ধ হাইভ সিস্টেমগুলি পরিচালনা করুন।",
+        "de": "Verwalten Sie verfügbare Beutensysteme, die in Lager- und Bienenstock-Arbeitsabläufen verwendet werden.",
+        "es": "Gestione los sistemas de colmena disponibles utilizados en los flujos de trabajo de almacén y de colmena.",
+        "et": "Hallake saadaolevaid tarusüsteeme, mida kasutatakse lao- ja tarutööde voogudes.",
+        "fr": "Gérez les systèmes de ruche disponibles utilisés dans les flux de travail de l'entrepôt et des ruches.",
+        "hi": "गोदाम और छत्ता कार्यप्रवाह में उपयोग की जाने वाली उपलब्ध छत्ता प्रणालियों को प्रबंधित करें।",
+        "ja": "倉庫およびハイブのワークフローで使用される、利用可能なハイブシステムを管理します。",
+        "pl": "Zarządzaj dostępnymi systemami uli używanymi w przepływach pracy magazynu i uli.",
+        "pt": "Gerencie os sistemas de colmeia disponíveis usados nos fluxos de trabalho do armazém e da colmeia.",
+        "ru": "Управляйте доступными системами ульев, используемыми в складских и пасечных рабочих процессах.",
+        "tr": "Depo ve kovan iş akışlarında kullanılan mevcut kovan sistemlerini yönetin.",
+        "zh": "管理仓库和蜂箱工作流程中使用的可用蜂箱系统。"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Manage device",
       "namespace": null,
       "context": null,
@@ -4687,6 +6341,27 @@
         "ru": "Карта",
         "tr": "Harita",
         "zh": "地图"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Mark as Collapsed",
+      "namespace": null,
+      "context": "Marking bee colony as dead due to varroa mite infestation or other unknown causes",
+      "values": {
+        "ar": "تحديد كمنهارة",
+        "bn": "ভেঙে পড়েছে হিসেবে চিহ্নিত করুন",
+        "de": "Als zusammengebrochen markieren",
+        "es": "Marcar como colapsada",
+        "et": "Märgi hukkunuks",
+        "fr": "Marquer comme effondrée",
+        "hi": "समाप्त चिह्नित करें",
+        "ja": "崩壊としてマーク",
+        "pl": "Oznacz jako upadłą",
+        "pt": "Marcar como colapsada",
+        "ru": "Пометить как погибшую",
+        "tr": "Çöktü olarak işaretle",
+        "zh": "标记为崩溃"
       },
       "plurals": {}
     },
@@ -4894,6 +6569,27 @@
       "plurals": {}
     },
     {
+      "key": "Move device focus in list view",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "التركيز على الجهاز في القائمة",
+        "bn": "তালিকায় ডিভাইসটিতে ফোকাস করুন",
+        "de": "Gerät in Listenansicht fokussieren",
+        "es": "Enfocar dispositivo en la lista",
+        "et": "Fookusta seade loendivaates",
+        "fr": "Centrer sur l'appareil dans la liste",
+        "hi": "सूची में डिवाइस पर फ़ोकस करें",
+        "ja": "リスト表示でデバイスにフォーカスする",
+        "pl": "Ustaw fokus na urządzeniu w widoku listy",
+        "pt": "Focar no dispositivo na lista",
+        "ru": "Сфокусировать устройство в списке",
+        "tr": "Liste görünümünde cihaza odaklan",
+        "zh": "在列表中聚焦设备"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Move down",
       "namespace": null,
       "context": null,
@@ -4974,6 +6670,27 @@
         "ru": "Переместить фокус улья в списке/таблице",
         "tr": "Liste/tablo görünümünde kovan odağını taşı",
         "zh": "在列表/表格视图中移动蜂箱焦点"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Move queen focus in table view",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "التركيز على الملكة في الجدول",
+        "bn": "সারণীতে রানীকে ফোকাস করুন",
+        "de": "Königin in der Tabelle fokussieren",
+        "es": "Enfocar a la reina en la vista de tabla",
+        "et": "Keskenda vaade emale tabelis",
+        "fr": "Centrer sur la reine dans le tableau",
+        "hi": "तालिका में रानी पर फ़ोकस करें",
+        "ja": "テーブル表示で女王蜂にフォーカス",
+        "pl": "Ustaw fokus na matce w tabeli",
+        "pt": "Focar na rainha na visualização de tabela",
+        "ru": "Сфокусироваться на матке в таблице",
+        "tr": "Tabloda ana arıya odaklan",
+        "zh": "在表格中聚焦蜂王"
       },
       "plurals": {}
     },
@@ -5209,6 +6926,27 @@
       "plurals": {}
     },
     {
+      "key": "No device connected",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "لا يوجد جهاز متصل",
+        "bn": "কোনো ডিভাইস সংযুক্ত নেই",
+        "de": "Kein Gerät verbunden",
+        "es": "Ningún dispositivo conectado",
+        "et": "Ühtegi seadet pole ühendatud",
+        "fr": "Aucun appareil connecté",
+        "hi": "कोई डिवाइस कनेक्ट नहीं है",
+        "ja": "デバイスが接続されていません",
+        "pl": "Brak podłączonych urządzeń",
+        "pt": "Nenhum dispositivo conectado",
+        "ru": "Нет подключенных устройств",
+        "tr": "Bağlı cihaz yok",
+        "zh": "未连接设备"
+      },
+      "plurals": {}
+    },
+    {
       "key": "No devices yet",
       "namespace": null,
       "context": null,
@@ -5237,10 +6975,87 @@
       "plurals": {}
     },
     {
+      "key": "No hives here yet",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "لا توجد خلايا نحل هنا بعد",
+        "bn": "এখানে এখনও কোন মৌচাক নেই",
+        "de": "Hier gibt es noch keine Bienenstöcke",
+        "es": "Aún no hay colmenas aquí",
+        "et": "Siin pole veel tarusid",
+        "fr": "Pas encore de ruches ici",
+        "hi": "यहाँ अभी तक कोई छत्ता नहीं है",
+        "ja": "ここにはまだ巣箱がありません",
+        "pl": "Tutaj nie ma jeszcze uli",
+        "pt": "Ainda não há colmeias aqui",
+        "ru": "Здесь еще нет ульев",
+        "tr": "Burada henüz kovan yok",
+        "zh": "这里还没有蜂箱"
+      },
+      "plurals": {}
+    },
+    {
       "key": "No inspections found",
       "namespace": null,
       "context": null,
-      "values": {},
+      "values": {
+        "ar": "لم يتم العثور على أي عمليات فحص",
+        "bn": "কোনো পরিদর্শন পাওয়া যায়নি",
+        "de": "Keine Inspektionen gefunden",
+        "es": "No se encontraron inspecciones",
+        "et": "Ülevaatusi ei leitud",
+        "fr": "Aucune inspection trouvée",
+        "hi": "कोई निरीक्षण नहीं मिला",
+        "ja": "検査記録が見つかりません",
+        "pl": "Nie znaleziono żadnych przeglądów",
+        "pt": "Nenhuma inspeção encontrada",
+        "ru": "Осмотры не найдены",
+        "tr": "Hiç denetim bulunamadı",
+        "zh": "未找到任何检查记录"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "No log entries yet",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "لا توجد إدخالات في السجل بعد",
+        "bn": "এখনও কোন লগ এন্ট্রি নেই",
+        "de": "Noch keine Einträge vorhanden",
+        "es": "Aún no hay entradas en el registro",
+        "et": "Sissekandeid veel pole",
+        "fr": "Aucune entrée pour le moment",
+        "hi": "अभी तक कोई लॉग प्रविष्टि नहीं है",
+        "ja": "まだ記録がありません",
+        "pl": "Brak wpisów w dzienniku",
+        "pt": "Ainda não há registros",
+        "ru": "Записей в журнале пока нет",
+        "tr": "Henüz günlük kaydı yok",
+        "zh": "暂无日志条目"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "No queen (queenless split)",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "لا توجد ملكة (تقسيم يتيم)",
+        "bn": "রানী নেই (রানীবিহীন বিভাজন)",
+        "de": "Keine Königin (weiselloser Ableger)",
+        "es": "Sin reina (núcleo huérfano)",
+        "et": "Ema puudub (emata jaotuspere)",
+        "fr": "Pas de reine (division orpheline)",
+        "hi": "रानी नहीं है (रानीहीन विभाजन)",
+        "ja": "女王蜂なし (無王分蜂群)",
+        "pl": "Brak matki (odkład bezmateczny)",
+        "pt": "Sem rainha (núcleo órfão)",
+        "ru": "Нет матки (безматочный отводок)",
+        "tr": "Ana arı yok (anasız bölme)",
+        "zh": "无王 (无王分蜂群)"
+      },
       "plurals": {}
     },
     {
@@ -5275,7 +7090,21 @@
       "key": "Not treated",
       "namespace": null,
       "context": null,
-      "values": {},
+      "values": {
+        "ar": "غير مُعَالَج",
+        "bn": "চিকিৎসা করা হয়নি",
+        "de": "Nicht behandelt",
+        "es": "No tratado",
+        "et": "Töötlemata",
+        "fr": "Non traité",
+        "hi": "इलाज नहीं किया गया",
+        "ja": "未治療",
+        "pl": "Nie leczono",
+        "pt": "Não tratado",
+        "ru": "Не обработано",
+        "tr": "İlaçlanmadı",
+        "zh": "未治疗"
+      },
       "plurals": {}
     },
     {
@@ -5387,6 +7216,27 @@
         "ru": "Оптим. мин. (18°C)",
         "tr": "İdeal min (18°C)",
         "zh": "最佳最低值 (18°C)"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "or",
+      "namespace": null,
+      "context": "this is a label for choosing one authentication method or another, its a single word, use lowercase",
+      "values": {
+        "ar": "أو",
+        "bn": "বা",
+        "de": "oder",
+        "es": "o",
+        "et": "või",
+        "fr": "ou",
+        "hi": "या",
+        "ja": "または",
+        "pl": "lub",
+        "pt": "ou",
+        "ru": "или",
+        "tr": "veya",
+        "zh": "或"
       },
       "plurals": {}
     },
@@ -5686,7 +7536,7 @@
         "ja": "王椀",
         "pl": "Miseczki matecznikowe",
         "pt": "Cúpulas reais",
-        "ru": "Маточные мисочки",
+        "ru": "Маточники",
         "tr": "Ana arı yüksükleri",
         "zh": "王台基"
       },
@@ -5710,6 +7560,27 @@
         "ru": "Разделительная решётка",
         "tr": "Ana arı ızgarası",
         "zh": "隔王板"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Queen Management",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "إدارة الملكة",
+        "bn": "রানি ব্যবস্থাপনা",
+        "de": "Königinnen-Management",
+        "es": "Manejo de la reina",
+        "et": "Emahaldus",
+        "fr": "Gestion de la reine",
+        "hi": "रानी प्रबंधन",
+        "ja": "女王蜂の管理",
+        "pl": "Zarządzanie matką",
+        "pt": "Manejo da Rainha",
+        "ru": "Управление маткой",
+        "tr": "Ana Arı Yönetimi",
+        "zh": "蜂后管理"
       },
       "plurals": {}
     },
@@ -5759,14 +7630,42 @@
       "key": "Queen race",
       "namespace": null,
       "context": "table header - queen race",
-      "values": {},
+      "values": {
+        "ar": "سلالة الملكة",
+        "bn": "রানির জাত",
+        "de": "Königinnenrasse",
+        "es": "Raza de la reina",
+        "et": "Ema tõug",
+        "fr": "Race de la reine",
+        "hi": "रानी की नस्ल",
+        "ja": "女王蜂の品種",
+        "pl": "Rasa matki",
+        "pt": "Raça da rainha",
+        "ru": "Порода матки",
+        "tr": "Ana arı ırkı",
+        "zh": "蜂王品种"
+      },
       "plurals": {}
     },
     {
       "key": "Queen year",
       "namespace": null,
       "context": "table header - queen year",
-      "values": {},
+      "values": {
+        "ar": "سنة الملكة",
+        "bn": "রানির বছর",
+        "de": "Königin-Jahr",
+        "es": "Año de la reina",
+        "et": "Ema aasta",
+        "fr": "Année de la reine",
+        "hi": "रानी का वर्ष",
+        "ja": "女王蜂の年",
+        "pl": "Rok matki",
+        "pt": "Ano da rainha",
+        "ru": "Год матки",
+        "tr": "Ana arı yılı",
+        "zh": "蜂王年份"
+      },
       "plurals": {}
     },
     {
@@ -5879,6 +7778,27 @@
         "ru": "Порода",
         "tr": "Irk",
         "zh": "蜂种"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Race unknown",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "السلالة غير معروفة",
+        "bn": "জাত অজানা",
+        "de": "Rasse unbekannt",
+        "es": "Raza desconocida",
+        "et": "Tõug teadmata",
+        "fr": "Race inconnue",
+        "hi": "नस्ल अज्ञात",
+        "ja": "品種不明",
+        "pl": "Rasa nieznana",
+        "pt": "Raça desconhecida",
+        "ru": "Порода неизвестна",
+        "tr": "Irk bilinmiyor",
+        "zh": "品种未知"
       },
       "plurals": {}
     },
@@ -6030,6 +7950,27 @@
       "plurals": {}
     },
     {
+      "key": "Remove hive",
+      "namespace": null,
+      "context": "this is a button",
+      "values": {
+        "ar": "إزالة الخلية",
+        "bn": "মৌচাক সরান",
+        "de": "Bienenstock entfernen",
+        "es": "Eliminar colmena",
+        "et": "Eemalda taru",
+        "fr": "Supprimer la ruche",
+        "hi": "छत्ता हटाएँ",
+        "ja": "巣箱を削除",
+        "pl": "Usuń ul",
+        "pt": "Remover colmeia",
+        "ru": "Удалить улей",
+        "tr": "Kovanı kaldır",
+        "zh": "移除蜂箱"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Replace apiary photo",
       "namespace": null,
       "context": null,
@@ -6096,7 +8037,42 @@
       "key": "Rotate Left",
       "namespace": null,
       "context": null,
-      "values": {},
+      "values": {
+        "ar": "تدوير لليسار",
+        "bn": "বামে ঘোরান",
+        "de": "Nach links drehen",
+        "es": "Girar a la izquierda",
+        "et": "Pööra vasakule",
+        "fr": "Pivoter à gauche",
+        "hi": "बाईं ओर घुमाएं",
+        "ja": "左に回転",
+        "pl": "Obróć w lewo",
+        "pt": "Girar à esquerda",
+        "ru": "Повернуть налево",
+        "tr": "Sola Döndür",
+        "zh": "向左旋转"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Rotate Right",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "تدوير لليمين",
+        "bn": "ডানদিকে ঘোরান",
+        "de": "Nach rechts drehen",
+        "es": "Girar a la derecha",
+        "et": "Pööra paremale",
+        "fr": "Pivoter à droite",
+        "hi": "दाएं घुमाएं",
+        "ja": "右に回転",
+        "pl": "Obróć w prawo",
+        "pt": "Girar à direita",
+        "ru": "Повернуть вправо",
+        "tr": "Sağa Döndür",
+        "zh": "向右旋转"
+      },
       "plurals": {}
     },
     {
@@ -6205,6 +8181,27 @@
       "plurals": {}
     },
     {
+      "key": "Save connection",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "حفظ الاتصال",
+        "bn": "সংযোগ সংরক্ষণ করুন",
+        "de": "Verbindung speichern",
+        "es": "Guardar conexión",
+        "et": "Salvesta ühendus",
+        "fr": "Enregistrer la connexion",
+        "hi": "कनेक्शन सहेजें",
+        "ja": "接続を保存",
+        "pl": "Zapisz połączenie",
+        "pt": "Salvar conexão",
+        "ru": "Сохранить соединение",
+        "tr": "Bağlantıyı kaydet",
+        "zh": "保存连接"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Saved!",
       "namespace": null,
       "context": null,
@@ -6254,6 +8251,90 @@
       "plurals": {}
     },
     {
+      "key": "Sections",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "أقسام",
+        "bn": "বিভাগ",
+        "de": "Bereiche",
+        "es": "Secciones",
+        "et": "Sektsioonid",
+        "fr": "Sections",
+        "hi": "अनुभाग",
+        "ja": "セクション",
+        "pl": "Sekcje",
+        "pt": "Seções",
+        "ru": "Разделы",
+        "tr": "Bölümler",
+        "zh": "部分"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Select a hive below",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "اختر خلية نحل أدناه",
+        "bn": "নীচে একটি মৌচাক নির্বাচন করুন",
+        "de": "Wählen Sie unten einen Bienenstock aus",
+        "es": "Seleccione una colmena a continuación",
+        "et": "Valige allpool taru",
+        "fr": "Sélectionnez une ruche ci-dessous",
+        "hi": "नीचे एक छत्ता चुनें",
+        "ja": "以下から巣箱を選択してください",
+        "pl": "Wybierz ul poniżej",
+        "pt": "Selecione uma colmeia abaixo",
+        "ru": "Выберите улей ниже",
+        "tr": "Aşağıdan bir kovan seçin",
+        "zh": "请在下方选择一个蜂箱"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Select a target hive to merge this colony into",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "اختر خلية الهدف لدمج هذه المستعمرة فيها.",
+        "bn": "এই কলোনিটিকে একীভূত করার জন্য একটি লক্ষ্য মৌচাক নির্বাচন করুন।",
+        "de": "Wählen Sie einen Zielstock aus, um dieses Volk damit zu vereinigen.",
+        "es": "Seleccione una colmena de destino para fusionar esta colonia.",
+        "et": "Valige sihttaru, kuhu see pere ühendada.",
+        "fr": "Sélectionnez une ruche de destination pour y fusionner cette colonie.",
+        "hi": "इस कॉलोनी को मिलाने के लिए एक लक्ष्य छत्ता चुनें।",
+        "ja": "このコロニーを統合する先の巣箱を選択してください。",
+        "pl": "Wybierz ul docelowy, aby połączyć z nim tę rodzinę.",
+        "pt": "Selecione uma colmeia de destino para unir esta colônia.",
+        "ru": "Выберите целевой улей для объединения этой семьи.",
+        "tr": "Bu koloniyi birleştirmek için bir hedef kovan seçin.",
+        "zh": "选择一个目标蜂箱来合并此蜂群。"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Select Frames",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "اختر الإطارات",
+        "bn": "ফ্রেম নির্বাচন করুন",
+        "de": "Rahmen auswählen",
+        "es": "Seleccionar marcos",
+        "et": "Valige raamid",
+        "fr": "Sélectionner les cadres",
+        "hi": "फ़्रेम चुनें",
+        "ja": "巣枠を選択",
+        "pl": "Wybierz ramki",
+        "pt": "Selecionar Quadros",
+        "ru": "Выберите рамки",
+        "tr": "Çerçeveleri Seçin",
+        "zh": "选择蜂框"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Select Queen",
       "namespace": null,
       "context": null,
@@ -6271,6 +8352,48 @@
         "ru": "Выбрать матку",
         "tr": "Ana Arıyı Seç",
         "zh": "选择蜂王"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Select up to 10 frames to move to a new hive",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "اختر ما يصل إلى 10 إطارات لنقلها إلى خلية جديدة.",
+        "bn": "একটি নতুন মৌচাকে সরানোর জন্য 10টি পর্যন্ত ফ্রেম নির্বাচন করুন।",
+        "de": "Wählen Sie bis zu 10 Rähmchen aus, um sie in einen neuen Bienenstock zu verschieben.",
+        "es": "Seleccione hasta 10 cuadros para mover a una nueva colmena.",
+        "et": "Valige kuni 10 raami uude tarusse viimiseks.",
+        "fr": "Sélectionnez jusqu'à 10 cadres à déplacer vers une nouvelle ruche.",
+        "hi": "एक नए छत्ते में ले जाने के लिए 10 तक फ्रेम चुनें।",
+        "ja": "新しい巣箱に移動する巣碑枠を最大10枚まで選択してください。",
+        "pl": "Wybierz do 10 ramek do przeniesienia do nowego ula.",
+        "pt": "Selecione até 10 quadros para mover para uma nova colmeia.",
+        "ru": "Выберите до 10 рамок для перемещения в новый улей.",
+        "tr": "Yeni bir kovana taşımak için en fazla 10 çerçeve seçin.",
+        "zh": "选择最多10个巢框移动到新的蜂箱。"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Select which video camera device should be connected to this hive entrance. Camera permissions and local streaming are managed from the device page.",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "حدد جهاز كاميرا الفيديو الذي يجب توصيله بمدخل خلية النحل هذا. تتم إدارة أذونات الكاميرا والبث المحلي من صفحة الجهاز.",
+        "bn": "এই মৌচাকের প্রবেশপথে কোন ভিডিও ক্যামেরা ডিভাইসটি সংযুক্ত করা উচিত তা নির্বাচন করুন। ক্যামেরার অনুমতি এবং স্থানীয় স্ট্রিমিং ডিভাইস পৃষ্ঠা থেকে পরিচালনা করা হয়।",
+        "de": "Wählen Sie aus, welche Videokamera mit diesem Flugloch verbunden werden soll. Kameraberechtigungen und lokales Streaming werden auf der Geräteseite verwaltet.",
+        "es": "Seleccione qué dispositivo de cámara de vídeo debe conectarse a esta piquera. Los permisos de la cámara y la transmisión local se gestionan desde la página del dispositivo.",
+        "et": "Valige, milline videokaamera seade tuleks selle taru lennuavaga ühendada. Kaamera lube ja kohalikku voogedastust hallatakse seadme lehel.",
+        "fr": "Sélectionnez la caméra vidéo qui doit être connectée à cette entrée de ruche. Les autorisations de la caméra et la diffusion en local sont gérées depuis la page de l'appareil.",
+        "hi": "चुनें कि इस छत्ते के प्रवेश द्वार से कौन सा वीडियो कैमरा डिवाइस जोड़ा जाना चाहिए। कैमरे की अनुमतियाँ और स्थानीय स्ट्रीमिंग डिवाइस पेज से प्रबंधित की जाती हैं।",
+        "ja": "この巣箱の入り口に接続するビデオカメラデバイスを選択してください。カメラの権限とローカルストリーミングは、デバイスページで管理されます。",
+        "pl": "Wybierz urządzenie kamery wideo, które ma być podłączone do tego wlotka ula. Uprawnienia kamery i lokalne przesyłanie strumieniowe są zarządzane na stronie urządzenia.",
+        "pt": "Selecione qual câmera de vídeo deve ser conectada a esta entrada da colmeia. As permissões da câmera e a transmissão local são gerenciadas na página do dispositivo.",
+        "ru": "Выберите, какая видеокамера должна быть подключена к этому летку. Разрешения для камеры и локальная трансляция настраиваются на странице устройства.",
+        "tr": "Bu kovan girişine hangi video kamera cihazının bağlanacağını seçin. Kamera izinleri ve yerel akış, cihaz sayfasından yönetilir.",
+        "zh": "选择要连接到此蜂箱入口的视频摄像头设备。摄像头权限和本地流媒体在设备页面进行管理。"
       },
       "plurals": {}
     },
@@ -6313,6 +8436,27 @@
         "ru": "Отправка контекста ИИ-консультанту для обобщения...",
         "tr": "Bağlam, özetleme için Yapay Zeka Danışmanına gönderiliyor...",
         "zh": "正在将上下文发送给AI顾问进行总结..."
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Set minimum confidence for objects detected from uploaded images. These settings apply to frame image detections and bottom board varroa detections. All values below are percentages. Higher percentages are stricter and reduce false positives. Lower percentages detect more objects but may include more false positives.",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "عيّن الحد الأدنى للثقة للكائنات المكتشفة في الصور المرفوعة. تنطبق هذه الإعدادات على اكتشافات صور الإطارات واكتشافات حلم الفاروا في لوح الخلية السفلي. جميع القيم أدناه هي نسب مئوية. النسب المئوية الأعلى تكون أكثر صرامة وتقلل من النتائج الإيجابية الخاطئة. النسب المئوية الأقل تكتشف المزيد من الكائنات ولكنها قد تتضمن المزيد من النتائج الإيجابية الخاطئة.",
+        "bn": "আপলোড করা ছবি থেকে সনাক্ত করা বস্তুর জন্য সর্বনিম্ন আস্থা নির্ধারণ করুন। এই সেটিংস ফ্রেমের ছবির সনাক্তকরণ এবং বটম বোর্ডের ভারোয়া মাইট সনাক্তকরণের জন্য প্রযোজ্য। নীচের সমস্ত মান শতাংশে দেওয়া আছে। উচ্চ শতাংশ বেশি কঠোর এবং ভুল পজিটিভ কমায়। নিম্ন শতাংশ বেশি বস্তু সনাক্ত করে তবে এতে আরও ভুল পজিটিভ অন্তর্ভুক্ত থাকতে পারে।",
+        "de": "Legen Sie die minimale Konfidenz für Objekte fest, die auf hochgeladenen Bildern erkannt werden. Diese Einstellungen gelten für die Erkennung auf Rahmenbildern und die Varroa-Erkennung auf dem Gitterboden. Alle nachstehenden Werte sind Prozentangaben. Höhere Prozentwerte sind strenger und reduzieren Falsch-Positive-Ergebnisse. Niedrigere Prozentwerte erkennen mehr Objekte, können aber mehr Falsch-Positive-Ergebnisse enthalten.",
+        "es": "Establezca la confianza mínima para los objetos detectados en las imágenes subidas. Estos ajustes se aplican a las detecciones en imágenes de cuadros y a las detecciones de varroa en el fondo de la colmena. Todos los valores a continuación son porcentajes. Los porcentajes más altos son más estrictos y reducen los falsos positivos. Los porcentajes más bajos detectan más objetos, pero pueden incluir más falsos positivos.",
+        "et": "Määrake üleslaaditud piltidelt tuvastatud objektide minimaalne usaldusväärsus. Need seaded kehtivad raami piltide tuvastustele ja tarupõhjalt varroalesta tuvastustele. Kõik allpool toodud väärtused on protsentides. Kõrgemad protsendid on rangemad ja vähendavad valepositiivseid tulemusi. Madalamad protsendid tuvastavad rohkem objekte, kuid võivad sisaldada rohkem valepositiivseid tulemusi.",
+        "fr": "Définissez le seuil de confiance minimum pour les objets détectés sur les images téléchargées. Ces paramètres s'appliquent aux détections sur les images de cadres et aux détections de varroas sur le plancher de la ruche. Toutes les valeurs ci-dessous sont des pourcentages. Des pourcentages plus élevés sont plus stricts et réduisent les faux positifs. Des pourcentages plus bas détectent plus d'objets mais peuvent inclure plus de faux positifs.",
+        "hi": "अपलोड की गई छवियों से पता लगाए गए ऑब्जेक्ट के लिए न्यूनतम आत्मविश्वास स्तर सेट करें। ये सेटिंग्स फ्रेम छवि पहचान और बॉटम बोर्ड वरroa पहचान पर लागू होती हैं। नीचे दिए गए सभी मान प्रतिशत में हैं। उच्च प्रतिशत अधिक सख्त होते हैं और गलत सकारात्मकता को कम करते हैं। कम प्रतिशत अधिक ऑब्जेक्ट का पता लगाते हैं लेकिन इसमें अधिक गलत सकारात्मकता शामिल हो सकती है।",
+        "ja": "アップロードされた画像から検出されたオブジェクトの最小信頼度を設定します。この設定は、巣枠画像の検出と巣箱の底板でのバロア検出に適用されます。以下の値はすべてパーセンテージです。パーセンテージが高いほど、より厳密になり、誤検出が減少します。パーセンテージが低いほど、より多くのオブジェクトを検出しますが、誤検出が多く含まれる可能性があります。",
+        "pl": "Ustaw minimalny poziom pewności dla obiektów wykrytych na przesłanych zdjęciach. Te ustawienia dotyczą detekcji na zdjęciach ramek oraz detekcji roztoczy Varroa na dennicy ula. Wszystkie poniższe wartości są podane w procentach. Wyższe wartości procentowe są bardziej rygorystyczne i zmniejszają liczbę fałszywych alarmów. Niższe wartości procentowe wykrywają więcej obiektów, ale mogą zawierać więcej fałszywych alarmów.",
+        "pt": "Defina a confiança mínima para objetos detetados nas imagens carregadas. Estas definições aplicam-se a deteções em imagens de quadros e a deteções de varroa no fundo da colmeia. Todos os valores abaixo são percentagens. Percentagens mais altas são mais rigorosas e reduzem os falsos positivos. Percentagens mais baixas detetam mais objetos, mas podem incluir mais falsos positivos.",
+        "ru": "Установите минимальный уровень уверенности для объектов, обнаруженных на загруженных изображениях. Эти настройки применяются к обнаружениям на изображениях рамок и обнаружениям клеща варроа на поддоне улья. Все значения ниже указаны в процентах. Более высокие значения являются более строгими и уменьшают количество ложных срабатываний. Более низкие значения позволяют обнаружить больше объектов, но могут включать больше ложных срабатываний.",
+        "tr": "Yüklenen resimlerden tespit edilen nesneler için minimum güvenilirlik seviyesini ayarlayın. Bu ayarlar, çerçeve resmi tespitleri ve kovan taban tahtası varroa tespitleri için geçerlidir. Aşağıdaki tüm değerler yüzde olarak verilmiştir. Daha yüksek yüzdeler daha katıdır ve yanlış pozitifleri azaltır. Daha düşük yüzdeler daha fazla nesne tespit eder ancak daha fazla yanlış pozitif içerebilir.",
+        "zh": "为从上传图像中检测到的对象设置最低置信度。这些设置适用于蜂框图像检测和巢底板瓦螨检测。以下所有数值均为百分比。百分比越高，要求越严格，并能减少误报。百分比越低，检测到的对象越多，但可能包含更多误报。"
       },
       "plurals": {}
     },
@@ -6520,10 +8664,108 @@
       "plurals": {}
     },
     {
+      "key": "Source Hive",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "خلية المصدر",
+        "bn": "উৎস মৌচাক",
+        "de": "Quellvolk",
+        "es": "Colmena de origen",
+        "et": "Lähtetaru",
+        "fr": "Ruche source",
+        "hi": "स्रोत छत्ता",
+        "ja": "元の巣箱",
+        "pl": "Ul źródłowy",
+        "pt": "Colmeia de origem",
+        "ru": "Исходный улей",
+        "tr": "Kaynak Kovan",
+        "zh": "来源蜂箱"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Split Colony",
       "namespace": null,
       "context": "An operation on a bee colony by separating it into two or more parts. This is done to prevent swarming, expand the apiary, or create nucleus colonies.",
-      "values": {},
+      "values": {
+        "ar": "تقسيم الطائفة",
+        "bn": "কলোনি বিভাজন",
+        "de": "Volksteilung",
+        "es": "División de la colonia",
+        "et": "Pere jagamine",
+        "fr": "Division de la colonie",
+        "hi": "कॉलोनी का विभाजन",
+        "ja": "人工分蜂",
+        "pl": "Podział rodziny pszczelej",
+        "pt": "Divisão da colónia",
+        "ru": "Разделение семьи",
+        "tr": "Koloni Bölme",
+        "zh": "分蜂"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Split Colony requires Hobbyist plan or higher.",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "تقسيم الطائفة يتطلب خطة الهاوي أو أعلى.",
+        "bn": "কলোনি বিভাজনের জন্য হবিস্ট প্ল্যান বা উচ্চতর প্ল্যান প্রয়োজন।",
+        "de": "Die Ablegerbildung erfordert den Plan „Hobbyist“ oder höher.",
+        "es": "La división de colonia requiere el plan Aficionado o superior.",
+        "et": "Pere jagamine nõuab Harrastaja paketti või kõrgemat.",
+        "fr": "La division de colonie nécessite le forfait « Amateur » ou supérieur.",
+        "hi": "कॉलोनी का विभाजन के लिए हॉबीस्ट प्लान या उच्चतर की आवश्यकता है।",
+        "ja": "群の分割にはホビイストプラン以上が必要です。",
+        "pl": "Podział rodziny wymaga planu Hobbysta lub wyższego.",
+        "pt": "A divisão de colónia requer o plano Amador ou superior.",
+        "ru": "Для разделения семьи требуется тариф «Любитель» или выше.",
+        "tr": "Koloni Bölme, Hobi planı veya üstünü gerektirir.",
+        "zh": "分群功能需要“爱好者”或更高级别的套餐。"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Start stream",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "بدء البث",
+        "bn": "স্ট্রিম শুরু করুন",
+        "de": "Stream starten",
+        "es": "Iniciar transmisión",
+        "et": "Alusta voogedastust",
+        "fr": "Démarrer la diffusion",
+        "hi": "स्ट्रीम शुरू करें",
+        "ja": "ストリームを開始",
+        "pl": "Rozpocznij transmisję",
+        "pt": "Iniciar transmissão",
+        "ru": "Начать трансляцию",
+        "tr": "Yayını başlat",
+        "zh": "开始直播"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Static apiary",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "منحل ثابت",
+        "bn": "স্থির মৌ খামার",
+        "de": "Stationärer Bienenstand",
+        "es": "Apiario estante",
+        "et": "Statsionaarne mesila",
+        "fr": "Rucher sédentaire",
+        "hi": "स्थिर मधुमक्खी पालन केंद्र",
+        "ja": "定置養蜂場",
+        "pl": "Pasieka stacjonarna",
+        "pt": "Apiário fixo",
+        "ru": "Стационарная пасека",
+        "tr": "Sabit arılık",
+        "zh": "固定蜂场"
+      },
       "plurals": {}
     },
     {
@@ -6565,6 +8807,27 @@
         "ru": "Сравнение стационарных пчёл",
         "tr": "Sabit Arı Karşılaştırması",
         "zh": "固定蜂群比较"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Stop stream",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "إيقاف البث",
+        "bn": "স্ট্রিম বন্ধ করুন",
+        "de": "Stream stoppen",
+        "es": "Detener transmisión",
+        "et": "Peata voog",
+        "fr": "Arrêter le flux",
+        "hi": "स्ट्रीम रोकें",
+        "ja": "ストリームを停止",
+        "pl": "Zatrzymaj transmisję",
+        "pt": "Parar transmissão",
+        "ru": "Остановить трансляцию",
+        "tr": "Yayını durdur",
+        "zh": "停止直播"
       },
       "plurals": {}
     },
@@ -6670,6 +8933,111 @@
         "ru": "Поддерживаемые типы: JPEG, PNG, GIF, WebP",
         "tr": "Desteklenen türler: JPEG, PNG, GIF, WebP",
         "zh": "支持的格式：JPEG, PNG, GIF, WebP"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Switch selected hive frames",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "تبديل الإطارات المحددة",
+        "bn": "নির্বাচিত ফ্রেমগুলি বদল করুন",
+        "de": "Ausgewählte Rähmchen tauschen",
+        "es": "Intercambiar cuadros seleccionados",
+        "et": "Vaheta valitud raamide asukohti",
+        "fr": "Intervertir les cadres sélectionnés",
+        "hi": "चुने हुए छत्ते के फ्रेम बदलें",
+        "ja": "選択した巣枠を入れ替える",
+        "pl": "Zamień wybrane ramki miejscami",
+        "pt": "Trocar quadros selecionados",
+        "ru": "Поменять местами выбранные рамки",
+        "tr": "Seçili çıtaların yerini değiştir",
+        "zh": "交换所选巢框"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Switch selected hive sections",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "تبديل أقسام الخلية المحددة",
+        "bn": "নির্বাচিত মৌচাকের অংশগুলি অদলবদল করুন",
+        "de": "Ausgewählte Zargen tauschen",
+        "es": "Intercambiar secciones de colmena seleccionadas",
+        "et": "Vaheta valitud taru sektsioonid",
+        "fr": "Intervertir les éléments de ruche sélectionnés",
+        "hi": "चयनित छत्ते के खंडों को बदलें",
+        "ja": "選択した巣箱のセクションを入れ替える",
+        "pl": "Zamień miejscami wybrane sekcje ula",
+        "pt": "Trocar seções da colmeia selecionadas",
+        "ru": "Поменять местами выбранные секции улья",
+        "tr": "Seçili kovan bölümlerinin yerini değiştir",
+        "zh": "交换所选箱体"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Table",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "جدول",
+        "bn": "সারণী",
+        "de": "Tabelle",
+        "es": "Tabla",
+        "et": "Tabel",
+        "fr": "Tableau",
+        "hi": "तालिका",
+        "ja": "表",
+        "pl": "Tabela",
+        "pt": "Tabela",
+        "ru": "Таблица",
+        "tr": "Tablo",
+        "zh": "表格"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Take old queen (source hive becomes queenless)",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "خذ الملكة القديمة (تصبح خلية المصدر يتيمة)",
+        "bn": "পুরোনো রানিকে নিন (উৎস মৌচাক রানিহীন হয়ে যায়)",
+        "de": "Alte Königin entnehmen (Quellvolk wird weisellos)",
+        "es": "Retirar la reina vieja (la colmena de origen queda huérfana)",
+        "et": "Võta vana ema (lähtetaru jääb emata)",
+        "fr": "Prélever l'ancienne reine (la ruche source devient orpheline)",
+        "hi": "पुरानी रानी को लें (स्रोत छत्ता रानीहीन हो जाता है)",
+        "ja": "古い女王蜂を取り出す (元の巣箱は女王蜂不在になります)",
+        "pl": "Zabierz starą matkę (rodzina macierzysta staje się bezmateczna)",
+        "pt": "Retirar a rainha velha (a colmeia de origem fica órfã)",
+        "ru": "Забрать старую матку (семья-донор становится безматочной)",
+        "tr": "Eski ana arıyı al (kaynak kovan anasız kalır)",
+        "zh": "取走老蜂王 (原蜂群变为无王群)"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Target Hive",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "الخلية المستهدفة",
+        "bn": "লক্ষ্য মৌচাক",
+        "de": "Ziel-Bienenstock",
+        "es": "Colmena objetivo",
+        "et": "Sihttaru",
+        "fr": "Ruche cible",
+        "hi": "लक्ष्य छत्ता",
+        "ja": "対象の巣箱",
+        "pl": "Ul docelowy",
+        "pt": "Colmeia Alvo",
+        "ru": "Целевой улей",
+        "tr": "Hedef Kovan",
+        "zh": "目标蜂箱"
       },
       "plurals": {}
     },
@@ -6800,10 +9168,108 @@
       "plurals": {}
     },
     {
+      "key": "This device is not linked to a hive entrance section (box). Stream works as local preview only.",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "هذا الجهاز غير مرتبط بقسم مدخل خلية النحل (صندوق). يعمل البث كمعاينة محلية فقط.",
+        "bn": "এই ডিভাইসটি কোনো মৌচাকের প্রবেশদ্বার অংশের (বাক্স) সাথে লিঙ্ক করা নেই। স্ট্রিম শুধুমাত্র স্থানীয় প্রিভিউ হিসাবে কাজ করে।",
+        "de": "Dieses Gerät ist nicht mit einem Beuten-Eingangsbereich (Box) verbunden. Der Stream funktioniert nur als lokale Vorschau.",
+        "es": "Este dispositivo no está vinculado a una sección de entrada de colmena (caja). La transmisión funciona solo como vista previa local.",
+        "et": "See seade ei ole seotud taru sissepääsu sektsiooniga (kastiga). Voog töötab ainult kohaliku eelvaatena.",
+        "fr": "Cet appareil n'est pas lié à une section d'entrée de ruche (boîte). Le flux fonctionne uniquement en tant qu'aperçu local.",
+        "hi": "यह डिवाइस छत्ते के प्रवेश खंड (बॉक्स) से जुड़ा नहीं है। स्ट्रीम केवल स्थानीय पूर्वावलोकन के रूप में काम करती है।",
+        "ja": "このデバイスはハイブの入り口セクション（ボックス）にリンクされていません。ストリームはローカルプレビューとしてのみ機能します。",
+        "pl": "To urządzenie nie jest połączone z sekcją wlotkową ula (korpusem). Strumień działa tylko jako podgląd lokalny.",
+        "pt": "Este dispositivo não está vinculado a uma seção de entrada de colmeia (caixa). A transmissão funciona apenas como pré-visualização local.",
+        "ru": "Это устройство не связано с секцией ульевого входа (корпусом). Поток работает только в режиме локального предпросмотра.",
+        "tr": "Bu cihaz bir kovan giriş bölümüne (kutu) bağlı değil. Akış yalnızca yerel önizleme olarak çalışır.",
+        "zh": "此设备未与蜂箱入口部分（箱体）关联。视频流仅用作本地预览。"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "This section requires Professional plan or higher.",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "يتطلب هذا القسم الخطة الاحترافية أو أعلى.",
+        "bn": "এই বিভাগের জন্য প্রফেশনাল প্ল্যান বা উচ্চতর সংস্করণ প্রয়োজন।",
+        "de": "Dieser Bereich erfordert den Professional-Tarif oder höher.",
+        "es": "Esta sección requiere el plan Profesional o superior.",
+        "et": "See jaotis nõuab Professionaalset paketti või kõrgemat.",
+        "fr": "Cette section nécessite un forfait Professionnel ou supérieur.",
+        "hi": "इस अनुभाग के लिए प्रोफेशनल प्लान या उच्चतर की आवश्यकता है।",
+        "ja": "このセクションにはプロフェッショナルプラン以上が必要です。",
+        "pl": "Ta sekcja wymaga planu Profesjonalnego lub wyższego.",
+        "pt": "Esta seção requer o plano Profissional ou superior.",
+        "ru": "Этот раздел требует плана «Professional» или выше.",
+        "tr": "Bu bölüm için Profesyonel plan veya üzeri gereklidir.",
+        "zh": "此部分需要“专业”或更高级别的套餐。"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "This stream is local preview only. Link this device to an entrance section to upload fragments.",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "هذا البث للمعاينة المحلية فقط. اربط هذا الجهاز بقسم مدخل لتحميل المقاطع.",
+        "bn": "এই স্ট্রিমটি শুধুমাত্র স্থানীয় প্রিভিউয়ের জন্য। ফ্র্যাগমেন্ট আপলোড করার জন্য এই ডিভাইসটিকে একটি প্রবেশ বিভাগের সাথে লিঙ্ক করুন।",
+        "de": "Dieser Stream ist nur eine lokale Vorschau. Verbinden Sie dieses Gerät mit einem Flugloch-Abschnitt, um Fragmente hochzuladen.",
+        "es": "Esta transmisión es solo una vista previa local. Vincule este dispositivo a una sección de piquera para subir fragmentos.",
+        "et": "See voog on ainult kohalikuks eelvaateks. Fragmentide üleslaadimiseks seo see seade lennuava jaotisega.",
+        "fr": "Ce flux est un aperçu local uniquement. Liez cet appareil à une section d'entrée pour téléverser des fragments.",
+        "hi": "यह स्ट्रीम केवल स्थानीय पूर्वावलोकन के लिए है। खंडों को अपलोड करने के लिए इस डिवाइस को एक प्रवेश खंड से लिंक करें।",
+        "ja": "このストリームはローカルプレビュー専用です。フラグメントをアップロードするには、このデバイスを巣門セクションにリンクしてください。",
+        "pl": "Ten strumień to tylko lokalny podgląd. Połącz to urządzenie z sekcją wlotu, aby przesyłać fragmenty.",
+        "pt": "Esta transmissão é apenas uma prévia local. Vincule este dispositivo a uma seção de entrada para enviar fragmentos.",
+        "ru": "Эта трансляция — только локальный предпросмотр. Привяжите это устройство к секции летка, чтобы загружать фрагменты.",
+        "tr": "Bu akış yalnızca yerel önizleme içindir. Parçaları yüklemek için bu cihazı bir giriş bölümüne bağlayın.",
+        "zh": "此视频流仅供本地预览。请将此设备关联到一个入口区域，以上传片段。"
+      },
+      "plurals": {}
+    },
+    {
       "key": "This view shows how colonies develop over time. Add an apiary with a hive to see first data here.",
       "namespace": null,
       "context": null,
-      "values": {},
+      "values": {
+        "ar": "يعرض هذا العرض كيفية تطور مستعمرات النحل بمرور الوقت. أضف منحلاً مع خلية لرؤية البيانات الأولية هنا.",
+        "bn": "এই ভিউটি দেখায় কিভাবে সময়ের সাথে সাথে কলোনিগুলি বিকশিত হয়। এখানে প্রথম ডেটা দেখতে একটি মৌচাক সহ একটি মৌমাছি খামার যোগ করুন।",
+        "de": "Diese Ansicht zeigt, wie sich Bienenvölker im Laufe der Zeit entwickeln. Fügen Sie einen Bienenstand mit einem Bienenstock hinzu, um hier erste Daten zu sehen.",
+        "es": "Esta vista muestra cómo se desarrollan las colonias a lo largo del tiempo. Añada un colmenar con una colmena para ver los primeros datos aquí.",
+        "et": "See vaade näitab, kuidas mesilaspered aja jooksul arenevad. Esimeste andmete nägemiseks lisage mesila koos taruga.",
+        "fr": "Cet affichage montre comment les colonies se développent au fil du temps. Ajoutez un rucher avec une ruche pour voir les premières données ici.",
+        "hi": "यह दृश्य दिखाता है कि समय के साथ मधुमक्खी परिवार कैसे विकसित होते हैं। यहां पहला डेटा देखने के लिए एक छत्ते वाली मधुवाटिका जोड़ें।",
+        "ja": "このビューは、コロニーが時間経過と共にどのように発展するかを示します。最初のデータをここに表示するには、蜂の巣箱がある養蜂場を追加してください。",
+        "pl": "Ten widok pokazuje, jak rodziny pszczele rozwijają się w czasie. Dodaj pasiekę z ulem, aby zobaczyć tutaj pierwsze dane.",
+        "pt": "Esta vista mostra como as colónias se desenvolvem ao longo do tempo. Adicione um apiário com uma colmeia para ver os primeiros dados aqui.",
+        "ru": "Этот экран показывает, как развиваются пчелиные семьи с течением времени. Добавьте пасеку с ульем, чтобы увидеть здесь первые данные.",
+        "tr": "Bu görünüm, kolonilerin zaman içinde nasıl geliştiğini gösterir. İlk verileri burada görmek için kovan içeren bir arılık ekleyin.",
+        "zh": "此视图显示蜂群如何随时间发展。请添加一个带蜂箱的蜂场，以在此处查看初始数据。"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Time",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "الوقت",
+        "bn": "সময়",
+        "de": "Zeit",
+        "es": "Hora",
+        "et": "Aeg",
+        "fr": "Heure",
+        "hi": "समय",
+        "ja": "時間",
+        "pl": "Czas",
+        "pt": "Hora",
+        "ru": "Время",
+        "tr": "Zaman",
+        "zh": "时间"
+      },
       "plurals": {}
     },
     {
@@ -6940,6 +9406,48 @@
       "plurals": {}
     },
     {
+      "key": "To trash",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "نقل إلى سلة المهملات",
+        "bn": "ট্র্যাশে ফেলুন",
+        "de": "In den Papierkorb",
+        "es": "Mover a la papelera",
+        "et": "Prügikasti",
+        "fr": "Mettre à la corbeille",
+        "hi": "ट्रैश में डालें",
+        "ja": "ゴミ箱に入れる",
+        "pl": "Do kosza",
+        "pt": "Mover para o lixo",
+        "ru": "В корзину",
+        "tr": "Çöp kutusuna taşı",
+        "zh": "移至垃圾桶"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "To warehouse",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "إلى المستودع",
+        "bn": "গুদামে",
+        "de": "Ins Lager",
+        "es": "Al almacén",
+        "et": "Lattu",
+        "fr": "À l'entrepôt",
+        "hi": "गोदाम में",
+        "ja": "倉庫へ",
+        "pl": "Do magazynu",
+        "pt": "Para o armazém",
+        "ru": "На склад",
+        "tr": "Depoya",
+        "zh": "入库"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Toggle",
       "namespace": null,
       "context": null,
@@ -6957,6 +9465,27 @@
         "ru": "Переключить",
         "tr": "Aç/Kapat",
         "zh": "切换"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Toggle left menu",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "تبديل القائمة اليسرى",
+        "bn": "বাম মেনু টগল করুন",
+        "de": "Linkes Menü umschalten",
+        "es": "Alternar menú izquierdo",
+        "et": "Lülita vasakmenüü",
+        "fr": "Afficher/Masquer le menu de gauche",
+        "hi": "बायां मेनू टॉगल करें",
+        "ja": "左メニューを切り替え",
+        "pl": "Przełącz lewe menu",
+        "pt": "Alternar menu esquerdo",
+        "ru": "Переключить левое меню",
+        "tr": "Sol menüyü değiştir",
+        "zh": "切换左侧菜单"
       },
       "plurals": {}
     },
@@ -7045,6 +9574,27 @@
       "plurals": {}
     },
     {
+      "key": "Total unique bees detected in the frame during the processing period",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "إجمالي عدد النحل الفريد الذي تم اكتشافه في الإطار خلال فترة المعالجة",
+        "bn": "প্রক্রিয়াকরণের সময়কালে ফ্রেমে শনাক্ত করা মোট স্বতন্ত্র মৌমাছির সংখ্যা",
+        "de": "Gesamtzahl der im Verarbeitungszeitraum im Rähmchen erfassten einzigartigen Bienen",
+        "es": "Número total de abejas únicas detectadas en el cuadro durante el período de procesamiento",
+        "et": "Töötlemisperioodi jooksul raamis tuvastatud unikaalsete mesilaste koguarv",
+        "fr": "Nombre total d'abeilles uniques détectées dans le cadre pendant la période de traitement",
+        "hi": "प्रसंस्करण अवधि के दौरान फ्रेम में पहचानी गई कुल अनूठी मधुमक्खियों की संख्या",
+        "ja": "処理期間中にフレーム内で検出されたユニークなミツバチの総数",
+        "pl": "Łączna liczba unikalnych pszczół wykrytych w ramce w okresie przetwarzania",
+        "pt": "Total de abelhas únicas detectadas no quadro durante o período de processamento",
+        "ru": "Общее количество уникальных пчел, обнаруженных в рамке за период обработки",
+        "tr": "İşlem süresi boyunca çerçevede tespit edilen toplam benzersiz arı sayısı",
+        "zh": "处理期间在蜂巢框中检测到的独立蜜蜂总数"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Track available hive modules with simple count operations.",
       "namespace": null,
       "context": null,
@@ -7066,10 +9616,66 @@
       "plurals": {}
     },
     {
+      "key": "Track colony population over time across multiple hives",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "تتبع تعداد مستعمرات النحل بمرور الوقت في خلايا متعددة.",
+        "bn": "একাধিক মৌচাকে সময়ের সাথে সাথে কলোনির জনসংখ্যা ট্র্যাক করুন।",
+        "de": "Verfolgen Sie die Volksstärke mehrerer Bienenvölker im Zeitverlauf.",
+        "es": "Realice un seguimiento de la población de las colonias a lo largo del tiempo en múltiples colmenas.",
+        "et": "Jälgige mesilaspere populatsiooni aja jooksul mitmes tarus.",
+        "fr": "Suivez l'évolution de la population des colonies dans plusieurs ruches.",
+        "hi": "कई छत्तों में समय के साथ कॉलोनी की आबादी को ट्रैक करें।",
+        "ja": "複数の巣箱でコロニーの個体数を時系列で追跡します。",
+        "pl": "Śledź populację rodzin pszczelich w wielu ulach na przestrzeni czasu.",
+        "pt": "Acompanhe a população das colônias ao longo do tempo em várias colmeias.",
+        "ru": "Отслеживайте популяцию колоний в нескольких ульях с течением времени.",
+        "tr": "Birden fazla kovandaki koloni popülasyonunu zamanla takip edin.",
+        "zh": "追踪多个蜂箱的蜂群数量随时间的变化。"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Treatment added",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "تمت إضافة العلاج",
+        "bn": "চিকিৎসা যোগ করা হয়েছে",
+        "de": "Behandlung hinzugefügt",
+        "es": "Tratamiento añadido",
+        "et": "Ravi lisatud",
+        "fr": "Traitement ajouté",
+        "hi": "उपचार जोड़ा गया",
+        "ja": "処置が追加されました",
+        "pl": "Zabieg dodany",
+        "pt": "Tratamento adicionado",
+        "ru": "Обработка добавлена",
+        "tr": "Tedavi eklendi",
+        "zh": "已添加处理"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Treatment type",
       "namespace": null,
       "context": null,
-      "values": {},
+      "values": {
+        "ar": "نوع العلاج",
+        "bn": "চিকিৎসার ধরন",
+        "de": "Behandlungsart",
+        "es": "Tipo de tratamiento",
+        "et": "Töötluse tüüp",
+        "fr": "Type de traitement",
+        "hi": "उपचार का प्रकार",
+        "ja": "処置の種類",
+        "pl": "Rodzaj leczenia",
+        "pt": "Tipo de tratamento",
+        "ru": "Тип обработки",
+        "tr": "Tedavi türü",
+        "zh": "治疗类型"
+      },
       "plurals": {}
     },
     {
@@ -7304,6 +9910,48 @@
       "plurals": {}
     },
     {
+      "key": "Upload disabled",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "التحميل معطل",
+        "bn": "আপলোড নিষ্ক্রিয়",
+        "de": "Upload deaktiviert",
+        "es": "Carga deshabilitada",
+        "et": "Üleslaadimine keelatud",
+        "fr": "Téléversement désactivé",
+        "hi": "अपलोड अक्षम है",
+        "ja": "アップロード無効",
+        "pl": "Przesyłanie wyłączone",
+        "pt": "Upload desativado",
+        "ru": "Загрузка отключена",
+        "tr": "Yükleme devre dışı",
+        "zh": "上传已禁用"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Upload disabled because device is not linked to a box",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "تم تعطيل التحميل لأن الجهاز غير مرتبط بخلية نحل",
+        "bn": "আপলোড অক্ষম করা হয়েছে কারণ ডিভাইসটি কোনো মৌচাকের সাথে লিঙ্ক করা নেই",
+        "de": "Upload deaktiviert, da das Gerät nicht mit einer Beute verbunden ist",
+        "es": "Carga desactivada porque el dispositivo no está vinculado a una colmena",
+        "et": "Üleslaadimine on keelatud, kuna seade pole taruga seotud",
+        "fr": "Téléchargement désactivé car l'appareil n'est pas lié à une ruche",
+        "hi": "अपलोड अक्षम है क्योंकि डिवाइस किसी छत्ते से लिंक नहीं है",
+        "ja": "デバイスが巣箱にリンクされていないため、アップロードは無効です",
+        "pl": "Przesyłanie wyłączone, ponieważ urządzenie nie jest połączone z ulem",
+        "pt": "Upload desativado porque o dispositivo não está vinculado a uma colmeia",
+        "ru": "Загрузка отключена, так как устройство не привязано к улью",
+        "tr": "Cihaz bir kovana bağlı olmadığı için yükleme devre dışı bırakıldı",
+        "zh": "上传已禁用，因为设备未关联到蜂箱"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Upload frame photo",
       "namespace": null,
       "context": "this is a button which allows to select and upload a photo of a beehive frame",
@@ -7353,6 +10001,48 @@
       "plurals": {}
     },
     {
+      "key": "Varroa",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "الفاروا",
+        "bn": "ভারোয়া",
+        "de": "Varroa",
+        "es": "Varroa",
+        "et": "Varroa",
+        "fr": "Varroa",
+        "hi": "वर्रोआ",
+        "ja": "バロア",
+        "pl": "Warroza",
+        "pt": "Varroa",
+        "ru": "Клещи Варроа (на рамках)",
+        "tr": "Varroa",
+        "zh": "瓦螨"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Varroa (bottom board)",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "الفاروا (اللوح السفلي)",
+        "bn": "ভারোয়া (তল বোর্ড)",
+        "de": "Varroa (Bodenbrett)",
+        "es": "Varroa (fondo)",
+        "et": "Varroa (põhjalaua)",
+        "fr": "Varroa (plateau de fond)",
+        "hi": "वरोआ (तल बोर्ड)",
+        "ja": "バロア (底板)",
+        "pl": "Warroza (dennica)",
+        "pt": "Varroa (fundo)",
+        "ru": "Клещи Варроа (на дне)",
+        "tr": "Varroa (kovan tabanı)",
+        "zh": "瓦螨 (巢底板)"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Varroa mites",
       "namespace": null,
       "context": "toggle varroa mites visibility",
@@ -7370,6 +10060,27 @@
         "ru": "Клещи варроа",
         "tr": "Varroa akarları",
         "zh": "瓦螨"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Varroa monitoring requires Starter plan or higher.",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "مراقبة الفاروا تتطلب خطة Starter أو أعلى.",
+        "bn": "ভ্যারোয়া পর্যবেক্ষণের জন্য স্টার্টার প্ল্যান বা উচ্চতর প্ল্যান প্রয়োজন।",
+        "de": "Für das Varroa-Monitoring ist der Starter-Plan oder höher erforderlich.",
+        "es": "El monitoreo de varroa requiere el plan Starter o superior.",
+        "et": "Varroalesta seire nõuab Stardipaketti või kõrgemat.",
+        "fr": "Le suivi du varroa requiert le forfait Starter ou supérieur.",
+        "hi": "वरोआ की निगरानी के लिए स्टार्टर प्लान या उच्चतर की आवश्यकता है।",
+        "ja": "バロアのモニタリングには、スタータープラン以上が必要です。",
+        "pl": "Monitoring warrozy wymaga planu Starter lub wyższego.",
+        "pt": "O monitoramento de varroa requer o plano Starter ou superior.",
+        "ru": "Для мониторинга клеща Варроа требуется тариф «Стартовый» или выше.",
+        "tr": "Varroa takibi için Başlangıç planı veya üstü gereklidir.",
+        "zh": "瓦螨监测需要入门版或更高级别的套餐。"
       },
       "plurals": {}
     },
@@ -7421,6 +10132,27 @@
       "plurals": {}
     },
     {
+      "key": "Video recording in progress",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "جارٍ تسجيل الفيديو",
+        "bn": "ভিডিও রেকর্ডিং চলছে",
+        "de": "Videoaufnahme läuft",
+        "es": "Grabación de video en curso",
+        "et": "Videosalvestus on pooleli",
+        "fr": "Enregistrement vidéo en cours",
+        "hi": "वीडियो रिकॉर्डिंग चल रही है",
+        "ja": "ビデオ録画中",
+        "pl": "Trwa nagrywanie wideo",
+        "pt": "Gravação de vídeo em andamento",
+        "ru": "Идёт видеозапись",
+        "tr": "Video kaydı yapılıyor",
+        "zh": "视频录制中"
+      },
+      "plurals": {}
+    },
+    {
       "key": "View",
       "namespace": null,
       "context": null,
@@ -7463,6 +10195,27 @@
       "plurals": {}
     },
     {
+      "key": "Waiting for next fragment upload (about 10 seconds)",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "انتظار تحميل المقطع التالي (حوالي 10 ثوانٍ)",
+        "bn": "পরবর্তী খণ্ড আপলোডের অপেক্ষা (প্রায় ১০ সেকেন্ড)",
+        "de": "Warten auf Upload des nächsten Fragments (ca. 10 Sekunden)",
+        "es": "Esperando la subida del siguiente fragmento (unos 10 segundos)",
+        "et": "Oodatakse järgmise fragmendi üleslaadimist (umbes 10 sekundit)",
+        "fr": "En attente du téléversement du prochain fragment (environ 10 secondes)",
+        "hi": "अगले फ़्रैगमेंट के अपलोड की प्रतीक्षा (लगभग 10 सेकंड)",
+        "ja": "次のフラグメントのアップロードを待機中 (約10秒)",
+        "pl": "Oczekiwanie na przesłanie następnego fragmentu (około 10 sekund)",
+        "pt": "Aguardando o envio do próximo fragmento (cerca de 10 segundos)",
+        "ru": "Ожидание загрузки следующего фрагмента (около 10 секунд)",
+        "tr": "Sonraki parçanın yüklenmesi bekleniyor (yaklaşık 10 saniye)",
+        "zh": "等待下一个片段上传 (约10秒)"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Warehouse",
       "namespace": null,
       "context": null,
@@ -7484,6 +10237,48 @@
       "plurals": {}
     },
     {
+      "key": "Warehouse queen list view",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "قائمة الملكات في المستودع",
+        "bn": "গুদামের রানী মৌমাছির তালিকা",
+        "de": "Lagerköniginnen-Listenansicht",
+        "es": "Lista de reinas en almacén",
+        "et": "Lao emade nimekiri",
+        "fr": "Liste des reines en réserve",
+        "hi": "गोदाम की रानी मक्खियों की सूची",
+        "ja": "倉庫の女王蜂一覧",
+        "pl": "Lista matek w magazynie",
+        "pt": "Lista de Rainhas do Armazém",
+        "ru": "Список маток на складе",
+        "tr": "Depo Ana Arı Listesi",
+        "zh": "仓库蜂王列表"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Warehouse queen table with keyboard row selection and deletion flow.",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "جدول ملكات المستودع مع تحديد الصفوف بلوحة المفاتيح وعملية الحذف.",
+        "bn": "কীবোর্ড দিয়ে সারি নির্বাচন এবং মুছে ফেলার প্রক্রিয়া সহ ওয়্যারহাউসের রানী টেবিল।",
+        "de": "Lagerköniginnen-Tabelle mit Zeilenauswahl per Tastatur und Löschvorgang.",
+        "es": "Tabla de reinas en almacén con selección de filas por teclado y proceso de eliminación.",
+        "et": "Lao mesilasemade tabel klaviatuuriga ridade valimise ja kustutamise protsessiga.",
+        "fr": "Tableau des reines en stock avec sélection de ligne au clavier et procédure de suppression.",
+        "hi": "कीबोर्ड से पंक्ति चयन और हटाने की प्रक्रिया वाली वेयरहाउस क्वीन तालिका।",
+        "ja": "キーボードによる行選択と削除フローを備えた倉庫の女王蜂テーブル。",
+        "pl": "Tabela matek w magazynie z wyborem wierszy za pomocą klawiatury i procesem usuwania.",
+        "pt": "Tabela de rainhas em armazém com seleção de linha pelo teclado e fluxo de exclusão.",
+        "ru": "Таблица маток на складе с выбором строк с клавиатуры и процессом удаления.",
+        "tr": "Klavye ile satır seçimi ve silme akışlı depo ana arı tablosu.",
+        "zh": "仓库蜂王表格，支持键盘行选择和删除流程。"
+      },
+      "plurals": {}
+    },
+    {
       "key": "Warehouse Queens",
       "namespace": null,
       "context": null,
@@ -7501,6 +10296,27 @@
         "ru": "Склад маток",
         "tr": "Depo Ana Arıları",
         "zh": "库存蜂王"
+      },
+      "plurals": {}
+    },
+    {
+      "key": "Warehouse requires Hobbyist plan or higher.",
+      "namespace": null,
+      "context": null,
+      "values": {
+        "ar": "المستودع يتطلب خطة \"الهاوي\" أو أعلى.",
+        "bn": "ওয়্যারহাউসের জন্য হবিস্ট প্ল্যান বা উচ্চতর প্ল্যান প্রয়োজন।",
+        "de": "Das Lager erfordert den Hobby-Tarif oder höher.",
+        "es": "El Almacén requiere el plan Aficionado o superior.",
+        "et": "Lao kasutamiseks on vajalik Hobimesiniku pakett või kõrgem.",
+        "fr": "L'accès à l'Entrepôt requiert le forfait Amateur ou supérieur.",
+        "hi": "गोदाम के लिए हॉबीस्ट प्लान या उच्चतर की आवश्यकता है।",
+        "ja": "倉庫機能にはホビイストプラン以上が必要です。",
+        "pl": "Magazyn wymaga planu Hobbysta lub wyższego.",
+        "pt": "O Armazém requer o plano Hobbyist ou superior.",
+        "ru": "Для доступа к складу требуется план «Hobbyist» или выше.",
+        "tr": "Depo, Hobi planı veya üstünü gerektirir.",
+        "zh": "仓库功能需要“爱好者”或更高级别的套餐。"
       },
       "plurals": {}
     },
