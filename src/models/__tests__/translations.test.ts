@@ -90,6 +90,25 @@ describe('translationModel caching', () => {
 		expect(query).toHaveBeenCalledTimes(2);
 	});
 
+	it('falls back when key_hash column is missing in getByKey', async () => {
+		const missingColumnError = Object.assign(new Error("Unknown column 'key_hash' in 'where clause'"), {
+			code: 'ER_BAD_FIELD_ERROR',
+			sqlMessage: "Unknown column 'key_hash' in 'where clause'",
+		});
+		const query = jest.fn()
+			.mockRejectedValueOnce(missingColumnError)
+			.mockResolvedValueOnce([{ id: 42 }]);
+		mockStorage.mockReturnValue({ query } as any);
+
+		const first = await translationModel.getByKey('Current view', null);
+		const second = await translationModel.getByKey('Current view', null);
+
+		expect(first).toBe(42);
+		expect(second).toBe(42);
+		expect(query).toHaveBeenCalledTimes(2);
+		expect(mockLogger.warn).toHaveBeenCalledWith('[getByKey] key_hash column missing, falling back to key lookup');
+	});
+
 	it('generates multiple language translations from one LLM call', async () => {
 		mockGenerateGeminiText.mockResolvedValueOnce(JSON.stringify({
 			ru: 'Улей',

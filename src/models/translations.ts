@@ -82,6 +82,7 @@ const translationIdByKeyCache = new BoundedTtlCache<number | null>();
 const hasPluralFormsCache = new BoundedTtlCache<boolean>();
 const translationValueCache = new BoundedTtlCache<string | null>();
 const pluralFormsCache = new BoundedTtlCache<any | null>();
+let supportsTranslationKeyHashLookup: boolean | null = null;
 
 function keyWithNamespace(key: string, namespace: string | null): string {
 	return `${namespace ?? "__NULL__"}:${key}`;
@@ -89,6 +90,15 @@ function keyWithNamespace(key: string, namespace: string | null): string {
 
 function translationLangKey(translationId: number, lang: string): string {
 	return `${translationId}:${lang}`;
+}
+
+function isMissingKeyHashColumnError(error: unknown): boolean {
+	if (!error || typeof error !== 'object') {
+		return false;
+	}
+
+	const err = error as { code?: string; sqlMessage?: string };
+	return err.code === 'ER_BAD_FIELD_ERROR' && err.sqlMessage?.includes('key_hash') === true;
 }
 
 function parseJsonObjectFromLlm(raw: string): Record<string, any> | null {
@@ -120,13 +130,36 @@ export const translationModel = {
 			return cachedId;
 		}
 
-		let result = await storage().query(
-			sql`SELECT id FROM translations
-				WHERE key_hash = SHA2(${key}, 256)
-				  AND \`key\` = ${key}
-				  AND namespace <=> ${namespace}
-				LIMIT 1`
-		);
+		let result: Array<{ id: number }> = [];
+
+		if (supportsTranslationKeyHashLookup !== false) {
+			try {
+				result = await storage().query(
+					sql`SELECT id FROM translations
+						WHERE key_hash = SHA2(${key}, 256)
+						  AND \`key\` = ${key}
+						  AND namespace <=> ${namespace}
+						LIMIT 1`
+				);
+				supportsTranslationKeyHashLookup = true;
+			} catch (error) {
+				if (!isMissingKeyHashColumnError(error)) {
+					throw error;
+				}
+
+				supportsTranslationKeyHashLookup = false;
+				logger.warn('[getByKey] key_hash column missing, falling back to key lookup');
+			}
+		}
+
+		if (result.length === 0 && supportsTranslationKeyHashLookup === false) {
+			result = await storage().query(
+				sql`SELECT id FROM translations
+					WHERE \`key\` = ${key}
+					  AND namespace <=> ${namespace}
+					LIMIT 1`
+			);
+		}
 
 		if (result.length === 0) {
 			logger.debug(`[getByKey] Exact match not found, trying case-insensitive for "${key}"`);
@@ -536,5 +569,6 @@ export const translationModel = {
 		hasPluralFormsCache.clear();
 		translationValueCache.clear();
 		pluralFormsCache.clear();
+		supportsTranslationKeyHashLookup = null;
 	}
 };

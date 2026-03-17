@@ -4,6 +4,17 @@ import sha1 from 'sha1';
 import { storage } from "../storage";
 export const TRIAL_DAYS = 14; // should not affect free billing_plan
 
+let supportsAccountLocaleColumn: boolean | null = null;
+
+function isMissingLocaleColumnError(error: unknown): boolean {
+	if (!error || typeof error !== 'object') {
+		return false;
+	}
+
+	const err = error as { code?: string; sqlMessage?: string };
+	return err.code === 'ER_BAD_FIELD_ERROR' && err.sqlMessage?.includes('locale') === true;
+}
+
 export const userModel = {
 	expireToFreeIfNeeded: async function (uid: number): Promise<string | null> {
 		const result = await storage().tx(async (dbi) => {
@@ -80,15 +91,39 @@ export const userModel = {
 	},
 
 	getById: async function (id) {
-		const result = await storage().query(
-			sql`SELECT id, email, first_name, last_name, date_expiration, date_added, 
-			stripe_subscription, lang,
-			billing_plan as billingPlan,
-			(date_expiration IS NOT NULL AND date_expiration < NOW()) as isSubscriptionExpired
-			FROM account 
-			WHERE id=${id}
-			LIMIT 1`
-		);
+		let result: any[] = [];
+
+		if (supportsAccountLocaleColumn !== false) {
+			try {
+				result = await storage().query(
+					sql`SELECT id, email, first_name, last_name, date_expiration, date_added, 
+					stripe_subscription, lang, locale,
+					billing_plan as billingPlan,
+					(date_expiration IS NOT NULL AND date_expiration < NOW()) as isSubscriptionExpired
+					FROM account 
+					WHERE id=${id}
+					LIMIT 1`
+				);
+				supportsAccountLocaleColumn = true;
+			} catch (error) {
+				if (!isMissingLocaleColumnError(error)) {
+					throw error;
+				}
+				supportsAccountLocaleColumn = false;
+			}
+		}
+
+		if (supportsAccountLocaleColumn === false) {
+			result = await storage().query(
+				sql`SELECT id, email, first_name, last_name, date_expiration, date_added, 
+				stripe_subscription, lang, NULL as locale,
+				billing_plan as billingPlan,
+				(date_expiration IS NOT NULL AND date_expiration < NOW()) as isSubscriptionExpired
+				FROM account 
+				WHERE id=${id}
+				LIMIT 1`
+			);
+		}
 
 		return result[0];
 	},
@@ -100,11 +135,34 @@ export const userModel = {
 	},
 
 	update: async function (user, uid) {
-		await storage().query(
-			sql`UPDATE \`account\` 
-			SET first_name=${user.first_name}, last_name=${user.last_name}, lang=${user.lang}
-			WHERE id=${uid}`
-		);
+		if (supportsAccountLocaleColumn === false) {
+			await storage().query(
+				sql`UPDATE \`account\`
+				SET first_name=${user.first_name}, last_name=${user.last_name}, lang=${user.lang}
+				WHERE id=${uid}`
+			);
+			return;
+		}
+
+		try {
+			await storage().query(
+				sql`UPDATE \`account\` 
+				SET first_name=${user.first_name}, last_name=${user.last_name}, lang=${user.lang},
+				locale=COALESCE(${user.locale}, locale)
+				WHERE id=${uid}`
+			);
+			supportsAccountLocaleColumn = true;
+		} catch (error) {
+			if (!isMissingLocaleColumnError(error)) {
+				throw error;
+			}
+			supportsAccountLocaleColumn = false;
+			await storage().query(
+				sql`UPDATE \`account\`
+				SET first_name=${user.first_name}, last_name=${user.last_name}, lang=${user.lang}
+				WHERE id=${uid}`
+			);
+		}
 	},
 	updateLastLogin: async function (uid) {
 		await storage().query(sql`UPDATE \`account\` SET date_last_login=NOW() WHERE id=${uid}`);
@@ -118,11 +176,31 @@ export const userModel = {
 		return !result[0] || result[0].date_last_login === null;
 	},
 
-	create: async function (first_name, last_name, email, password, lang, expirationDateString, billingPlan = 'professional') {
-		return await storage().query(
-			sql`INSERT INTO account (first_name, last_name, email, password, lang, date_expiration, billing_plan)
-			VALUES(${first_name}, ${last_name}, ${email}, ${sha1(password)}, ${lang}, ${expirationDateString}, ${billingPlan})`
-		);
+	create: async function (first_name, last_name, email, password, lang, locale, expirationDateString, billingPlan = 'professional') {
+		if (supportsAccountLocaleColumn === false) {
+			return await storage().query(
+				sql`INSERT INTO account (first_name, last_name, email, password, lang, date_expiration, billing_plan)
+				VALUES(${first_name}, ${last_name}, ${email}, ${sha1(password)}, ${lang}, ${expirationDateString}, ${billingPlan})`
+			);
+		}
+
+		try {
+			const created = await storage().query(
+				sql`INSERT INTO account (first_name, last_name, email, password, lang, locale, date_expiration, billing_plan)
+				VALUES(${first_name}, ${last_name}, ${email}, ${sha1(password)}, ${lang}, ${locale}, ${expirationDateString}, ${billingPlan})`
+			);
+			supportsAccountLocaleColumn = true;
+			return created;
+		} catch (error) {
+			if (!isMissingLocaleColumnError(error)) {
+				throw error;
+			}
+			supportsAccountLocaleColumn = false;
+			return await storage().query(
+				sql`INSERT INTO account (first_name, last_name, email, password, lang, date_expiration, billing_plan)
+				VALUES(${first_name}, ${last_name}, ${email}, ${sha1(password)}, ${lang}, ${expirationDateString}, ${billingPlan})`
+			);
+		}
 	},
 
 	findByEmailAndPass: async function (email, password) {

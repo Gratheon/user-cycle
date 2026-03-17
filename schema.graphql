@@ -14,6 +14,7 @@ input RegisterInput {
 	email: String!
 	password: String!
 	lang: String
+	locale: String
 	nonce: String!
 	solution: String!
 }
@@ -167,6 +168,7 @@ type User {
 	Language code: en, ru, tr, et, pl
 	"""
 	lang: String
+	locale: String
 	date_added: DateTime
 	date_expiration: DateTime
 	hasSubscription: Boolean
@@ -183,6 +185,7 @@ input UserUpdateInput{
 	first_name: String
 	last_name: String
 	lang: String
+	locale: String
 }
 
 input TranslateRequest {

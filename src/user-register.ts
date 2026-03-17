@@ -13,7 +13,7 @@ import {sendAdminUserRegisteredMail, sendWelcomeMail} from "./send-mail";
 import {registrationNonceModel} from './models/registration-nonce';
 
 export default async function registerUser(_, { input }) {
-  const { first_name, last_name, email, password, lang, nonce, solution } = input;
+  const { first_name, last_name, email, password, lang, locale, nonce, solution } = input;
 
   if (!nonce || !solution) {
     logger.warn(`Registration - MISSING_NONCE`, {email})
@@ -66,7 +66,7 @@ export default async function registerUser(_, { input }) {
     expirationDate.setDate(expirationDate.getDate() + TRIAL_DAYS);
     const expirationDateString = expirationDate.toISOString().substring(0, 19).replace('T', ' ');
 
-    await userModel.create(first_name, last_name, email, password, lang || 'en', expirationDateString, 'professional');
+    await userModel.create(first_name, last_name, email, password, lang || 'en', locale || null, expirationDateString, 'professional');
     id = await userModel.findByEmailAndPass(email, password)
 
     if (!id) {
