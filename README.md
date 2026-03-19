@@ -1,4 +1,5 @@
 # user-cycle
+[![codecov](https://codecov.io/gh/Gratheon/user-cycle/graph/badge.svg?token=I3RZE8Z4LQ)](https://codecov.io/gh/Gratheon/user-cycle)
 
 A comprehensive user management microservice for the [Gratheon](https://gratheon.com) beekeeping platform. This service handles authentication, billing, API tokens, and internationalization within a federated GraphQL architecture.
 
