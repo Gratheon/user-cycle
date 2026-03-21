@@ -23,6 +23,21 @@ export const httpRequestsTotal = new client.Counter({
     registers: [register],
 });
 
+export const graphqlResolverDurationSeconds = new client.Histogram({
+    name: "user_cycle_graphql_resolver_duration_seconds",
+    help: "GraphQL resolver duration in seconds",
+    labelNames: ["operation_type", "resolver_name", "status"] as const,
+    buckets: [0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2, 5, 10],
+    registers: [register],
+});
+
+export const graphqlResolverCallsTotal = new client.Counter({
+    name: "user_cycle_graphql_resolver_calls_total",
+    help: "Total number of GraphQL resolver calls",
+    labelNames: ["operation_type", "resolver_name", "status"] as const,
+    registers: [register],
+});
+
 export function recordHttpRequest(input: {
     method: string;
     route: string;
@@ -37,6 +52,88 @@ export function recordHttpRequest(input: {
 
     httpRequestsTotal.inc(labels);
     httpRequestDurationSeconds.observe(labels, input.durationSeconds);
+}
+
+export function recordGraphqlResolverCall(input: {
+    operationType: string;
+    resolverName: string;
+    status: "success" | "error";
+    durationSeconds: number;
+}) {
+    const labels = {
+        operation_type: input.operationType,
+        resolver_name: input.resolverName,
+        status: input.status,
+    };
+
+    graphqlResolverCallsTotal.inc(labels);
+    graphqlResolverDurationSeconds.observe(labels, input.durationSeconds);
+}
+
+type ResolverMap = Record<string, any>;
+type ResolverFunction = (...args: any[]) => any;
+
+function isPromiseLike(value: unknown): value is Promise<unknown> {
+    return !!value && typeof (value as { then?: unknown }).then === "function";
+}
+
+export function wrapGraphqlResolversWithMetrics<T extends ResolverMap>(resolverMap: T): T {
+    const wrapped = { ...resolverMap } as ResolverMap;
+
+    for (const [operationType, operationResolvers] of Object.entries(resolverMap)) {
+        if (!operationResolvers || typeof operationResolvers !== "object" || Array.isArray(operationResolvers)) {
+            continue;
+        }
+
+        const wrappedOperationResolvers = { ...operationResolvers } as ResolverMap;
+
+        for (const [resolverName, resolver] of Object.entries(operationResolvers as ResolverMap)) {
+            if (typeof resolver !== "function") {
+                continue;
+            }
+
+            const originalResolver = resolver as ResolverFunction;
+
+            wrappedOperationResolvers[resolverName] = function wrappedResolver(this: unknown, ...args: any[]) {
+                const start = process.hrtime.bigint();
+                const observe = (status: "success" | "error") => {
+                    const elapsedNanoseconds = Number(process.hrtime.bigint() - start);
+                    const durationSeconds = elapsedNanoseconds / 1_000_000_000;
+
+                    recordGraphqlResolverCall({
+                        operationType,
+                        resolverName,
+                        status,
+                        durationSeconds,
+                    });
+                };
+
+                try {
+                    const result = originalResolver.apply(this, args);
+
+                    if (isPromiseLike(result)) {
+                        return result.then((value) => {
+                            observe("success");
+                            return value;
+                        }).catch((error) => {
+                            observe("error");
+                            throw error;
+                        });
+                    }
+
+                    observe("success");
+                    return result;
+                } catch (error) {
+                    observe("error");
+                    throw error;
+                }
+            };
+        }
+
+        wrapped[operationType] = wrappedOperationResolvers;
+    }
+
+    return wrapped as T;
 }
 
 export async function renderMetrics(): Promise<string> {

@@ -15,13 +15,14 @@ import registerUser from './user-register';
 import { sleepForSecurity } from './models/sleep';
 import { sendAdminUserRegisteredMail, sendWelcomeMail } from './send-mail';
 import { registrationNonceModel } from './models/registration-nonce';
+import { wrapGraphqlResolversWithMetrics } from './metrics';
 
 const stripe = new Stripe(config.stripe.secret, {
 	apiVersion: '2022-08-01'
 });
 
 
-export const resolvers = {
+const baseResolvers = {
 	Query: {
 		registrationNonce: async () => {
 			return registrationNonceModel.generateNonce();
@@ -258,7 +259,7 @@ export const resolvers = {
 			try {
 				if (!ctx.uid) return err(error_code.AUTHENTICATION_REQUIRED);
 
-				await resolvers.Mutation.cancelSubscription(_, __, ctx);
+				await baseResolvers.Mutation.cancelSubscription(_, __, ctx);
 				await userModel.deleteSelf(ctx.uid);
 			} catch (e) {
 				logger.error(e);
@@ -287,7 +288,7 @@ export const resolvers = {
 					user.billingPlan || 'hobbyist'
 				);
 
-				return await resolvers.Query.user(null, null, ctx);
+				return await baseResolvers.Query.user(null, null, ctx);
 			} catch (e) {
 				logger.error(e);
 				return err(error_code.INTERNAL_ERROR);
@@ -576,3 +577,5 @@ export const resolvers = {
 		},
 	}
 }
+
+export const resolvers = wrapGraphqlResolversWithMetrics(baseResolvers);
