@@ -4,6 +4,7 @@ import { logger } from '../logger';
 type TranslationCacheInput = {
 	key: string;
 	namespace?: string | null;
+	langs?: string[] | null;
 };
 
 type CachedTranslationPayload = {
@@ -94,7 +95,10 @@ function parseRedisConnection() {
 
 function buildKey(input: TranslationCacheInput): string {
 	const namespace = input.namespace ?? '__NULL__';
-	return `${redisKeyPrefix}${encodePart(namespace)}:${encodePart(input.key)}`;
+	const langs = input.langs && input.langs.length > 0
+		? [...new Set(input.langs.map((lang) => lang.toLowerCase()))].sort().join(',')
+		: '__ALL__';
+	return `${redisKeyPrefix}${encodePart(namespace)}:${encodePart(input.key)}:${encodePart(langs)}`;
 }
 
 function parsePayload(value: string | null): CachedTranslationPayload | null {

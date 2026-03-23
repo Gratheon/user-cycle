@@ -32,6 +32,22 @@ const languagesMap = {
 }
 const languageCodes = Object.keys(languagesMap);
 
+function normalizeTargetLangs(targetLangs?: string[] | null): string[] {
+	if (!targetLangs || targetLangs.length === 0) {
+		return [...languageCodes];
+	}
+
+	const normalized = targetLangs
+		.map((lang) => String(lang || '').toLowerCase().trim())
+		.filter((lang) => languagesMap[lang]);
+
+	if (normalized.length === 0) {
+		return [...languageCodes];
+	}
+
+	return Array.from(new Set(normalized));
+}
+
 type CacheEntry<T> = {
 	value: T;
 	expiresAt: number;
@@ -449,10 +465,16 @@ export const translationModel = {
 		return result[0].forms;
 	},
 
-	async translateBatch(requests: Array<{ key: string, context?: string, isPlural?: boolean, namespace?: string }>) {
+	async translateBatch(
+		requests: Array<{ key: string, context?: string, isPlural?: boolean, namespace?: string }>,
+		targetLangs?: string[]
+	) {
 		if (requests.length === 0) return [];
 
-		logger.info(`[translateBatch] Processing ${requests.length} requests`);
+		const selectedLangCodes = normalizeTargetLangs(targetLangs);
+		logger.info(`[translateBatch] Processing ${requests.length} requests`, {
+			targetLangs: selectedLangCodes
+		});
 
 		const translations = [];
 
@@ -480,9 +502,9 @@ export const translationModel = {
 				translation.plurals = {};
 				const missingPluralRules: Record<string, string[]> = {};
 
-				for (const lang of languageCodes) {
-					let pluralForms = await this.getPluralForms(translationId, lang);
-					logger.debug(`[translateBatch] Existing plural forms for ${lang}:`, { pluralForms });
+					for (const lang of selectedLangCodes) {
+						let pluralForms = await this.getPluralForms(translationId, lang);
+						logger.debug(`[translateBatch] Existing plural forms for ${lang}:`, { pluralForms });
 
 					if (!pluralForms && process.env.ENV_ID === 'dev') {
 						missingPluralRules[lang] = await this.getPluralRules(lang);
@@ -515,10 +537,10 @@ export const translationModel = {
 					}
 				}
 
-				for (const lang of languageCodes) {
-					if (!translation.plurals[lang]) {
-						logger.warn(`[translateBatch] No plural forms available for ${lang}`);
-					}
+					for (const lang of selectedLangCodes) {
+						if (!translation.plurals[lang]) {
+							logger.warn(`[translateBatch] No plural forms available for ${lang}`);
+						}
 				}
 
 				logger.info(`[translateBatch] Total plural languages for "${request.key}":`, {
@@ -530,9 +552,9 @@ export const translationModel = {
 				translation.values = {};
 				const missingLangs: string[] = [];
 
-				for (const lang of languageCodes) {
-					let value = await this.getValue(translationId, lang);
-					if (!value && process.env.ENV_ID === 'dev') {
+					for (const lang of selectedLangCodes) {
+						let value = await this.getValue(translationId, lang);
+						if (!value && process.env.ENV_ID === 'dev') {
 						missingLangs.push(lang);
 					}
 					if (value) {
