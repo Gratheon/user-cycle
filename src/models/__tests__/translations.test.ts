@@ -141,4 +141,41 @@ describe('translationModel caching', () => {
 		});
 		expect(mockGenerateGeminiText).toHaveBeenCalledTimes(1);
 	});
+
+	it('batches getByKeys lookups and reuses in-memory cache', async () => {
+		const query = jest.fn().mockResolvedValueOnce([
+			{ id: 31, key: 'hive', namespace: null },
+			{ id: 32, key: 'hive', namespace: 'dashboard' },
+		]);
+		mockStorage.mockReturnValue({ query } as any);
+
+		const first = await translationModel.getByKeys([
+			{ key: 'hive', namespace: null },
+			{ key: 'hive', namespace: 'dashboard' },
+			{ key: 'hive', namespace: null },
+		]);
+
+		const second = await translationModel.getByKeys([
+			{ key: 'hive', namespace: null },
+			{ key: 'hive', namespace: 'dashboard' },
+		]);
+
+		expect(first).toEqual([31, 32, 31]);
+		expect(second).toEqual([31, 32]);
+		expect(query).toHaveBeenCalledTimes(1);
+	});
+
+	it('batches hasPluralForms lookups and caches misses as false', async () => {
+		const query = jest.fn().mockResolvedValueOnce([
+			{ translation_id: 51, count: 3 }
+		]);
+		mockStorage.mockReturnValue({ query } as any);
+
+		const first = await translationModel.hasPluralFormsBatch([51, 52, 51]);
+		const second = await translationModel.hasPluralFormsBatch([51, 52]);
+
+		expect(first).toEqual([true, false, true]);
+		expect(second).toEqual([true, false]);
+		expect(query).toHaveBeenCalledTimes(1);
+	});
 });

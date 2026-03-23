@@ -92,6 +92,20 @@ function translationLangKey(translationId: number, lang: string): string {
 	return `${translationId}:${lang}`;
 }
 
+function buildKeyNamespaceWhereClause(pairs: Array<{ key: string; namespace: string | null }>, caseInsensitive: boolean): any {
+	let whereClause = sql`FALSE`;
+
+	for (const pair of pairs) {
+		if (caseInsensitive) {
+			whereClause = sql`${whereClause} OR (LOWER(\`key\`) = LOWER(${pair.key}) AND namespace <=> ${pair.namespace})`;
+		} else {
+			whereClause = sql`${whereClause} OR (\`key\` = ${pair.key} AND namespace <=> ${pair.namespace})`;
+		}
+	}
+
+	return whereClause;
+}
+
 function isMissingKeyHashColumnError(error: unknown): boolean {
 	if (!error || typeof error !== 'object') {
 		return false;
@@ -121,6 +135,84 @@ function parseJsonObjectFromLlm(raw: string): Record<string, any> | null {
 }
 
 export const translationModel = {
+	async getByKeys(inputs: Array<{ key: string; namespace: string | null }>): Promise<Array<number | null>> {
+		if (inputs.length === 0) return [];
+
+		const results: Array<number | null> = new Array(inputs.length).fill(null);
+		const uniqueInputByCacheKey = new Map<string, { key: string; namespace: string | null }>();
+		const inputIndexesByCacheKey = new Map<string, number[]>();
+
+		for (let index = 0; index < inputs.length; index++) {
+			const input = inputs[index];
+			const cacheKey = keyWithNamespace(input.key, input.namespace);
+			const cachedId = translationIdByKeyCache.get(cacheKey);
+			if (cachedId !== undefined) {
+				results[index] = cachedId;
+				continue;
+			}
+
+			if (!uniqueInputByCacheKey.has(cacheKey)) {
+				uniqueInputByCacheKey.set(cacheKey, input);
+			}
+
+			const indexes = inputIndexesByCacheKey.get(cacheKey) || [];
+			indexes.push(index);
+			inputIndexesByCacheKey.set(cacheKey, indexes);
+		}
+
+		const missingInputs = Array.from(uniqueInputByCacheKey.values());
+		if (missingInputs.length === 0) {
+			return results;
+		}
+
+		const exactWhereClause = buildKeyNamespaceWhereClause(missingInputs, false);
+		const exactMatches = await storage().query(
+			sql`SELECT id, \`key\`, namespace FROM translations WHERE ${exactWhereClause}`
+		);
+
+		const foundIdsByCacheKey = new Map<string, number>();
+		for (const row of exactMatches) {
+			const cacheKey = keyWithNamespace(row.key, row.namespace ?? null);
+			if (!foundIdsByCacheKey.has(cacheKey)) {
+				foundIdsByCacheKey.set(cacheKey, row.id);
+			}
+		}
+
+		const unresolved = missingInputs.filter((input) => !foundIdsByCacheKey.has(keyWithNamespace(input.key, input.namespace)));
+
+		if (unresolved.length > 0) {
+			const caseInsensitiveWhereClause = buildKeyNamespaceWhereClause(unresolved, true);
+			const caseInsensitiveMatches = await storage().query(
+				sql`SELECT id, \`key\`, namespace FROM translations WHERE ${caseInsensitiveWhereClause}`
+			);
+
+			for (const row of caseInsensitiveMatches) {
+				const matchedInput = unresolved.find(
+					(input) => input.namespace === (row.namespace ?? null) && input.key.toLowerCase() === String(row.key).toLowerCase()
+				);
+
+				if (!matchedInput) continue;
+				const cacheKey = keyWithNamespace(matchedInput.key, matchedInput.namespace);
+				if (!foundIdsByCacheKey.has(cacheKey)) {
+					foundIdsByCacheKey.set(cacheKey, row.id);
+				}
+			}
+		}
+
+		for (const input of missingInputs) {
+			const cacheKey = keyWithNamespace(input.key, input.namespace);
+			const translationId = foundIdsByCacheKey.get(cacheKey) ?? null;
+			translationIdByKeyCache.set(cacheKey, translationId);
+
+			const indexes = inputIndexesByCacheKey.get(cacheKey) || [];
+			for (const index of indexes) {
+				results[index] = translationId;
+			}
+		}
+
+		return results;
+	},
+
 	async getByKey(key: string, namespace: string | null = null): Promise<number | null> {
 		logger.debug(`[getByKey] Looking up translation with key: "${key}", namespace: "${namespace}"`);
 		const cacheKey = keyWithNamespace(key, namespace);
@@ -175,6 +267,58 @@ export const translationModel = {
 		translationIdByKeyCache.set(cacheKey, translationId);
 		logger.debug(`[getByKey] Result for "${key}", namespace "${namespace}":`, { translationId });
 		return translationId;
+	},
+
+	async hasPluralFormsBatch(translationIds: number[]): Promise<boolean[]> {
+		if (translationIds.length === 0) return [];
+
+		const results: boolean[] = new Array(translationIds.length).fill(false);
+		const missingIds = new Set<number>();
+		const indexById = new Map<number, number[]>();
+
+		for (let index = 0; index < translationIds.length; index++) {
+			const translationId = translationIds[index];
+			const cacheKey = String(translationId);
+			const cached = hasPluralFormsCache.get(cacheKey);
+			if (cached !== undefined) {
+				results[index] = cached;
+				continue;
+			}
+
+			missingIds.add(translationId);
+			const indexes = indexById.get(translationId) || [];
+			indexes.push(index);
+			indexById.set(translationId, indexes);
+		}
+
+		if (missingIds.size === 0) {
+			return results;
+		}
+
+		let whereClause = sql`FALSE`;
+		for (const translationId of missingIds) {
+			whereClause = sql`${whereClause} OR translation_id = ${translationId}`;
+		}
+
+		const pluralRows = await storage().query(
+			sql`SELECT translation_id, COUNT(*) as count FROM plural_forms WHERE ${whereClause} GROUP BY translation_id`
+		);
+
+		const countByTranslationId = new Map<number, number>();
+		for (const row of pluralRows) {
+			countByTranslationId.set(row.translation_id, row.count);
+		}
+
+		for (const translationId of missingIds) {
+			const hasPlurals = (countByTranslationId.get(translationId) || 0) > 0;
+			hasPluralFormsCache.set(String(translationId), hasPlurals);
+			const indexes = indexById.get(translationId) || [];
+			for (const index of indexes) {
+				results[index] = hasPlurals;
+			}
+		}
+
+		return results;
 	},
 
 	async hasPluralForms(translationId: number): Promise<boolean> {
