@@ -32,10 +32,31 @@ const pluralLanguages = Object.keys({
 	de: 'german',
 	fr: 'french'
 });
+const supportedTranslationLangs = [
+	'ru', 'et', 'tr', 'pl', 'de', 'fr', 'zh', 'hi', 'es', 'ar', 'bn', 'pt', 'ja'
+];
 
 function keyNeedsPluralForms(key: string): boolean {
 	const normalized = key.toLowerCase();
 	return pluralWords.some(word => normalized === word || normalized === `${word}s`);
+}
+
+function normalizeRequestedLangs(langs?: string[] | null): string[] | null {
+	if (!langs || langs.length === 0) {
+		return null;
+	}
+
+	const normalized = Array.from(new Set(
+		langs
+			.map((lang) => String(lang || '').toLowerCase().trim())
+			.filter((lang) => supportedTranslationLangs.includes(lang))
+	));
+
+	if (normalized.length === 0) {
+		return null;
+	}
+
+	return normalized;
 }
 
 const baseResolvers = {
@@ -117,14 +138,16 @@ const baseResolvers = {
 				__typename: 'Locale'
 			}));
 		},
-		getTranslations: async (_, { inputs }) => {
+		getTranslations: async (_, { inputs, langs }) => {
 			logger.info(`[getTranslations] Received request for ${inputs.length} inputs`);
 			if (inputs.length === 0) return [];
+			const requestedLangs = normalizeRequestedLangs(langs);
 
 			const normalizedInputs = inputs.map((input) => ({
 				key: input.key,
 				context: input.context || null,
 				namespace: input.namespace || null,
+				langs: requestedLangs,
 			}));
 
 			const results: any[] = new Array(normalizedInputs.length);
@@ -133,7 +156,11 @@ const baseResolvers = {
 
 			for (let index = 0; index < normalizedInputs.length; index++) {
 				const input = normalizedInputs[index];
-				const cacheKey = translationRedisCache.buildCacheKey(input);
+					const cacheKey = translationRedisCache.buildCacheKey({
+						key: input.key,
+						namespace: input.namespace,
+						langs: input.langs
+					});
 				const cachedTranslation = cachedEntries.get(cacheKey);
 				if (!cachedTranslation) {
 					cacheMissIndexes.push(index);
@@ -188,8 +215,8 @@ const baseResolvers = {
 					};
 				});
 
-				const createdTranslations = await translationModel.translateBatch(createRequests);
-				const warmupEntries: Array<{ input: { key: string; namespace: string | null }; payload: any }> = [];
+					const createdTranslations = await translationModel.translateBatch(createRequests, requestedLangs || undefined);
+					const warmupEntries: Array<{ input: { key: string; namespace: string | null; langs?: string[] | null }; payload: any }> = [];
 
 				for (let i = 0; i < createIndexes.length; i++) {
 					const index = createIndexes[i];
@@ -200,10 +227,10 @@ const baseResolvers = {
 						__typename: 'Translation'
 					};
 					warmupEntries.push({
-						input: { key: input.key, namespace: input.namespace },
-						payload: {
-							...created,
-							context: input.context
+							input: { key: input.key, namespace: input.namespace, langs: requestedLangs },
+							payload: {
+								...created,
+								context: input.context
 						}
 					});
 				}
@@ -241,8 +268,8 @@ const baseResolvers = {
 					};
 				});
 
-				const fetchedTranslations = await translationModel.translateBatch(fetchRequests);
-				const warmupEntries: Array<{ input: { key: string; namespace: string | null }; payload: any }> = [];
+					const fetchedTranslations = await translationModel.translateBatch(fetchRequests, requestedLangs || undefined);
+					const warmupEntries: Array<{ input: { key: string; namespace: string | null; langs?: string[] | null }; payload: any }> = [];
 
 				for (let i = 0; i < existingIndexes.length; i++) {
 					const index = existingIndexes[i];
@@ -253,9 +280,9 @@ const baseResolvers = {
 						__typename: 'Translation'
 					};
 					warmupEntries.push({
-						input: { key: input.key, namespace: input.namespace },
-						payload: {
-							...translation,
+							input: { key: input.key, namespace: input.namespace, langs: requestedLangs },
+							payload: {
+								...translation,
 							context: input.context
 						}
 					});
