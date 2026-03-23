@@ -16,11 +16,27 @@ import { sleepForSecurity } from './models/sleep';
 import { sendAdminUserRegisteredMail, sendWelcomeMail } from './send-mail';
 import { registrationNonceModel } from './models/registration-nonce';
 import { wrapGraphqlResolversWithMetrics } from './metrics';
+import DataLoader from 'dataloader';
+import { translationRedisCache } from './cache/translationRedisCache';
 
 const stripe = new Stripe(config.stripe.secret, {
 	apiVersion: '2022-08-01'
 });
 
+const pluralWords = ['hive', 'apiary', 'box', 'frame', 'bee', 'queen', 'worker', 'drone'];
+const pluralLanguages = Object.keys({
+	ru: 'russian',
+	et: 'estonian',
+	tr: 'turkish',
+	pl: 'polish',
+	de: 'german',
+	fr: 'french'
+});
+
+function keyNeedsPluralForms(key: string): boolean {
+	const normalized = key.toLowerCase();
+	return pluralWords.some(word => normalized === word || normalized === `${word}s`);
+}
 
 const baseResolvers = {
 	Query: {
@@ -102,94 +118,153 @@ const baseResolvers = {
 			}));
 		},
 		getTranslations: async (_, { inputs }) => {
-			logger.info(`[getTranslations] Received request for ${inputs.length} inputs:`, { inputs });
-			const results = [];
+			logger.info(`[getTranslations] Received request for ${inputs.length} inputs`);
+			if (inputs.length === 0) return [];
 
-			// List of words that should have plural forms
-			const pluralWords = ['hive', 'apiary', 'box', 'frame', 'bee', 'queen', 'worker', 'drone'];
+			const normalizedInputs = inputs.map((input) => ({
+				key: input.key,
+				context: input.context || null,
+				namespace: input.namespace || null,
+			}));
 
-			for (const input of inputs) {
-				const { key, context, namespace } = input;
-				logger.info(`[getTranslations] Processing key: "${key}" with context: "${context}", namespace: "${namespace}"`);
+			const results: any[] = new Array(normalizedInputs.length);
+			const cachedEntries = await translationRedisCache.getMany(normalizedInputs);
+			const cacheMissIndexes: number[] = [];
 
-				const translationId = await translationModel.getByKey(key, namespace || null);
-				logger.info(`[getTranslations] Translation ID for "${key}" (namespace: ${namespace}):`, { translationId });
-
-				if (!translationId) {
-					logger.info(`[getTranslations] No existing translation for "${key}", creating new one with context`);
-
-					// Check if this is a word that needs plural forms
-					const needsPluralForms = pluralWords.some(word =>
-						key.toLowerCase() === word || key.toLowerCase() === word + 's'
-					);
-
-					logger.info(`[getTranslations] Word "${key}" needs plural forms:`, { needsPluralForms });
-
-				const [newTranslation] = await translationModel.translateBatch([
-					{ key, context, namespace: namespace || null, isPlural: needsPluralForms }
-				]);
-
-					logger.info(`[getTranslations] Created new translation:`, {
-						key,
-						context,
-						id: newTranslation.id,
-						hasValues: !!newTranslation.values,
-						hasPluralForms: !!newTranslation.plurals
-					});
-					results.push({
-						...newTranslation,
-						__typename: 'Translation'
-					});
+			for (let index = 0; index < normalizedInputs.length; index++) {
+				const input = normalizedInputs[index];
+				const cacheKey = translationRedisCache.buildCacheKey(input);
+				const cachedTranslation = cachedEntries.get(cacheKey);
+				if (!cachedTranslation) {
+					cacheMissIndexes.push(index);
 					continue;
 				}
 
-				const hasPluralForms = await translationModel.hasPluralForms(translationId);
-				logger.info(`[getTranslations] Plural forms check for "${key}" (id: ${translationId}):`, { hasPluralForms });
-
-				// If no plural forms but should have them (dev mode only), generate them
-				if (!hasPluralForms && process.env.ENV_ID === 'dev') {
-					const shouldHavePlurals = pluralWords.some(word =>
-						key.toLowerCase() === word || key.toLowerCase() === word + 's'
-					);
-
-					if (shouldHavePlurals) {
-						logger.info(`[getTranslations] Generating missing plural forms for "${key}" in dev mode`);
-
-						// Generate plural forms for all languages
-						for (const lang of Object.keys({ ru: 'russian', et: 'estonian', tr: 'turkish', pl: 'polish', de: 'german', fr: 'french' })) {
-							const forms = await translationModel.getPluralRules(lang);
-							const pluralData = await translationModel.generatePluralForms(key, lang, forms);
-							await translationModel.setPluralForms(translationId, lang, pluralData);
-							logger.info(`[getTranslations] Generated plural forms for "${key}" in ${lang}`);
-						}
-					}
-				}
-
-				// Re-check if we now have plural forms
-				const hasPluralsNow = await translationModel.hasPluralForms(translationId);
-
-				const [translation] = await translationModel.translateBatch([
-					{ key, context, namespace: namespace || null, isPlural: hasPluralsNow }
-				]);
-
-				logger.info(`[getTranslations] Final translation for "${key}":`, {
-					id: translation.id,
-					key: translation.key,
-					context: translation.context,
-					isPlural: translation.isPlural,
-					hasValues: !!translation.values,
-					hasPluralForms: !!translation.plurals,
-					valueKeys: translation.values ? Object.keys(translation.values) : [],
-					pluralKeys: translation.plurals ? Object.keys(translation.plurals) : []
-				});
-
-				results.push({
-					...translation,
+				results[index] = {
+					...cachedTranslation,
+					context: input.context,
 					__typename: 'Translation'
-				});
+				};
 			}
 
-			logger.info(`[getTranslations] Returning ${results.length} translations`);
+			if (cacheMissIndexes.length === 0) {
+				logger.info(`[getTranslations] Redis cache hit for all ${normalizedInputs.length} inputs`);
+				return results;
+			}
+
+			const translationIdLoader = new DataLoader(
+				async (keys: ReadonlyArray<{ key: string; namespace: string | null }>) =>
+					translationModel.getByKeys(keys.map((entry) => ({ key: entry.key, namespace: entry.namespace }))),
+				{
+					cacheKeyFn: (entry) => `${entry.namespace ?? '__NULL__'}:${entry.key}`
+				}
+			);
+
+			const hasPluralLoader = new DataLoader(
+				async (translationIds: ReadonlyArray<number>) => translationModel.hasPluralFormsBatch(translationIds.map((id) => Number(id))),
+				{
+					cacheKeyFn: (id) => String(id)
+				}
+			);
+
+			const translationIdsByIndex = new Map<number, number | null>();
+			await Promise.all(cacheMissIndexes.map(async (index) => {
+				const input = normalizedInputs[index];
+				const translationId = await translationIdLoader.load({ key: input.key, namespace: input.namespace });
+				translationIdsByIndex.set(index, translationId);
+			}));
+
+			const createIndexes = cacheMissIndexes.filter((index) => !translationIdsByIndex.get(index));
+			const existingIndexes = cacheMissIndexes.filter((index) => !!translationIdsByIndex.get(index));
+
+			if (createIndexes.length > 0) {
+				const createRequests = createIndexes.map((index) => {
+					const input = normalizedInputs[index];
+					return {
+						key: input.key,
+						context: input.context,
+						namespace: input.namespace,
+						isPlural: keyNeedsPluralForms(input.key),
+					};
+				});
+
+				const createdTranslations = await translationModel.translateBatch(createRequests);
+				const warmupEntries: Array<{ input: { key: string; namespace: string | null }; payload: any }> = [];
+
+				for (let i = 0; i < createIndexes.length; i++) {
+					const index = createIndexes[i];
+					const input = normalizedInputs[index];
+					const created = createdTranslations[i];
+					results[index] = {
+						...created,
+						__typename: 'Translation'
+					};
+					warmupEntries.push({
+						input: { key: input.key, namespace: input.namespace },
+						payload: {
+							...created,
+							context: input.context
+						}
+					});
+				}
+
+				await translationRedisCache.setMany(warmupEntries);
+			}
+
+			if (existingIndexes.length > 0) {
+				const hasPluralByIndex = new Map<number, boolean>();
+
+				await Promise.all(existingIndexes.map(async (index) => {
+					const translationId = Number(translationIdsByIndex.get(index));
+					let hasPluralForms = await hasPluralLoader.load(translationId);
+
+					if (!hasPluralForms && process.env.ENV_ID === 'dev' && keyNeedsPluralForms(normalizedInputs[index].key)) {
+						for (const lang of pluralLanguages) {
+							const forms = await translationModel.getPluralRules(lang);
+							const pluralData = await translationModel.generatePluralForms(normalizedInputs[index].key, lang, forms);
+							await translationModel.setPluralForms(translationId, lang, pluralData);
+						}
+						hasPluralForms = true;
+						hasPluralLoader.clear(translationId).prime(translationId, true);
+					}
+
+					hasPluralByIndex.set(index, hasPluralForms);
+				}));
+
+				const fetchRequests = existingIndexes.map((index) => {
+					const input = normalizedInputs[index];
+					return {
+						key: input.key,
+						context: input.context,
+						namespace: input.namespace,
+						isPlural: hasPluralByIndex.get(index) || false,
+					};
+				});
+
+				const fetchedTranslations = await translationModel.translateBatch(fetchRequests);
+				const warmupEntries: Array<{ input: { key: string; namespace: string | null }; payload: any }> = [];
+
+				for (let i = 0; i < existingIndexes.length; i++) {
+					const index = existingIndexes[i];
+					const input = normalizedInputs[index];
+					const translation = fetchedTranslations[i];
+					results[index] = {
+						...translation,
+						__typename: 'Translation'
+					};
+					warmupEntries.push({
+						input: { key: input.key, namespace: input.namespace },
+						payload: {
+							...translation,
+							context: input.context
+						}
+					});
+				}
+
+				await translationRedisCache.setMany(warmupEntries);
+			}
+
+			logger.info(`[getTranslations] Returning ${results.length} translations (cache misses: ${cacheMissIndexes.length})`);
 			return results;
 		},
 		getPluralRules: async (_, { lang }) => {

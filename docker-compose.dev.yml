@@ -7,6 +7,7 @@ services:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - ENV_ID=dev
       - NODE_OPTIONS=--enable-source-maps
+      - REDIS_URL=${REDIS_URL:-redis://:pass@redis:6379}
     tty: true
     ports:
       - 4000:4000
