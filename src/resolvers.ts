@@ -111,10 +111,13 @@ const baseResolvers = {
 
 			const user = await userModel.getById(ctx.uid)
 			logger.info("user", user)
-			if (user) {
-				user.hasSubscription = user.stripe_subscription !== null;
-				delete user.stripe_subscription;
+			if (!user) {
+				logger.warn("Authenticated user record not found", { uid: ctx.uid });
+				return err(error_code.USER_NOT_FOUND);
 			}
+
+			user.hasSubscription = user.stripe_subscription !== null;
+			delete user.stripe_subscription;
 
 			return {
 				__typename: 'User',
@@ -463,6 +466,11 @@ const baseResolvers = {
 			try {
 				await userModel.update(user, ctx.uid);
 				const result = await userModel.getById(ctx.uid);
+
+				if (!result) {
+					logger.warn("Updated user record could not be reloaded", { uid: ctx.uid });
+					return err(error_code.USER_NOT_FOUND);
+				}
 
 				return {
 					__typename: 'User',
