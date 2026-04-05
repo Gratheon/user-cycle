@@ -13,7 +13,9 @@ COPY package.json pnpm-lock.yaml* ./
 RUN npm install -g pnpm@10.29.2
 
 # Install including dev dependencies explicitly (robust against NODE_ENV mismatches)
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile \
+  && pnpm store prune \
+  && rm -rf /root/.npm /root/.local/share/pnpm/store
 
 # Copy tsconfig so tooling can read it even before volume mount
 COPY src/config ./src/config
@@ -21,4 +23,4 @@ COPY schema.graphql /app/schema.graphql
 
 EXPOSE 4000
 
-CMD sh -lc "pnpm install --frozen-lockfile && pnpm run dev-in-docker"
+CMD ["pnpm", "run", "dev-in-docker"]
