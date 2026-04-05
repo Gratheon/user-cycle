@@ -1,0 +1,16 @@
+.git
+.github
+.idea
+.dccache
+node_modules
+coverage
+tmp
+
+# Build output generated locally
+app
+
+# Misc local files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
