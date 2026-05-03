@@ -9,5 +9,9 @@ services:
       - 4000:4000
     environment:
       - ENV_ID=prod
+      - OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT:-http://127.0.0.1:4318}
+      - OTEL_SERVICE_NAME=user-cycle
+      - OTEL_RESOURCE_ATTRIBUTES=deployment.environment.name=prod,service.namespace=gratheon
+      - HYPERDX_API_KEY=${HYPERDX_API_KEY:-}
     restart: always
     network_mode: host
