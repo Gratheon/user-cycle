@@ -8,6 +8,10 @@ services:
       - ENV_ID=dev
       - NODE_OPTIONS=--enable-source-maps
       - REDIS_URL=${REDIS_URL:-redis://:pass@redis:6379}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT:-http://host.docker.internal:4318}
+      - OTEL_SERVICE_NAME=user-cycle
+      - OTEL_RESOURCE_ATTRIBUTES=deployment.environment.name=dev,service.namespace=gratheon
+      - HYPERDX_API_KEY=${HYPERDX_API_KEY:-local-gratheon-clickstack}
     tty: true
     ports:
       - 4000:4000
