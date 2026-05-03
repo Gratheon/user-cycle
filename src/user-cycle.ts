@@ -18,6 +18,7 @@ import {logger} from './logger'
 import {registerGoogle} from "./google-auth";
 import {rootHandler} from './handlers/rootHandler';
 import {metricsContentType, recordHttpRequest, renderMetrics} from "./metrics";
+import {registerFastifyTracing} from "@gratheon/log-lib";
 
 const requestStartTimes = new WeakMap<object, bigint>();
 
@@ -99,6 +100,7 @@ async function startApolloServer(app, typeDefs, resolvers) {
         logger: false,
         disableRequestLogging: true,
     });
+    registerFastifyTracing(app);
 
     app.register(require('fastify-cookie'), {
         secret: "my-secret", // for cookies signature
