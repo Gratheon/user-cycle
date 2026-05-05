@@ -13,6 +13,13 @@ const config = {
     database: 'user-cycle',
   },
 
+  redis: {
+    url: 'redis://:pass@redis:6379',
+    translationCacheEnabled: process.env.TRANSLATION_REDIS_ENABLED !== 'false',
+    translationKeyPrefix: process.env.TRANSLATION_REDIS_KEY_PREFIX || 'user-cycle:translation:v1:',
+    translationTtlSeconds: Number(process.env.TRANSLATION_REDIS_TTL_SECONDS || 3600),
+  },
+
   aws: {
     region: 'eu-west-1',
     accessKeyId: '',

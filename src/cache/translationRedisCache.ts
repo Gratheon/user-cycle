@@ -1,4 +1,5 @@
 import { createClient } from 'redis';
+import config from '../config';
 import { logger } from '../logger';
 
 type TranslationCacheInput = {
@@ -17,12 +18,11 @@ type CachedTranslationPayload = {
 	isPlural: boolean;
 };
 
-const redisUrl = process.env.REDIS_URL || 'redis://redis:6379';
-const redisUsername = process.env.REDIS_USERNAME;
-const redisPassword = process.env.REDIS_PASSWORD;
-const redisEnabled = process.env.TRANSLATION_REDIS_ENABLED !== 'false';
-const redisKeyPrefix = process.env.TRANSLATION_REDIS_KEY_PREFIX || 'user-cycle:translation:v1:';
-const ttlSeconds = Math.max(1, Number(process.env.TRANSLATION_REDIS_TTL_SECONDS || 3600));
+const redisConfig = config.redis;
+const redisUrl = redisConfig.url;
+const redisEnabled = redisConfig.translationCacheEnabled !== false;
+const redisKeyPrefix = redisConfig.translationKeyPrefix || 'user-cycle:translation:v1:';
+const ttlSeconds = Math.max(1, Number(redisConfig.translationTtlSeconds || 3600));
 
 let redisClient: any = null;
 let redisConnectPromise: Promise<any | null> | null = null;
@@ -77,8 +77,8 @@ function parseRedisConnection() {
 	const usernameFromUrl = parsed.username ? decodeURIComponent(parsed.username) : undefined;
 	const passwordFromUrl = parsed.password ? decodeURIComponent(parsed.password) : undefined;
 
-	const username = redisUsername ?? usernameFromUrl;
-	const password = redisPassword ?? passwordFromUrl;
+	const username = usernameFromUrl;
+	const password = passwordFromUrl;
 
 	const endpointForLogs = `${protocol}//${host}:${port}/${Number.isFinite(database) ? database : 0}`;
 
