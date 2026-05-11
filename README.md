@@ -28,7 +28,6 @@ A comprehensive user management microservice for the [Gratheon](https://gratheon
   - Profile management
   - Account deletion
   - Email notifications via AWS SES
-  - Grafana provisioning per user
 
 ## Technology Stack
 
@@ -43,7 +42,7 @@ A comprehensive user management microservice for the [Gratheon](https://gratheon
 - **Payment Processing**: Stripe
 - **Email**: AWS SES (Simple Email Service)
 - **AI Translations**: Clarifai (GPT model via gRPC)
-- **Monitoring**: Sentry (error tracking), Grafana (user provisioning)
+- **Monitoring**: Sentry (error tracking), ClickStack (observability)
 - **Schema Registry**: GraphQL Federation schema registration
 
 ## Database Architecture
@@ -227,7 +226,6 @@ flowchart LR
     user-cycle--"get/set translations"--> mysql
 
     user-cycle--"send emails"--> aws-ses["AWS SES"]
-    user-cycle--"create grafana org and user"--> grafana
     user-cycle--"error tracking"--> sentry
 ```
 
@@ -244,7 +242,6 @@ flowchart LR
 │   │   ├── locales.ts         # Legacy translation system
 │   │   ├── translations.ts    # Modern i18n system
 │   │   ├── billingHistory.ts  # Billing audit log
-│   │   ├── grafana.ts         # Grafana provisioning
 │   │   └── registration-nonce.ts # Proof-of-work anti-spam
 │   ├── user-cycle.ts          # Main entry point (Apollo Server + Fastify)
 │   ├── google-auth.ts         # Google OAuth 2.0 implementation

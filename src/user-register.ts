@@ -8,7 +8,6 @@ import error_code, {err} from './error_code';
 import {tokenModel} from './models/tokens';
 import {billingHistoryModel} from './models/billingHistory';
 import config from './config';
-import {createGrafanaUser} from './models/grafana';
 import {sendAdminUserRegisteredMail, sendWelcomeMail} from "./send-mail";
 import {registrationNonceModel} from './models/registration-nonce';
 
@@ -90,12 +89,6 @@ export default async function registerUser(_, { input }) {
       await sendAdminUserRegisteredMail({email});
     } catch (e) {
       logger.errorEnriched(`Failed to send admin user registered mail`, e, {email});
-    }
-
-    try {
-      await createGrafanaUser(email, password, `${first_name} ${last_name}`);
-    } catch (e) {
-      logger.errorEnriched(`Failed to create grafana user`, e, {email});
     }
   }
 
