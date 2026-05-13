@@ -73,7 +73,7 @@ export function registerGoogle(app) {
         const password = Math.random().toString(36).substring(2, 15);
         const email = profile.email;
 
-	        await userModel.create(profile.given_name, profile.family_name, email, password, 'en', expirationDateString, 'professional');
+		        await userModel.create(profile.given_name, profile.family_name, email, password, profile.locale || 'en', profile.locale || null, expirationDateString, 'professional');
 	        id = await userModel.findByEmailAndPass(email, password)
 
         if (!id) {
