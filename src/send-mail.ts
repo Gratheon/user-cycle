@@ -29,6 +29,7 @@ type WelcomeEmailContent = {
     privateIssues: string;
     publicIssues: string;
     signoff: string;
+    senderName?: string;
 };
 
 const supportedWelcomeEmailLangs = [
@@ -51,6 +52,7 @@ const welcomeEmailTranslations: Record<string, WelcomeEmailContent> = {
         privateIssues: 'Если у вас есть личные вопросы, например по оплате, напишите мне по email.',
         publicIssues: 'По публичным проблемам, отзывам, предложениям функций или вопросам приглашаю вас присоединиться к нашему сообществу в Discord.',
         signoff: 'Пчелиного благополучия,',
+        senderName: 'Артём Курапов',
     },
     et: {
         subject: 'Tere tulemast Gratheoni!',
@@ -170,6 +172,17 @@ function escapeHtml(value: string): string {
         .replace(/'/g, '&#39;');
 }
 
+function linkDiscordInHtml(text: string): string {
+    const escapedText = escapeHtml(text);
+    const discordLink = '<a href="https://discord.gg/PcbP4uedWj">Discord</a>';
+
+    if (escapedText.includes('Discord')) {
+        return escapedText.replace('Discord', discordLink);
+    }
+
+    return `${escapedText} ${discordLink}`;
+}
+
 function renderWelcomeEmailHtml(content: WelcomeEmailContent, lang: string): string {
     if (lang === 'en') {
         return welcomeEmailHtml;
@@ -198,9 +211,9 @@ function renderWelcomeEmailHtml(content: WelcomeEmailContent, lang: string): str
         <img width="50" height="50" src="https://gratheon.com/img/logo_v7.png" alt="Gratheon Logo" class="logo">
         <p>${escapeHtml(content.greeting)}</p>
         <p>${escapeHtml(content.intro)}</p>
-        <p>${escapeHtml(content.privateIssues)} ${escapeHtml(content.publicIssues)} <a href="https://discord.gg/PcbP4uedWj">Discord</a>.</p>
+        <p>${escapeHtml(content.privateIssues)} ${linkDiscordInHtml(content.publicIssues)}</p>
         <img width="50" height="50" style="float:${direction === 'rtl' ? 'right' : 'left'}; border-radius: 25px; margin: 0 10px 0 0;" src="https://user-cycle.gratheon.com/assets/logo-100.jpg" />
-        <p>${escapeHtml(content.signoff)}<br>Artjom Kurapov</p>
+        <p>${escapeHtml(content.signoff)}<br>${escapeHtml(content.senderName || 'Artjom Kurapov')}</p>
     </div>
 </body>
 </html>`;
@@ -219,7 +232,7 @@ ${content.privateIssues}
 ${content.publicIssues} - https://discord.gg/PcbP4uedWj
 
 ${content.signoff}
-Artjom Kurapov`;
+${content.senderName || 'Artjom Kurapov'}`;
 }
 
 async function sendEmailWithSES({ 
