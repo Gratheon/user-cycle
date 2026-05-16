@@ -8,6 +8,14 @@ import { tokenModel } from "./models/tokens";
 import { sendAdminUserRegisteredMail, sendWelcomeMail } from "./send-mail";
 import { billingHistoryModel } from "./models/billingHistory";
 
+function getGoogleProfileLocale(profile): string | null {
+	return profile?.locale ? String(profile.locale) : null;
+}
+
+function getGoogleProfileLang(profile): string {
+	return getGoogleProfileLocale(profile)?.toLowerCase().substring(0, 2) || 'en';
+}
+
 export function registerGoogle(app) {
 	// Initiates the Google Login flow
 	app.get('/auth/google', (req, res) => {
@@ -46,6 +54,8 @@ export function registerGoogle(app) {
 			}
 
 			let id = await userModel.findByEmail(profile.email);
+			const profileLocale = getGoogleProfileLocale(profile);
+			const profileLang = getGoogleProfileLang(profile);
 
 			// do login
 			if (id) {
@@ -55,7 +65,8 @@ export function registerGoogle(app) {
 
 				if (isFirstLogin) {
 					try {
-						await sendWelcomeMail({ email: profile.email });
+						const user = await userModel.getById(id);
+						await sendWelcomeMail({ email: profile.email, lang: user?.lang || profileLang });
 					} catch (e) {
 						logger.errorEnriched(`Failed to send welcome mail on first login via Google auth`, e, { email: profile.email });
 					}
@@ -63,30 +74,36 @@ export function registerGoogle(app) {
 			}
 
 			// do registration
-      else {
-        logger.info('Google auth - user does not exist, registering');
-        const expirationDate = new Date();
-        expirationDate.setDate(expirationDate.getDate() + TRIAL_DAYS);
-        const expirationDateString = expirationDate.toISOString().substring(0, 19).replace('T', ' ');
+			else {
+				logger.info('Google auth - user does not exist, registering');
+				const expirationDate = new Date();
+				expirationDate.setDate(expirationDate.getDate() + TRIAL_DAYS);
+				const expirationDateString = expirationDate.toISOString().substring(0, 19).replace('T', ' ');
 
-        // generate random password
-        const password = Math.random().toString(36).substring(2, 15);
-        const email = profile.email;
+				// generate random password
+				const password = Math.random().toString(36).substring(2, 15);
+				const email = profile.email;
 
-		        await userModel.create(profile.given_name, profile.family_name, email, password, profile.locale || 'en', profile.locale || null, expirationDateString, 'professional');
-	        id = await userModel.findByEmailAndPass(email, password)
+				await userModel.create(profile.given_name, profile.family_name, email, password, profileLang, profileLocale, expirationDateString, 'professional');
+				id = await userModel.findByEmailAndPass(email, password)
 
-        if (!id) {
-          logger.error(`Registration failure, inconsistent storage`, profile)
-          return res.redirect(config.login_ui_url);
-        }
+				if (!id) {
+					logger.error(`Registration failure, inconsistent storage`, profile)
+					return res.redirect(config.login_ui_url);
+				}
 
-	        // add api token
-	        logger.info(`Created user, adding API token`, {id, email})
-	        await tokenModel.create(id)
-	        await billingHistoryModel.addRegistration(id, 'professional');
-	        await billingHistoryModel.addTrialStarted(id, 'professional', TRIAL_DAYS);
-	      }
+				// add api token
+				logger.info(`Created user, adding API token`, { id, email })
+				await tokenModel.create(id)
+				await billingHistoryModel.addRegistration(id, 'professional');
+				await billingHistoryModel.addTrialStarted(id, 'professional', TRIAL_DAYS);
+
+				try {
+					await sendWelcomeMail({ email, lang: profileLang });
+				} catch (e) {
+					logger.errorEnriched(`Failed to send welcome mail after Google registration`, e, { email });
+				}
+			}
 
 			// log in
 			const sessionKey = sign({
