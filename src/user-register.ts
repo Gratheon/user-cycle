@@ -80,7 +80,7 @@ export default async function registerUser(_, { input }) {
     await tokenModel.create(id)
 
     try {
-      await sendWelcomeMail({ email });
+      await sendWelcomeMail({ email, lang });
     } catch (e) {
       logger.errorEnriched(`Failed to send welcome mail on first login`, e, { email });
     }
