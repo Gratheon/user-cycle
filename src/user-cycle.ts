@@ -106,8 +106,8 @@ async function startApolloServer(app, typeDefs, resolvers) {
 
     app.get('/', rootHandler);
 
-    app.get('/assets/logo.jpg', (request, reply) => {
-        const stream = fs.createReadStream(path.join(__dirname, '../assets/logo.jpg'));
+    app.get('/assets/logo-100.jpg', (request, reply) => {
+        const stream = fs.createReadStream(path.join(__dirname, '../assets/logo-100.jpg'));
         reply.type('image/jpeg').send(stream);
     });
     app.get('/health', (request, reply) => {
