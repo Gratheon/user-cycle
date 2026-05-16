@@ -64,6 +64,11 @@ const baseResolvers = {
 		registrationNonce: async () => {
 			return registrationNonceModel.generateNonce();
 		},
+		aiAdvisorUsage: async () => {
+			// Usage accounting is not stored yet. Keep the GraphQL contract available
+			// without returning misleading limits or counters.
+			return null;
+		},
 		invoices: async (_, __, ctx) => {
 			if (!ctx.uid) {
 				logger.warn("Authentication required for invoices resolver")

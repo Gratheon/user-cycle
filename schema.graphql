@@ -31,6 +31,7 @@ type Query {
 	getPluralRules(lang: String!): PluralRules
 	validateShareToken(token: String!): ValidateShareTokenResult
 	registrationNonce: RegistrationNonce
+	aiAdvisorUsage: AIAdvisorUsage
 }
 
 type APIToken {
@@ -100,6 +101,19 @@ type RegistrationNonce {
 	nonce: String!
 	challenge: String!
 	difficulty: Int!
+}
+
+type AIAdvisorUsage {
+	month: String!
+	inputTokensUsed: Int!
+	outputTokensUsed: Int!
+	totalTokensUsed: Int!
+	requestCount: Int!
+	inputTokensLimit: Int!
+	outputTokensLimit: Int!
+	inputUsagePercent: Int!
+	outputUsagePercent: Int!
+	percentUsed: Int!
 }
 
 type Mutation {

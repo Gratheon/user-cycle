@@ -56,3 +56,10 @@ describe('resolvers.Query.user', () => {
     });
   });
 });
+
+
+describe('resolvers.Query.aiAdvisorUsage', () => {
+  it('returns null until AI Advisor usage accounting is implemented', async () => {
+    await expect(resolvers.Query.aiAdvisorUsage()).resolves.toBeNull();
+  });
+});
