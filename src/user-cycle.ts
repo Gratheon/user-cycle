@@ -13,6 +13,8 @@ import {resolvers} from './resolvers';
 import {initStorage, isStorageConnected} from "./storage";
 import {registerStripe} from "./stripe";
 import {registerSchema} from "./schema-registry";
+import fs from 'fs';
+import path from 'path';
 import {logger} from './logger'
 import {registerGoogle} from "./google-auth";
 import {rootHandler} from './handlers/rootHandler';
@@ -104,6 +106,10 @@ async function startApolloServer(app, typeDefs, resolvers) {
 
     app.get('/', rootHandler);
 
+    app.get('/assets/logo.jpg', (request, reply) => {
+        const stream = fs.createReadStream(path.join(__dirname, '../assets/logo.jpg'));
+        reply.type('image/jpeg').send(stream);
+    });
     app.get('/health', (request, reply) => {
         reply.send({
             status: 'ok',

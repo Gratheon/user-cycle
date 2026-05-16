@@ -37,6 +37,7 @@ COPY --from=build /app/migrations ./migrations
 COPY --from=build /app/schema.graphql ./schema.graphql
 COPY --from=build /app/scripts ./scripts
 COPY --from=build /app/translations ./translations
+COPY --from=build /app/assets ./assets
 
 EXPOSE 4000
 
