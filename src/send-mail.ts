@@ -208,7 +208,7 @@ function renderWelcomeEmailHtml(content: WelcomeEmailContent, lang: string): str
 </head>
 <body>
     <div class="container">
-        <img width="50" height="50" src="https://gratheon.com/img/logo_v7.png" alt="Gratheon Logo" class="logo">
+        <img width="50" height="50" src="https://gratheon.com/assets/img/logo_v7w.svg" alt="Gratheon Logo" class="logo">
         <p>${escapeHtml(content.greeting)}</p>
         <p>${escapeHtml(content.intro)}</p>
         <p>${escapeHtml(content.privateIssues)} ${linkDiscordInHtml(content.publicIssues)}</p>
