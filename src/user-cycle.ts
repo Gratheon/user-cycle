@@ -62,12 +62,27 @@ function fastifyAppClosePlugin(app) {
         }
     };
 }
+function badUserInputHttpStatusPlugin() {
+    return {
+        async requestDidStart() {
+            return {
+                async willSendResponse(requestContext) {
+                    if (requestContext.response.errors?.some(error => error.extensions?.code === 'BAD_USER_INPUT')) {
+                        requestContext.response.http = requestContext.response.http || {headers: new Map()};
+                        requestContext.response.http.status = 400;
+                    }
+                }
+            };
+        }
+    };
+}
 
 async function startApolloServer(app, typeDefs, resolvers) {
     const server = new ApolloServer({
         schema: buildSubgraphSchema({typeDefs: gql(typeDefs), resolvers}),
         plugins: [
             fastifyAppClosePlugin(app),
+            badUserInputHttpStatusPlugin(),
             ApolloServerPluginLandingPageGraphQLPlayground(),
             ApolloServerPluginDrainHttpServer({httpServer: app.server})
         ],

@@ -1,3 +1,4 @@
+import {UserInputError} from 'apollo-server-fastify';
 import validate from 'deep-email-validator'
 import sign from 'jwt-encode';
 
@@ -11,6 +12,8 @@ import config from './config';
 import {sendAdminUserRegisteredMail, sendWelcomeMail} from "./send-mail";
 import {registrationNonceModel} from './models/registration-nonce';
 
+const containsNumber = (value?: string | null): boolean => /\p{Nd}/u.test(value || '');
+
 export default async function registerUser(_, { input }) {
   const { first_name, last_name, email, password, lang, locale, nonce, solution } = input;
 
@@ -23,6 +26,11 @@ export default async function registerUser(_, { input }) {
     await sleepForSecurity()
     logger.warn(`Registration - INVALID_PROOF_OF_WORK`, {email})
     return err(error_code.INVALID_PROOF_OF_WORK);
+  }
+
+  if (containsNumber(first_name) || containsNumber(last_name)) {
+    logger.warn(`Registration - BAD_USER_INPUT`, {email})
+    throw new UserInputError('Bad input');
   }
 
   // try to login first
