@@ -32,18 +32,31 @@ jobs:
       - name: Run unit test suite
         run: pnpm run test:coverage
 
+      - name: Check Codecov token availability
+        if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        run: |
+          if [ -z "$CODECOV_TOKEN" ]; then
+            echo "::error::CODECOV_TOKEN is not available to this workflow. If this is an organization secret, grant it access to ${{ github.repository }} in GitHub org secret settings."
+            exit 1
+          fi
+
       # Codecov action v5 verifies the downloaded CLI with this key.
       # Pre-import it from a keyserver because the action's Keybase mirror can return non-OpenPGP data.
       - name: Import Codecov GPG key
+        if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
         run: |
           curl -fsSL 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x27034E7FDB850E0BBC2C62FF806BB28AED779869' | gpg --batch --import
 
       - name: Upload coverage to Codecov
+        if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          slug: Gratheon/user-cycle
+          slug: ${{ github.repository }}
           files: ./coverage/lcov.info
+          disable_search: true
           fail_ci_if_error: true
           verbose: true
 
