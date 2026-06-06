@@ -32,10 +32,17 @@ jobs:
       - name: Run unit test suite
         run: pnpm run test:coverage
 
+      # Codecov action v5 verifies the downloaded CLI with this key.
+      # Pre-import it from a keyserver because the action's Keybase mirror can return non-OpenPGP data.
+      - name: Import Codecov GPG key
+        run: |
+          curl -fsSL 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x27034E7FDB850E0BBC2C62FF806BB28AED779869' | gpg --batch --import
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          slug: Gratheon/user-cycle
           files: ./coverage/lcov.info
           fail_ci_if_error: true
           verbose: true
