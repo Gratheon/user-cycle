@@ -86,4 +86,57 @@ describe('registerUser', () => {
 
     expect(userModel.findByEmailAndPass).not.toHaveBeenCalled();
   });
+
+  it.each([
+    ['XsGIfEQwgEnGSugHcqaFSgyd', 'User'],
+    ['Spam', 'klCTbimECipVgIYpEf'],
+    ['bhZcyLqhrYopebrKRhKztC', 'User'],
+    ['Spam', 'dIoSTPqLrouYwsCk'],
+    ['trvrUvWnctLDEyEdRXohRY', 'User'],
+  ])('throws generic bad input when name looks hash-like: %s %s', async (first_name, last_name) => {
+    await expect(registerUser(null, {
+      input: {
+        first_name,
+        last_name,
+        email: 'spam@example.com',
+        password: 'Test1234',
+        lang: 'en',
+        nonce: 'nonce',
+        solution: 'solution',
+      },
+    })).rejects.toMatchObject({
+      message: 'Bad input',
+      extensions: {
+        code: 'BAD_USER_INPUT',
+      },
+    });
+
+    expect(userModel.findByEmailAndPass).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['John', 'Smith'],
+    ['Марія', 'Шевченко'],
+    ['Αλέξανδρος', 'Παπαδόπουλος'],
+    ['山田', '太郎'],
+    ["O'Connor", 'Anne-Marie'],
+  ])('allows regular and international names: %s %s', async (first_name, last_name) => {
+    (userModel.findByEmailAndPass as jest.Mock).mockResolvedValue(123);
+    (userModel.getById as jest.Mock).mockResolvedValue({ id: 123, first_name, last_name });
+
+    await expect(registerUser(null, {
+      input: {
+        first_name,
+        last_name,
+        email: 'existing@example.com',
+        password: 'Test1234',
+        lang: 'en',
+        nonce: 'nonce',
+        solution: 'solution',
+      },
+    })).resolves.toMatchObject({
+      __typename: 'UserSession',
+      user: { id: 123, first_name, last_name },
+    });
+  });
 });

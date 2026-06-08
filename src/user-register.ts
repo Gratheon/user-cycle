@@ -13,6 +13,31 @@ import {sendAdminUserRegisteredMail, sendWelcomeMail} from "./send-mail";
 import {registrationNonceModel} from './models/registration-nonce';
 
 const containsNumber = (value?: string | null): boolean => /\p{Nd}/u.test(value || '');
+const hasConsecutiveUppercase = (value: string): boolean => /\p{Lu}{2,}/u.test(value);
+
+const isHashLikeName = (value?: string | null): boolean => {
+  const letterTokens = (value || '').match(/\p{L}+/gu) || [];
+
+  return letterTokens.some((token) => {
+    if (token.length < 12 || !/^\p{Script=Latin}+$/u.test(token)) {
+      return false;
+    }
+
+    const characters = Array.from(token);
+    const uppercaseCount = characters.filter((character) => /\p{Lu}/u.test(character)).length;
+    const lowercaseCount = characters.filter((character) => /\p{Ll}/u.test(character)).length;
+    const caseSwitchCount = characters.slice(1).filter((character, index) => {
+      const previousCharacter = characters[index];
+      return /\p{Lu}/u.test(character) !== /\p{Lu}/u.test(previousCharacter);
+    }).length;
+
+    return uppercaseCount >= 4
+      && lowercaseCount >= 4
+      && uppercaseCount / characters.length >= 0.3
+      && caseSwitchCount >= 6
+      && hasConsecutiveUppercase(token);
+  });
+};
 
 export default async function registerUser(_, { input }) {
   const { first_name, last_name, email, password, lang, locale, nonce, solution } = input;
@@ -28,7 +53,7 @@ export default async function registerUser(_, { input }) {
     return err(error_code.INVALID_PROOF_OF_WORK);
   }
 
-  if (containsNumber(first_name) || containsNumber(last_name)) {
+  if (containsNumber(first_name) || containsNumber(last_name) || isHashLikeName(first_name) || isHashLikeName(last_name)) {
     logger.warn(`Registration - BAD_USER_INPUT`, {email})
     throw new UserInputError('Bad input');
   }
