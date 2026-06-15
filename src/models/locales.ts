@@ -12,6 +12,12 @@ const languagesMap = {
 	'pl': 'polish',
 	'de': 'german',
 	'fr': 'french',
+	'lv': 'latvian',
+	'lt': 'lithuanian',
+	'hu': 'hungarian',
+	'uk': 'ukrainian',
+	'it': 'italian',
+	'ro': 'romanian',
 }
 const languageCodes = Object.keys(languagesMap);
 
@@ -41,9 +47,9 @@ export const localeModel = {
 		let result;
 
 		if (key) {
-			result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr FROM locales WHERE \`key\`=${key} LIMIT 1`);
+			result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro FROM locales WHERE \`key\`=${key} LIMIT 1`);
 		} else {
-			result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr FROM locales WHERE en=${en} LIMIT 1`);
+			result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro FROM locales WHERE en=${en} LIMIT 1`);
 		}
 
 		let translation = result[0]
@@ -54,9 +60,9 @@ export const localeModel = {
 				await storage().query(sql`INSERT INTO locales (\`key\`, translation_context, en) VALUES(${key}, ${tc}, ${en})`);
 
 				if (key) {
-					result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr FROM locales WHERE \`key\`=${key} LIMIT 1`);
+					result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro FROM locales WHERE \`key\`=${key} LIMIT 1`);
 				} else {
-					result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr FROM locales WHERE en=${en} LIMIT 1`);
+					result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro FROM locales WHERE en=${en} LIMIT 1`);
 				}
 					translation = result[0]
 				}
@@ -92,13 +98,19 @@ export const localeModel = {
 						if (langCode === 'pl') await storage().query(sql`UPDATE locales SET pl=${value} WHERE id=${translation.id}`);
 						if (langCode === 'de') await storage().query(sql`UPDATE locales SET de=${value} WHERE id=${translation.id}`);
 						if (langCode === 'fr') await storage().query(sql`UPDATE locales SET fr=${value} WHERE id=${translation.id}`);
+						if (langCode === 'lv') await storage().query(sql`UPDATE locales SET lv=${value} WHERE id=${translation.id}`);
+						if (langCode === 'lt') await storage().query(sql`UPDATE locales SET lt=${value} WHERE id=${translation.id}`);
+						if (langCode === 'hu') await storage().query(sql`UPDATE locales SET hu=${value} WHERE id=${translation.id}`);
+						if (langCode === 'uk') await storage().query(sql`UPDATE locales SET uk=${value} WHERE id=${translation.id}`);
+						if (langCode === 'it') await storage().query(sql`UPDATE locales SET it=${value} WHERE id=${translation.id}`);
+						if (langCode === 'ro') await storage().query(sql`UPDATE locales SET ro=${value} WHERE id=${translation.id}`);
 					}
 				}
 
 			if (key) {
-				result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr FROM locales WHERE \`key\`=${key} LIMIT 1`);
+				result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro FROM locales WHERE \`key\`=${key} LIMIT 1`);
 			} else {
-				result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr FROM locales WHERE en=${en} LIMIT 1`);
+				result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro FROM locales WHERE en=${en} LIMIT 1`);
 			}
 			translation = result[0]
 		}
@@ -126,7 +138,7 @@ export const localeModel = {
 		if (keyRequests.length > 0) {
 			const keys = keyRequests.map(r => r.key);
 			const keyResults = await storage().query(
-				sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr FROM locales WHERE \`key\` IN (${keys})`
+				sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro FROM locales WHERE \`key\` IN (${keys})`
 			);
 			results.push(...keyResults);
 		}
@@ -135,7 +147,7 @@ export const localeModel = {
 		if (enRequests.length > 0) {
 			const enTexts = enRequests.map(r => r.en);
 			const enResults = await storage().query(
-				sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr FROM locales WHERE en IN (${enTexts})`
+				sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro FROM locales WHERE en IN (${enTexts})`
 			);
 			results.push(...enResults);
 		}
@@ -167,9 +179,9 @@ export const localeModel = {
 
 				let newResult;
 				if (request.key) {
-					newResult = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr FROM locales WHERE \`key\`=${request.key} LIMIT 1`);
+					newResult = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro FROM locales WHERE \`key\`=${request.key} LIMIT 1`);
 				} else {
-					newResult = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr FROM locales WHERE en=${request.en} LIMIT 1`);
+					newResult = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro FROM locales WHERE en=${request.en} LIMIT 1`);
 				}
 
 				if (newResult[0]) {
@@ -199,10 +211,16 @@ export const localeModel = {
 					pl: !translation.pl,
 					de: !translation.de,
 					fr: !translation.fr,
+					lv: !translation.lv,
+					lt: !translation.lt,
+					hu: !translation.hu,
+					uk: !translation.uk,
+					it: !translation.it,
+					ro: !translation.ro,
 					tc
 				};
 
-				if (needsUpdate.ru || needsUpdate.et || needsUpdate.tr || needsUpdate.pl || needsUpdate.de || needsUpdate.fr) {
+				if (languageCodes.some((langCode) => needsUpdate[langCode])) {
 					translationsToUpdate.push({ translation, needsUpdate });
 				}
 			}
@@ -250,6 +268,24 @@ export const localeModel = {
 					if (updates['fr']) {
 						await storage().query(sql`UPDATE locales SET fr=${updates['fr']} WHERE id=${translation.id}`);
 					}
+					if (updates['lv']) {
+						await storage().query(sql`UPDATE locales SET lv=${updates['lv']} WHERE id=${translation.id}`);
+					}
+					if (updates['lt']) {
+						await storage().query(sql`UPDATE locales SET lt=${updates['lt']} WHERE id=${translation.id}`);
+					}
+					if (updates['hu']) {
+						await storage().query(sql`UPDATE locales SET hu=${updates['hu']} WHERE id=${translation.id}`);
+					}
+					if (updates['uk']) {
+						await storage().query(sql`UPDATE locales SET uk=${updates['uk']} WHERE id=${translation.id}`);
+					}
+					if (updates['it']) {
+						await storage().query(sql`UPDATE locales SET it=${updates['it']} WHERE id=${translation.id}`);
+					}
+					if (updates['ro']) {
+						await storage().query(sql`UPDATE locales SET ro=${updates['ro']} WHERE id=${translation.id}`);
+					}
 
 					Object.assign(translation, updates);
 				}
@@ -261,7 +297,7 @@ export const localeModel = {
 			if (keyRequests.length > 0) {
 				const keys = keyRequests.map(r => r.key);
 				const keyResults = await storage().query(
-					sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr FROM locales WHERE \`key\` IN (${keys})`
+					sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro FROM locales WHERE \`key\` IN (${keys})`
 				);
 				finalResults.push(...keyResults);
 			}
@@ -269,7 +305,7 @@ export const localeModel = {
 			if (enRequests.length > 0) {
 				const enTexts = enRequests.map(r => r.en);
 				const enResults = await storage().query(
-					sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr FROM locales WHERE en IN (${enTexts})`
+					sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro FROM locales WHERE en IN (${enTexts})`
 				);
 				finalResults.push(...enResults);
 			}

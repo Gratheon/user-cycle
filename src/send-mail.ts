@@ -33,7 +33,7 @@ type WelcomeEmailContent = {
 };
 
 const supportedWelcomeEmailLangs = [
-    'en', 'ru', 'et', 'tr', 'pl', 'de', 'fr', 'zh', 'hi', 'es', 'ar', 'bn', 'pt', 'ja'
+    'en', 'ru', 'et', 'tr', 'pl', 'de', 'fr', 'lv', 'lt', 'hu', 'uk', 'it', 'ro', 'zh', 'hi', 'es', 'ar', 'bn', 'pt', 'ja'
 ];
 
 const welcomeEmailTranslations: Record<string, WelcomeEmailContent> = {
@@ -148,6 +148,54 @@ const welcomeEmailTranslations: Record<string, WelcomeEmailContent> = {
         intro: 'ご参加いただきありがとうございます。この Web アプリが、養蜂場のミツバチを観察し理解する助けになればうれしいです。',
         privateIssues: '請求などの個別の問題があれば、遠慮なくメールでご連絡ください。',
         publicIssues: '公開の問題、フィードバック、機能リクエスト、質問については、Discord サーバーのコミュニティにご参加ください。',
+        signoff: 'Bee Well,',
+    },
+    lv: {
+        subject: 'Laipni lūdzam Gratheon!',
+        greeting: 'Sveiki!',
+        intro: 'Priecājos, ka pievienojāties. Ceru, ka šī tīmekļa lietotne palīdzēs vērot un labāk izprast bites jūsu dravā.',
+        privateIssues: 'Ja jums ir privāti jautājumi, piemēram, par norēķiniem, droši rakstiet man e-pastā.',
+        publicIssues: 'Par publiskām problēmām, atsauksmēm, funkciju pieprasījumiem vai jautājumiem aicinu pievienoties mūsu kopienai Discord serverī.',
+        signoff: 'Lai bitēm labi klājas,',
+    },
+    lt: {
+        subject: 'Sveiki atvykę į Gratheon!',
+        greeting: 'Sveiki!',
+        intro: 'Džiaugiuosi, kad prisijungėte. Tikiuosi, ši žiniatinklio programa padės stebėti ir geriau suprasti bites jūsų bityne.',
+        privateIssues: 'Jei turite privačių klausimų, pavyzdžiui, dėl atsiskaitymo, drąsiai parašykite man el. paštu.',
+        publicIssues: 'Dėl viešų problemų, atsiliepimų, funkcijų prašymų ar klausimų kviečiu prisijungti prie mūsų bendruomenės Discord serveryje.',
+        signoff: 'Tegul bitėms sekasi,',
+    },
+    hu: {
+        subject: 'Üdvözlünk a Gratheonban!',
+        greeting: 'Szia!',
+        intro: 'Örülök, hogy csatlakoztál. Remélem, ez a webalkalmazás segít megfigyelni és jobban megérteni a méheket a méhészetedben.',
+        privateIssues: 'Ha személyes ügyed van, például számlázással kapcsolatban, nyugodtan írj nekem e-mailt.',
+        publicIssues: 'Nyilvános problémák, visszajelzés, funkciókérések vagy kérdések esetén csatlakozz a közösségünkhöz a Discord szerveren.',
+        signoff: 'Méhekben gazdag napokat,',
+    },
+    uk: {
+        subject: 'Ласкаво просимо до Gratheon!',
+        greeting: 'Вітаю!',
+        intro: 'Радий, що ви приєдналися. Сподіваюся, цей вебзастосунок допоможе спостерігати за бджолами на вашій пасіці й краще їх розуміти.',
+        privateIssues: 'Якщо у вас є приватні питання, наприклад щодо оплати, сміливо пишіть мені на email.',
+        publicIssues: 'Щодо публічних проблем, відгуків, запитів на функції або запитань запрошую приєднатися до нашої спільноти на сервері Discord.',
+        signoff: 'Бджолиного добробуту,',
+    },
+    it: {
+        subject: 'Benvenuto in Gratheon!',
+        greeting: 'Ciao!',
+        intro: 'Sono felice che tu ti sia unito. Spero che questa applicazione web ti aiuti a osservare e capire meglio le api nel tuo apiario.',
+        privateIssues: 'Se hai questioni private, ad esempio sulla fatturazione, scrivimi pure via e-mail.',
+        publicIssues: 'Per problemi pubblici, feedback, richieste di funzionalità o domande, ti invito a unirti alla nostra comunità sul server Discord.',
+        signoff: 'Bee Well,',
+    },
+    ro: {
+        subject: 'Bun venit la Gratheon!',
+        greeting: 'Salut!',
+        intro: 'Mă bucur că te-ai alăturat. Sper ca această aplicație web să te ajute să observi și să înțelegi mai bine albinele din stupina ta.',
+        privateIssues: 'Dacă ai chestiuni private, de exemplu legate de facturare, îmi poți scrie oricând pe e-mail.',
+        publicIssues: 'Pentru probleme publice, feedback, cereri de funcționalități sau întrebări, te invit să te alături comunității noastre pe serverul Discord.',
         signoff: 'Bee Well,',
     },
 };

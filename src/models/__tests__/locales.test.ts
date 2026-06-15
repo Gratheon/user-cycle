@@ -321,7 +321,13 @@ describe('localeModel.translate', () => {
         tr: 'Aile',
         pl: 'Rodzina',
         de: 'Familie',
-        fr: 'Famille'
+        fr: 'Famille',
+        lv: 'Ģimene',
+        lt: 'Šeima',
+        hu: 'Család',
+        uk: 'Сім’я',
+        it: 'Famiglia',
+        ro: 'Familie'
       }));
 
       const queryMock = jest.fn()
@@ -336,7 +342,13 @@ describe('localeModel.translate', () => {
           tr: null,
           pl: null,
           de: null,
-          fr: null
+          fr: null,
+          lv: null,
+          lt: null,
+          hu: null,
+          uk: null,
+          it: null,
+          ro: null
         }])
         .mockResolvedValue([{
           id: 104,
@@ -347,7 +359,13 @@ describe('localeModel.translate', () => {
           tr: 'Aile',
           pl: 'Rodzina',
           de: 'Familie',
-          fr: 'Famille'
+          fr: 'Famille',
+          lv: 'Ģimene',
+          lt: 'Šeima',
+          hu: 'Család',
+          uk: 'Сім’я',
+          it: 'Famiglia',
+          ro: 'Familie'
         }]);
 
       mockStorage.mockReturnValue({
@@ -363,6 +381,7 @@ describe('localeModel.translate', () => {
       expect(result.en).toBe('Family');
       expect(result.ru).toBe('Семья');
       expect(result.fr).toBe('Famille');
+      expect(result.lv).toBe('Ģimene');
       expect(mockGenerateGeminiText).toHaveBeenCalledTimes(1);
     });
   });

@@ -30,10 +30,16 @@ const pluralLanguages = Object.keys({
 	tr: 'turkish',
 	pl: 'polish',
 	de: 'german',
-	fr: 'french'
+	fr: 'french',
+	lv: 'latvian',
+	lt: 'lithuanian',
+	hu: 'hungarian',
+	uk: 'ukrainian',
+	it: 'italian',
+	ro: 'romanian'
 });
 const supportedTranslationLangs = [
-	'ru', 'et', 'tr', 'pl', 'de', 'fr', 'zh', 'hi', 'es', 'ar', 'bn', 'pt', 'ja'
+	'ru', 'et', 'tr', 'pl', 'de', 'fr', 'lv', 'lt', 'hu', 'uk', 'it', 'ro', 'zh', 'hi', 'es', 'ar', 'bn', 'pt', 'ja'
 ];
 
 function keyNeedsPluralForms(key: string): boolean {
