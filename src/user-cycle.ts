@@ -87,8 +87,10 @@ async function startApolloServer(app, typeDefs, resolvers) {
             ApolloServerPluginDrainHttpServer({httpServer: app.server})
         ],
         context: (req) => {
+            const request = req.request;
             return {
-                uid: req.request.raw.headers['internal-userid']
+                uid: request.raw.headers['internal-userid'],
+                ip: request.raw.headers['x-forwarded-for'] || request.ip,
             };
         },
     });

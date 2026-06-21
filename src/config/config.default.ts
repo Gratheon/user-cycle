@@ -70,6 +70,7 @@ const config = {
 
   login_ui_url: 'http://localhost:8080/account/authenticate/',
   app_ui_url: 'http://localhost:8080/apiaries',
+  password_reset_ui_url: process.env.PASSWORD_RESET_UI_URL || (process.env.ENV_ID === 'prod' ? 'https://app.gratheon.com/account/reset-password' : 'http://localhost:8080/account/reset-password'),
   appShareTokenUrlPrefix: 'http://localhost:8080/',
 };
 

@@ -357,3 +357,40 @@ export async function sendAdminUserRegisteredMail({ email }: { email: string }) 
         textBody,
     });
 }
+
+export async function sendPasswordResetMail({ email, resetUrl }: { email: string; resetUrl: string }) {
+    const subject = 'Reset your Gratheon password';
+    const textBody = `We received a request to reset your Gratheon password.\n\nOpen this link within 1 hour to choose a new password:\n${resetUrl}\n\nIf you did not request this, you can ignore this email.`;
+    const escapedResetUrl = escapeHtml(resetUrl);
+    const htmlBody = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${escapeHtml(subject)}</title>
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 16px; color: black; line-height: 1.6; padding: 20px; }
+        a, a:visited { color: #0248FF; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #fff; padding: 20px 25px; border-radius: 8px; border-left: solid 2px #FFD900; border-right: solid 2px #FFD900; border-bottom: 2px solid #2F8B0B; border-top: 2px solid #0248FF; }
+        .button { display: inline-block; background: #2F8B0B; color: #fff !important; padding: 10px 16px; border-radius: 4px; text-decoration: none; }
+        .hint { color: #555; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <p>We received a request to reset your Gratheon password.</p>
+        <p><a class="button" href="${escapedResetUrl}">Reset password</a></p>
+        <p class="hint">This link expires in 1 hour and can be used only once.</p>
+        <p class="hint">If you did not request this, you can ignore this email.</p>
+        <p class="hint">If the button does not work, copy this link into your browser:<br><a href="${escapedResetUrl}">${escapedResetUrl}</a></p>
+    </div>
+</body>
+</html>`;
+
+    return await sendEmailWithSES({
+        to: email,
+        subject,
+        textBody,
+        htmlBody,
+    });
+}

@@ -9,11 +9,12 @@ import { shareTokenModel, tokenModel } from './models/tokens';
 import { localeModel } from './models/locales';
 import { translationModel } from './models/translations';
 import { billingHistoryModel } from './models/billingHistory';
+import { passwordResetModel } from './models/password-reset';
 import error_code, { err } from './error_code';
 import { logger } from './logger';
 import registerUser from './user-register';
 import { sleepForSecurity } from './models/sleep';
-import { sendAdminUserRegisteredMail, sendWelcomeMail } from './send-mail';
+import { sendAdminUserRegisteredMail, sendPasswordResetMail, sendWelcomeMail } from './send-mail';
 import { registrationNonceModel } from './models/registration-nonce';
 import { wrapGraphqlResolversWithMetrics } from './metrics';
 import DataLoader from 'dataloader';
@@ -470,6 +471,60 @@ const baseResolvers = {
 				return null;
 			}
 		},
+		requestPasswordReset: async (_, { email }, ctx) => {
+			const normalizedEmail = passwordResetModel.normalizeEmail(email);
+			const account = await passwordResetModel.findAccountByEmail(normalizedEmail);
+			const identities = [
+				normalizedEmail,
+				ctx?.ip ? `ip:${ctx.ip}` : '',
+				account?.id ? `user:${account.id}` : '',
+			].filter(Boolean);
+
+			const isRateLimited = await passwordResetModel.isRateLimited(identities);
+			if (isRateLimited || !account) {
+				if (isRateLimited) {
+					logger.warn('Password reset request rate-limited', { email: normalizedEmail, ip: ctx?.ip });
+				}
+
+				await sleepForSecurity();
+				return {
+					__typename: 'PasswordResetRequestResult',
+					ok: true,
+				};
+			}
+
+			try {
+				const { token } = await passwordResetModel.createResetToken(account.id);
+				const resetUrl = `${config.password_reset_ui_url}?token=${encodeURIComponent(token)}`;
+				await sendPasswordResetMail({ email: account.email, resetUrl });
+			} catch (e) {
+				logger.errorEnriched('Failed to create or send password reset email', e, { email: normalizedEmail });
+			}
+
+			return {
+				__typename: 'PasswordResetRequestResult',
+				ok: true,
+			};
+		},
+
+		resetPassword: async (_, { token, password }) => {
+			const result = await passwordResetModel.resetPassword(token, password);
+
+			if (result === 'SIMPLE_PASSWORD') {
+				return err(error_code.SIMPLE_PASSWORD);
+			}
+
+			if (result === 'INVALID_TOKEN') {
+				await sleepForSecurity();
+				return err(error_code.INVALID_TOKEN);
+			}
+
+			return {
+				__typename: 'PasswordResetRequestResult',
+				ok: true,
+			};
+		},
+
 
 		updateUser: async (parent, { user }, ctx) => {
 			if (!ctx.uid) return err(error_code.AUTHENTICATION_REQUIRED);

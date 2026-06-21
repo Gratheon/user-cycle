@@ -125,6 +125,8 @@ type AIAdvisorUsage {
 type Mutation {
 	register(input: RegisterInput!): LoginResult
 	login(email: String!, password: String!): LoginResult
+	requestPasswordReset(email: String!): PasswordResetRequestResult!
+	resetPassword(token: String!, password: String!): PasswordResetResult
 	generateApiToken: APIToken
 	generateShareToken(name: String!, scopes: JSON!, sourceUrl: URL!, scopeParams: JSON!): ShareToken
 	validateApiToken(token: String): ValidateTokenResult
@@ -171,10 +173,15 @@ type Error{
 	code: String
 }
 
+type PasswordResetRequestResult {
+	ok: Boolean!
+}
+
 union UserOrError = User | Error
 union ValidateTokenResult = TokenUser | Error
 union ValidateShareTokenResult = ShareTokenDetails | Error
 union LoginResult = UserSession | Error
+union PasswordResetResult = PasswordResetRequestResult | Error
 union UpdateUserResult = User | Error
 union CancelSubscriptionResult = User | Error
 
