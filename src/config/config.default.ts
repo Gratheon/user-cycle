@@ -34,7 +34,8 @@ const config = {
 
     plans: {
       hobbyist: {
-        monthly: 'price_hobbyist_monthly_placeholder'
+        monthly: 'price_hobbyist_monthly_placeholder',
+        yearly: 'price_hobbyist_yearly_placeholder'
       },
       starter: {
         monthly: 'price_1Sm0eIHe2QIxNzEc2BQwdPL3',

@@ -428,7 +428,9 @@ const baseResolvers = {
 				priceId = config.stripe.plans.addon.oneTime;
 				mode = 'payment';
 			} else if (plan === 'hobbyist') {
-				priceId = config.stripe.plans.hobbyist.monthly;
+				priceId = cycle === 'yearly'
+					? config.stripe.plans.hobbyist.yearly
+					: config.stripe.plans.hobbyist.monthly;
 				mode = 'subscription';
 			} else if (plan === 'starter') {
 				priceId = cycle === 'yearly'
