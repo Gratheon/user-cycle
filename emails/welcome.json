@@ -159,5 +159,29 @@
     "privateIssues": "Dacă ai chestiuni private, de exemplu legate de facturare, îmi poți scrie oricând pe e-mail.",
     "publicIssues": "Pentru probleme publice, feedback, cereri de funcționalități sau întrebări, te invit să te alături comunității noastre pe serverul Discord.",
     "signoff": "Bee Well,"
+  },
+  "he": {
+    "subject": "ברוכים הבאים ל-Gratheon!",
+    "greeting": "שלום!",
+    "intro": "אני שמח שהצטרפת. מקווה שהאפליקציה תעזור לך לצפות בדבורים במכוורת שלך ולהבין אותן טוב יותר.",
+    "privateIssues": "אם יש לך עניינים פרטיים, למשל בנושאי חיוב, אפשר לכתוב לי באימייל.",
+    "publicIssues": "לבעיות ציבוריות, משוב, בקשות לפיצ׳רים או שאלות, אני מזמין אותך להצטרף לקהילה שלנו בשרת Discord.",
+    "signoff": "שיהיה לדבורים טוב,"
+  },
+  "ko": {
+    "subject": "Gratheon에 오신 것을 환영합니다!",
+    "greeting": "안녕하세요!",
+    "intro": "가입해 주셔서 기쁩니다. 이 웹 앱이 양봉장의 벌을 관찰하고 더 잘 이해하는 데 도움이 되길 바랍니다.",
+    "privateIssues": "결제와 같은 개인적인 문제가 있으면 언제든지 이메일로 연락해 주세요.",
+    "publicIssues": "공개 이슈, 피드백, 기능 요청 또는 질문은 Discord 서버의 커뮤니티에 참여해 주세요.",
+    "signoff": "벌들이 건강하길 바라며,"
+  },
+  "nl": {
+    "subject": "Welkom bij Gratheon!",
+    "greeting": "Hallo!",
+    "intro": "Fijn dat je erbij bent. Ik hoop dat deze web-app helpt om de bijen in je bijenstand te observeren en beter te begrijpen.",
+    "privateIssues": "Als je privézaken hebt, bijvoorbeeld over facturatie, mail me gerust.",
+    "publicIssues": "Voor publieke problemen, feedback, functieverzoeken of vragen nodig ik je uit om deel te nemen aan onze community op de Discord-server.",
+    "signoff": "Bee Well,"
   }
 }

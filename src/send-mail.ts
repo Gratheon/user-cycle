@@ -109,7 +109,7 @@ function linkDiscordInHtml(text: string): string {
 }
 
 function renderWelcomeEmailHtml(content: WelcomeEmailContent, lang: string): string {
-    const direction = lang === 'ar' ? 'rtl' : 'ltr';
+    const direction = ['ar', 'he'].includes(lang) ? 'rtl' : 'ltr';
     const senderName = content.senderName || 'Artjom Kurapov';
 
     // HTML values are escaped before rendering, except publicIssuesHtml which intentionally
@@ -140,7 +140,7 @@ function renderWelcomeEmailText(content: WelcomeEmailContent): string {
 }
 
 function renderPasswordResetEmailHtml(content: PasswordResetEmailContent, lang: string, resetUrl: string): string {
-    const direction = lang === 'ar' ? 'rtl' : 'ltr';
+    const direction = ['ar', 'he'].includes(lang) ? 'rtl' : 'ltr';
 
     // Password-reset HTML has no intentional markup in translations, so every value is escaped.
     return renderTemplate(passwordResetEmailHtml, {

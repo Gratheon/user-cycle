@@ -35,6 +35,9 @@ const languagesMap = {
 	'bn': 'bengali',
 	'pt': 'portuguese',
 	'ja': 'japanese',
+	'he': 'hebrew',
+	'ko': 'korean',
+	'nl': 'dutch',
 }
 const languageCodes = Object.keys(languagesMap);
 

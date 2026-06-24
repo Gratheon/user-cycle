@@ -37,10 +37,13 @@ const pluralLanguages = Object.keys({
 	hu: 'hungarian',
 	uk: 'ukrainian',
 	it: 'italian',
-	ro: 'romanian'
+	ro: 'romanian',
+	he: 'hebrew',
+	ko: 'korean',
+	nl: 'dutch'
 });
 const supportedTranslationLangs = [
-	'ru', 'et', 'tr', 'pl', 'de', 'fr', 'lv', 'lt', 'hu', 'uk', 'it', 'ro', 'zh', 'hi', 'es', 'ar', 'bn', 'pt', 'ja'
+	'ru', 'et', 'tr', 'pl', 'de', 'fr', 'lv', 'lt', 'hu', 'uk', 'it', 'ro', 'zh', 'hi', 'es', 'ar', 'bn', 'pt', 'ja', 'he', 'ko', 'nl'
 ];
 
 function keyNeedsPluralForms(key: string): boolean {
@@ -653,6 +656,9 @@ const baseResolvers = {
 				'bn': 'bengali',
 				'pt': 'portuguese',
 				'ja': 'japanese',
+				'he': 'hebrew',
+				'ko': 'korean',
+				'nl': 'dutch',
 			};
 
 			if (!languagesMap[langCode]) {

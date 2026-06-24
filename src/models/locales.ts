@@ -18,6 +18,9 @@ const languagesMap = {
 	'uk': 'ukrainian',
 	'it': 'italian',
 	'ro': 'romanian',
+	'he': 'hebrew',
+	'ko': 'korean',
+	'nl': 'dutch',
 }
 const languageCodes = Object.keys(languagesMap);
 
@@ -47,9 +50,9 @@ export const localeModel = {
 		let result;
 
 		if (key) {
-			result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro FROM locales WHERE \`key\`=${key} LIMIT 1`);
+			result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE \`key\`=${key} LIMIT 1`);
 		} else {
-			result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro FROM locales WHERE en=${en} LIMIT 1`);
+			result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE en=${en} LIMIT 1`);
 		}
 
 		let translation = result[0]
@@ -60,9 +63,9 @@ export const localeModel = {
 				await storage().query(sql`INSERT INTO locales (\`key\`, translation_context, en) VALUES(${key}, ${tc}, ${en})`);
 
 				if (key) {
-					result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro FROM locales WHERE \`key\`=${key} LIMIT 1`);
+					result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE \`key\`=${key} LIMIT 1`);
 				} else {
-					result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro FROM locales WHERE en=${en} LIMIT 1`);
+					result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE en=${en} LIMIT 1`);
 				}
 					translation = result[0]
 				}
@@ -108,9 +111,9 @@ export const localeModel = {
 				}
 
 			if (key) {
-				result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro FROM locales WHERE \`key\`=${key} LIMIT 1`);
+				result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE \`key\`=${key} LIMIT 1`);
 			} else {
-				result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro FROM locales WHERE en=${en} LIMIT 1`);
+				result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE en=${en} LIMIT 1`);
 			}
 			translation = result[0]
 		}
@@ -138,7 +141,7 @@ export const localeModel = {
 		if (keyRequests.length > 0) {
 			const keys = keyRequests.map(r => r.key);
 			const keyResults = await storage().query(
-				sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro FROM locales WHERE \`key\` IN (${keys})`
+				sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE \`key\` IN (${keys})`
 			);
 			results.push(...keyResults);
 		}
@@ -147,7 +150,7 @@ export const localeModel = {
 		if (enRequests.length > 0) {
 			const enTexts = enRequests.map(r => r.en);
 			const enResults = await storage().query(
-				sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro FROM locales WHERE en IN (${enTexts})`
+				sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE en IN (${enTexts})`
 			);
 			results.push(...enResults);
 		}
@@ -179,9 +182,9 @@ export const localeModel = {
 
 				let newResult;
 				if (request.key) {
-					newResult = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro FROM locales WHERE \`key\`=${request.key} LIMIT 1`);
+					newResult = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE \`key\`=${request.key} LIMIT 1`);
 				} else {
-					newResult = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro FROM locales WHERE en=${request.en} LIMIT 1`);
+					newResult = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE en=${request.en} LIMIT 1`);
 				}
 
 				if (newResult[0]) {
@@ -217,6 +220,9 @@ export const localeModel = {
 					uk: !translation.uk,
 					it: !translation.it,
 					ro: !translation.ro,
+					he: !translation.he,
+					ko: !translation.ko,
+					nl: !translation.nl,
 					tc
 				};
 
@@ -286,6 +292,15 @@ export const localeModel = {
 					if (updates['ro']) {
 						await storage().query(sql`UPDATE locales SET ro=${updates['ro']} WHERE id=${translation.id}`);
 					}
+					if (updates['he']) {
+						await storage().query(sql`UPDATE locales SET he=${updates['he']} WHERE id=${translation.id}`);
+					}
+					if (updates['ko']) {
+						await storage().query(sql`UPDATE locales SET ko=${updates['ko']} WHERE id=${translation.id}`);
+					}
+					if (updates['nl']) {
+						await storage().query(sql`UPDATE locales SET nl=${updates['nl']} WHERE id=${translation.id}`);
+					}
 
 					Object.assign(translation, updates);
 				}
@@ -297,7 +312,7 @@ export const localeModel = {
 			if (keyRequests.length > 0) {
 				const keys = keyRequests.map(r => r.key);
 				const keyResults = await storage().query(
-					sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro FROM locales WHERE \`key\` IN (${keys})`
+					sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE \`key\` IN (${keys})`
 				);
 				finalResults.push(...keyResults);
 			}
@@ -305,7 +320,7 @@ export const localeModel = {
 			if (enRequests.length > 0) {
 				const enTexts = enRequests.map(r => r.en);
 				const enResults = await storage().query(
-					sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro FROM locales WHERE en IN (${enTexts})`
+					sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE en IN (${enTexts})`
 				);
 				finalResults.push(...enResults);
 			}
