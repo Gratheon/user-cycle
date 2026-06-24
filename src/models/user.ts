@@ -5,14 +5,27 @@ import { storage } from "../storage";
 export const TRIAL_DAYS = 14; // should not affect free billing_plan
 
 let supportsAccountLocaleColumn: boolean | null = null;
+let supportsAccountTemperatureUnitColumn: boolean | null = null;
 
-function isMissingLocaleColumnError(error: unknown): boolean {
+function isMissingColumnError(error: unknown, columnName: string): boolean {
 	if (!error || typeof error !== 'object') {
 		return false;
 	}
 
 	const err = error as { code?: string; sqlMessage?: string };
-	return err.code === 'ER_BAD_FIELD_ERROR' && err.sqlMessage?.includes('locale') === true;
+	return err.code === 'ER_BAD_FIELD_ERROR' && err.sqlMessage?.includes(columnName) === true;
+}
+
+function isMissingLocaleColumnError(error: unknown): boolean {
+	return isMissingColumnError(error, 'locale');
+}
+
+function isMissingTemperatureUnitColumnError(error: unknown): boolean {
+	return isMissingColumnError(error, 'temperature_unit');
+}
+
+function normalizeTemperatureUnit(unit?: string | null): 'celsius' | 'fahrenheit' {
+	return unit === 'fahrenheit' ? 'fahrenheit' : 'celsius';
 }
 
 export const userModel = {
@@ -93,14 +106,39 @@ export const userModel = {
 	getById: async function (id) {
 		let result: any[] = [];
 
-		if (supportsAccountLocaleColumn !== false) {
+		if (supportsAccountLocaleColumn !== false && supportsAccountTemperatureUnitColumn !== false) {
 			try {
 				result = await storage().query(
-					sql`SELECT id, email, first_name, last_name, date_expiration, date_added, 
-					stripe_subscription, lang, locale,
+					sql`SELECT id, email, first_name, last_name, date_expiration, date_added,
+					stripe_subscription, lang, locale, temperature_unit as temperatureUnit,
 					billing_plan as billingPlan,
 					(date_expiration IS NOT NULL AND date_expiration < NOW()) as isSubscriptionExpired
-					FROM account 
+					FROM account
+					WHERE id=${id}
+					LIMIT 1`
+				);
+				supportsAccountLocaleColumn = true;
+				supportsAccountTemperatureUnitColumn = true;
+			} catch (error) {
+				if (isMissingTemperatureUnitColumnError(error)) {
+					supportsAccountTemperatureUnitColumn = false;
+				} else if (isMissingLocaleColumnError(error)) {
+					supportsAccountLocaleColumn = false;
+					supportsAccountTemperatureUnitColumn = false;
+				} else {
+					throw error;
+				}
+			}
+		}
+
+		if (result.length === 0 && supportsAccountLocaleColumn !== false) {
+			try {
+				result = await storage().query(
+					sql`SELECT id, email, first_name, last_name, date_expiration, date_added,
+					stripe_subscription, lang, locale, 'celsius' as temperatureUnit,
+					billing_plan as billingPlan,
+					(date_expiration IS NOT NULL AND date_expiration < NOW()) as isSubscriptionExpired
+					FROM account
 					WHERE id=${id}
 					LIMIT 1`
 				);
@@ -110,16 +148,17 @@ export const userModel = {
 					throw error;
 				}
 				supportsAccountLocaleColumn = false;
+				supportsAccountTemperatureUnitColumn = false;
 			}
 		}
 
 		if (supportsAccountLocaleColumn === false) {
 			result = await storage().query(
-				sql`SELECT id, email, first_name, last_name, date_expiration, date_added, 
-				stripe_subscription, lang, NULL as locale,
+				sql`SELECT id, email, first_name, last_name, date_expiration, date_added,
+				stripe_subscription, lang, NULL as locale, 'celsius' as temperatureUnit,
 				billing_plan as billingPlan,
 				(date_expiration IS NOT NULL AND date_expiration < NOW()) as isSubscriptionExpired
-				FROM account 
+				FROM account
 				WHERE id=${id}
 				LIMIT 1`
 			);
@@ -135,6 +174,8 @@ export const userModel = {
 	},
 
 	update: async function (user, uid) {
+		const temperatureUnit = normalizeTemperatureUnit(user.temperatureUnit);
+
 		if (supportsAccountLocaleColumn === false) {
 			await storage().query(
 				sql`UPDATE \`account\`
@@ -144,19 +185,43 @@ export const userModel = {
 			return;
 		}
 
-		try {
+		if (supportsAccountTemperatureUnitColumn === false) {
 			await storage().query(
-				sql`UPDATE \`account\` 
+				sql`UPDATE \`account\`
 				SET first_name=${user.first_name}, last_name=${user.last_name}, lang=${user.lang},
 				locale=COALESCE(${user.locale}, locale)
 				WHERE id=${uid}`
 			);
+			return;
+		}
+
+		try {
+			await storage().query(
+				sql`UPDATE \`account\`
+				SET first_name=${user.first_name}, last_name=${user.last_name}, lang=${user.lang},
+				locale=COALESCE(${user.locale}, locale), temperature_unit=${temperatureUnit}
+				WHERE id=${uid}`
+			);
 			supportsAccountLocaleColumn = true;
+			supportsAccountTemperatureUnitColumn = true;
 		} catch (error) {
+			if (isMissingTemperatureUnitColumnError(error)) {
+				supportsAccountTemperatureUnitColumn = false;
+				await storage().query(
+					sql`UPDATE \`account\`
+					SET first_name=${user.first_name}, last_name=${user.last_name}, lang=${user.lang},
+					locale=COALESCE(${user.locale}, locale)
+					WHERE id=${uid}`
+				);
+				return;
+			}
+
 			if (!isMissingLocaleColumnError(error)) {
 				throw error;
 			}
+
 			supportsAccountLocaleColumn = false;
+			supportsAccountTemperatureUnitColumn = false;
 			await storage().query(
 				sql`UPDATE \`account\`
 				SET first_name=${user.first_name}, last_name=${user.last_name}, lang=${user.lang}

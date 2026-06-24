@@ -196,6 +196,7 @@ type User {
 	"""
 	lang: String
 	locale: String
+	temperatureUnit: String
 	date_added: DateTime
 	date_expiration: DateTime
 	hasSubscription: Boolean
@@ -213,6 +214,7 @@ input UserUpdateInput{
 	last_name: String
 	lang: String
 	locale: String
+	temperatureUnit: String
 }
 
 input TranslateRequest {
