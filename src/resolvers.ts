@@ -498,7 +498,7 @@ const baseResolvers = {
 			try {
 				const { token } = await passwordResetModel.createResetToken(account.id);
 				const resetUrl = `${config.password_reset_ui_url}?token=${encodeURIComponent(token)}`;
-				await sendPasswordResetMail({ email: account.email, resetUrl });
+				await sendPasswordResetMail({ email: account.email, resetUrl, lang: account.lang });
 			} catch (e) {
 				logger.errorEnriched('Failed to create or send password reset email', e, { email: normalizedEmail });
 			}

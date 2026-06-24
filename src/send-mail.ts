@@ -41,17 +41,32 @@ type WelcomeEmailContent = {
     senderName?: string;
 };
 
+type PasswordResetEmailContent = {
+    subject: string;
+    intro: string;
+    buttonLabel: string;
+    expiryHint: string;
+    ignoreHint: string;
+    copyLinkHint: string;
+    textOpenLink: string;
+};
+
 const welcomeEmailTranslations = JSON.parse(
     fs.readFileSync(path.join(__dirname, '..', 'emails', 'welcome.json'), 'utf8')
 ) as Record<string, WelcomeEmailContent>;
 
-const supportedWelcomeEmailLangs = Object.keys(welcomeEmailTranslations);
+const passwordResetEmailTranslations = JSON.parse(
+    fs.readFileSync(path.join(__dirname, '..', 'emails', 'password-reset.json'), 'utf8')
+) as Record<string, PasswordResetEmailContent>;
 
-function normalizeEmailLang(lang?: string | null): string {
+const welcomeEmailLangs = Object.keys(welcomeEmailTranslations);
+const passwordResetEmailLangs = Object.keys(passwordResetEmailTranslations);
+
+function normalizeEmailLang(lang: string | null | undefined, supportedLangs: string[]): string {
     if (!lang) return 'en';
 
     const normalized = String(lang).toLowerCase().trim().substring(0, 2);
-    if (supportedWelcomeEmailLangs.includes(normalized)) {
+    if (supportedLangs.includes(normalized)) {
         return normalized;
     }
 
@@ -124,6 +139,32 @@ function renderWelcomeEmailText(content: WelcomeEmailContent): string {
     });
 }
 
+function renderPasswordResetEmailHtml(content: PasswordResetEmailContent, lang: string, resetUrl: string): string {
+    const direction = lang === 'ar' ? 'rtl' : 'ltr';
+
+    // Password-reset HTML has no intentional markup in translations, so every value is escaped.
+    return renderTemplate(passwordResetEmailHtml, {
+        lang,
+        direction,
+        subject: content.subject,
+        intro: content.intro,
+        buttonLabel: content.buttonLabel,
+        expiryHint: content.expiryHint,
+        ignoreHint: content.ignoreHint,
+        copyLinkHint: content.copyLinkHint,
+        resetUrl,
+    }, escapeHtml);
+}
+
+function renderPasswordResetEmailText(content: PasswordResetEmailContent, resetUrl: string): string {
+    return renderTemplate(passwordResetEmailTxt, {
+        intro: content.intro,
+        textOpenLink: content.textOpenLink,
+        resetUrl,
+        ignoreHint: content.ignoreHint,
+    });
+}
+
 async function sendEmailWithSES({ 
     to, 
     subject, 
@@ -176,7 +217,7 @@ async function sendEmailWithSES({
 }
 
 export async function sendWelcomeMail({ email, lang }: { email: string; lang?: string | null }) {
-    const emailLang = normalizeEmailLang(lang);
+    const emailLang = normalizeEmailLang(lang, welcomeEmailLangs);
     const content = welcomeEmailTranslations[emailLang] || welcomeEmailTranslations.en;
 
     return await sendEmailWithSES({
@@ -199,15 +240,14 @@ export async function sendAdminUserRegisteredMail({ email }: { email: string }) 
     });
 }
 
-export async function sendPasswordResetMail({ email, resetUrl }: { email: string; resetUrl: string }) {
-    const subject = 'Reset your Gratheon password';
-    const textBody = renderTemplate(passwordResetEmailTxt, { resetUrl });
-    const htmlBody = renderTemplate(passwordResetEmailHtml, { resetUrl }, escapeHtml);
+export async function sendPasswordResetMail({ email, resetUrl, lang }: { email: string; resetUrl: string; lang?: string | null }) {
+    const emailLang = normalizeEmailLang(lang, passwordResetEmailLangs);
+    const content = passwordResetEmailTranslations[emailLang] || passwordResetEmailTranslations.en;
 
     return await sendEmailWithSES({
         to: email,
-        subject,
-        textBody,
-        htmlBody,
+        subject: content.subject,
+        textBody: renderPasswordResetEmailText(content, resetUrl),
+        htmlBody: renderPasswordResetEmailHtml(content, emailLang, resetUrl),
     });
 }

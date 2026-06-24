@@ -29,10 +29,14 @@ jest.mock('./logger', () => ({
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { sendWelcomeMail } from './send-mail';
+import { sendPasswordResetMail, sendWelcomeMail } from './send-mail';
 
 const welcomeTranslations = JSON.parse(
     fs.readFileSync(path.join(__dirname, '..', 'emails', 'welcome.json'), 'utf8')
+) as Record<string, { subject: string }>;
+
+const passwordResetTranslations = JSON.parse(
+    fs.readFileSync(path.join(__dirname, '..', 'emails', 'password-reset.json'), 'utf8')
 ) as Record<string, { subject: string }>;
 
 function latestSesInput() {
@@ -101,6 +105,80 @@ describe('sendWelcomeMail', () => {
     it('renders every configured welcome language without unresolved placeholders', async () => {
         for (const [lang, translation] of Object.entries(welcomeTranslations)) {
             await sendWelcomeMail({ email: `${lang}@example.com`, lang });
+
+            const input = latestSesInput();
+            expect(input.Message.Subject.Data).toBe(translation.subject);
+            expect(input.Message.Body.Text.Data).not.toMatch(/{{\s*\w+\s*}}|undefined/);
+            expect(input.Message.Body.Html.Data).not.toMatch(/{{\s*\w+\s*}}|undefined/);
+        }
+    });
+});
+
+describe('sendPasswordResetMail', () => {
+    beforeEach(() => {
+        sendMock.mockResolvedValue({ MessageId: 'message-id' });
+        SendEmailCommandMock.mockClear();
+    });
+
+    it('renders localized password reset email from file templates', async () => {
+        await sendPasswordResetMail({
+            email: 'reset-user@example.com',
+            resetUrl: 'https://app.gratheon.com/reset?token=abc123',
+            lang: 'ru-RU',
+        });
+
+        const input = latestSesInput();
+        expect(input.Destination.ToAddresses).toEqual(['reset-user@example.com']);
+        expect(input.Source).toBe('hello@gratheon.com');
+        expect(input.Message.Subject.Data).toBe('Сброс пароля Gratheon');
+
+        const textBody = input.Message.Body.Text.Data;
+        expect(textBody).toContain('Мы получили запрос на сброс вашего пароля Gratheon.');
+        expect(textBody).toContain('Откройте эту ссылку в течение 1 часа');
+        expect(textBody).toContain('https://app.gratheon.com/reset?token=abc123');
+        expect(textBody).not.toMatch(/{{\s*\w+\s*}}/);
+
+        const htmlBody = input.Message.Body.Html.Data;
+        expect(htmlBody).toContain('<html lang="ru" dir="ltr">');
+        expect(htmlBody).toContain('Сбросить пароль');
+        expect(htmlBody).toContain('href="https://app.gratheon.com/reset?token=abc123"');
+        expect(htmlBody).not.toMatch(/{{\s*\w+\s*}}/);
+    });
+
+    it('falls back to English for unsupported password reset languages', async () => {
+        await sendPasswordResetMail({
+            email: 'fallback-reset@example.com',
+            resetUrl: 'https://app.gratheon.com/reset?token=fallback',
+            lang: 'xx',
+        });
+
+        const input = latestSesInput();
+        expect(input.Message.Subject.Data).toBe('Reset your Gratheon password');
+        expect(input.Message.Body.Text.Data).toContain('We received a request to reset your Gratheon password.');
+        expect(input.Message.Body.Html.Data).toContain('<html lang="en" dir="ltr">');
+        expect(input.Message.Body.Html.Data).not.toMatch(/{{\s*\w+\s*}}/);
+    });
+
+    it('renders right-to-left password reset markup for Arabic', async () => {
+        await sendPasswordResetMail({
+            email: 'arabic-reset@example.com',
+            resetUrl: 'https://app.gratheon.com/reset?token=arabic',
+            lang: 'ar',
+        });
+
+        const input = latestSesInput();
+        expect(input.Message.Subject.Data).toBe('إعادة تعيين كلمة مرور Gratheon');
+        expect(input.Message.Body.Html.Data).toContain('<html lang="ar" dir="rtl">');
+        expect(input.Message.Body.Html.Data).not.toMatch(/{{\s*\w+\s*}}/);
+    });
+
+    it('renders every configured password reset language without unresolved placeholders', async () => {
+        for (const [lang, translation] of Object.entries(passwordResetTranslations)) {
+            await sendPasswordResetMail({
+                email: `${lang}-reset@example.com`,
+                resetUrl: `https://app.gratheon.com/reset?token=${lang}`,
+                lang,
+            });
 
             const input = latestSesInput();
             expect(input.Message.Subject.Data).toBe(translation.subject);
