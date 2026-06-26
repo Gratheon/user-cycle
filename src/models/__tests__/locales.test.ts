@@ -315,7 +315,7 @@ describe('localeModel.translate', () => {
     });
 
     it('should batch missing language translations in a single LLM request', async () => {
-      mockGenerateGeminiText.mockResolvedValueOnce(JSON.stringify({
+      const translatedFamily = {
         ru: 'Семья',
         et: 'Pere',
         tr: 'Aile',
@@ -327,8 +327,13 @@ describe('localeModel.translate', () => {
         hu: 'Család',
         uk: 'Сім’я',
         it: 'Famiglia',
-        ro: 'Familie'
-      }));
+        ro: 'Familie',
+        he: 'משפחה',
+        ko: '가족',
+        nl: 'Familie'
+      };
+
+      mockGenerateGeminiText.mockResolvedValueOnce(JSON.stringify(translatedFamily));
 
       const queryMock = jest.fn()
         .mockResolvedValueOnce([])
@@ -348,24 +353,16 @@ describe('localeModel.translate', () => {
           hu: null,
           uk: null,
           it: null,
-          ro: null
+          ro: null,
+          he: null,
+          ko: null,
+          nl: null
         }])
         .mockResolvedValue([{
           id: 104,
           key: null,
           en: 'Family',
-          ru: 'Семья',
-          et: 'Pere',
-          tr: 'Aile',
-          pl: 'Rodzina',
-          de: 'Familie',
-          fr: 'Famille',
-          lv: 'Ģimene',
-          lt: 'Šeima',
-          hu: 'Család',
-          uk: 'Сім’я',
-          it: 'Famiglia',
-          ro: 'Familie'
+          ...translatedFamily
         }]);
 
       mockStorage.mockReturnValue({
@@ -382,6 +379,9 @@ describe('localeModel.translate', () => {
       expect(result.ru).toBe('Семья');
       expect(result.fr).toBe('Famille');
       expect(result.lv).toBe('Ģimene');
+      expect(result.he).toBe('משפחה');
+      expect(result.ko).toBe('가족');
+      expect(result.nl).toBe('Familie');
       expect(mockGenerateGeminiText).toHaveBeenCalledTimes(1);
     });
   });

@@ -107,6 +107,9 @@ export const localeModel = {
 						if (langCode === 'uk') await storage().query(sql`UPDATE locales SET uk=${value} WHERE id=${translation.id}`);
 						if (langCode === 'it') await storage().query(sql`UPDATE locales SET it=${value} WHERE id=${translation.id}`);
 						if (langCode === 'ro') await storage().query(sql`UPDATE locales SET ro=${value} WHERE id=${translation.id}`);
+						if (langCode === 'he') await storage().query(sql`UPDATE locales SET he=${value} WHERE id=${translation.id}`);
+						if (langCode === 'ko') await storage().query(sql`UPDATE locales SET ko=${value} WHERE id=${translation.id}`);
+						if (langCode === 'nl') await storage().query(sql`UPDATE locales SET nl=${value} WHERE id=${translation.id}`);
 					}
 				}
 
