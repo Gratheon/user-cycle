@@ -303,7 +303,7 @@ npm run test:coverage # Generate coverage report
 - Low coverage on critical paths (auth, billing, resolvers)
 - Missing E2E tests
 - Integration tests require manual database setup
-- No pre-commit test execution
+- Pre-commit hook runs unit tests, but not integration tests
 
 **Coverage Gaps** (untested critical components)
 - User authentication/login (0%)

@@ -9,8 +9,10 @@ npm run setup-git-hooks
 ```
 
 This installs a pre-commit hook that:
+- Uses the Node.js version from `.nvmrc` when nvm is available
 - Runs TypeScript compilation check (`tsc --noEmit`)
-- Prevents commits if compilation fails
+- Runs the unit test suite (`jest --config jest.config.js --runInBand`)
+- Prevents commits if compilation or unit tests fail
 
 ## Manual Hook Installation
 
@@ -26,12 +28,12 @@ chmod +x .git/hooks/pre-commit
 To run the same checks that the pre-commit hook runs:
 
 ```bash
-npm run typecheck
+sh scripts/pre-commit.sh
 ```
 
 Or directly:
 
 ```bash
 npx tsc -p ./src/config/tsconfig.json --noEmit
+npx jest --config jest.config.js --runInBand
 ```
-
