@@ -307,9 +307,6 @@ export const translationResolvers = {
 					'he': 'hebrew',
 					'ko': 'korean',
 					'nl': 'dutch',
-				'he': 'hebrew',
-				'ko': 'korean',
-				'nl': 'dutch',
 			};
 
 			if (!languagesMap[langCode]) {
