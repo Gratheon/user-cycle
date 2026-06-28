@@ -1,112 +1,10 @@
 import { sql } from "@databases/mysql";
 import { storage } from "../storage";
 import { logger } from "../logger";
-import config from "../config/index";
-import { generateGeminiText } from "./gemini";
+import { clearTranslationCaches, hasPluralFormsCache, pluralFormsCache, translationIdByKeyCache, translationValueCache } from "./translationCache";
+import { normalizeTargetLangs } from "./translationLanguages";
+import * as translationGeneration from "./translationGeneration";
 
-function parsePositiveInteger(value: string | undefined, fallback: number): number {
-	const parsed = Number(value);
-	if (!Number.isFinite(parsed) || parsed <= 0) {
-		return fallback;
-	}
-	return Math.floor(parsed);
-}
-
-const translationCacheTtlMs = parsePositiveInteger(process.env.TRANSLATION_CACHE_TTL_MS, 5 * 60 * 1000);
-const translationCacheMaxEntries = parsePositiveInteger(process.env.TRANSLATION_CACHE_MAX_ENTRIES, 10_000);
-
-const languagesMap = {
-	'ru': 'russian',
-	'et': 'estonian',
-	'tr': 'turkish',
-	'pl': 'polish',
-	'de': 'german',
-	'fr': 'french',
-	'lv': 'latvian',
-	'lt': 'lithuanian',
-	'hu': 'hungarian',
-	'uk': 'ukrainian',
-	'it': 'italian',
-	'ro': 'romanian',
-	'zh': 'chinese',
-	'hi': 'hindi',
-	'es': 'spanish',
-	'ar': 'arabic',
-	'bn': 'bengali',
-	'pt': 'portuguese',
-	'ja': 'japanese',
-	'he': 'hebrew',
-	'ko': 'korean',
-	'nl': 'dutch',
-}
-const languageCodes = Object.keys(languagesMap);
-
-function normalizeTargetLangs(targetLangs?: string[] | null): string[] {
-	if (!targetLangs || targetLangs.length === 0) {
-		return [...languageCodes];
-	}
-
-	const normalized = targetLangs
-		.map((lang) => String(lang || '').toLowerCase().trim())
-		.filter((lang) => languagesMap[lang]);
-
-	if (normalized.length === 0) {
-		return [...languageCodes];
-	}
-
-	return Array.from(new Set(normalized));
-}
-
-type CacheEntry<T> = {
-	value: T;
-	expiresAt: number;
-};
-
-class BoundedTtlCache<T> {
-	private store = new Map<string, CacheEntry<T>>();
-
-	get(key: string): T | undefined {
-		const entry = this.store.get(key);
-		if (!entry) {
-			return undefined;
-		}
-
-		if (entry.expiresAt <= Date.now()) {
-			this.store.delete(key);
-			return undefined;
-		}
-
-		// Keep hottest keys in the end of insertion order for simple LRU-style eviction.
-		this.store.delete(key);
-		this.store.set(key, entry);
-
-		return entry.value;
-	}
-
-	set(key: string, value: T): void {
-		const expiresAt = Date.now() + translationCacheTtlMs;
-		this.store.set(key, { value, expiresAt });
-
-		while (this.store.size > translationCacheMaxEntries) {
-			const oldestKey = this.store.keys().next().value;
-			if (!oldestKey) break;
-			this.store.delete(oldestKey);
-		}
-	}
-
-	delete(key: string): void {
-		this.store.delete(key);
-	}
-
-	clear(): void {
-		this.store.clear();
-	}
-}
-
-const translationIdByKeyCache = new BoundedTtlCache<number | null>();
-const hasPluralFormsCache = new BoundedTtlCache<boolean>();
-const translationValueCache = new BoundedTtlCache<string | null>();
-const pluralFormsCache = new BoundedTtlCache<any | null>();
 let supportsTranslationKeyHashLookup: boolean | null = null;
 
 function keyWithNamespace(key: string, namespace: string | null): string {
@@ -607,143 +505,26 @@ export const translationModel = {
 	},
 
 	async generateTranslation(text: string, targetLangCode: string, context: string = null): Promise<string> {
-		const language = languagesMap[targetLangCode];
-
-		let RAW_TEXT = `You are an expert translator. You need to translate from English. Used in beekeeping and monitoring web app.`;
-
-		if (context) {
-			RAW_TEXT += ` The translation context is "${context}".`;
-		}
-
-		RAW_TEXT += ` Translate to ${language}.`;
-		RAW_TEXT += ` Do not write anything else but the translation in the target language (no extra notes or other languages) of the following phrase: ${text}`;
-
-		return this.callLLM(RAW_TEXT);
+		return translationGeneration.generateTranslation(text, targetLangCode, context);
 	},
 
 	async generateTranslations(text: string, targetLangCodes: string[], context: string = null): Promise<Record<string, string>> {
-		const validLangCodes = [...new Set(targetLangCodes)].filter((langCode) => languagesMap[langCode]);
-		if (validLangCodes.length === 0) {
-			return {};
-		}
-
-		let RAW_TEXT = `You are an expert translator. You need to translate from English. Used in beekeeping and monitoring web app.`;
-		if (context) {
-			RAW_TEXT += ` The translation context is "${context}".`;
-		}
-
-		const languageList = validLangCodes.map((code) => `${code} (${languagesMap[code]})`).join(', ');
-		RAW_TEXT += ` Translate the phrase "${text}" to the following languages: ${languageList}.`;
-		RAW_TEXT += ` Respond ONLY with a valid JSON object where keys are language codes and values are translations.`;
-		RAW_TEXT += ` Example format: {"ru":"...","de":"..."}.`;
-
-		const rawResponse = await this.callLLM(RAW_TEXT);
-		const parsed = parseJsonObjectFromLlm(rawResponse);
-		if (!parsed) {
-			throw new Error('Failed to parse batched translations JSON from LLM response');
-		}
-
-		const translations: Record<string, string> = {};
-		for (const langCode of validLangCodes) {
-			const value = parsed[langCode];
-			if (typeof value === 'string' && value.trim().length > 0) {
-				translations[langCode] = value.trim();
-			}
-		}
-
-		return translations;
+		return translationGeneration.generateTranslations(text, targetLangCodes, context);
 	},
 
 	async generatePluralForms(text: string, targetLangCode: string, forms: string[]): Promise<any> {
-		const language = languagesMap[targetLangCode];
-		const pluralData: any = {};
-
-		for (const form of forms) {
-			let RAW_TEXT = `You are an expert translator. You need to translate from English. Used in beekeeping and monitoring web app.`;
-
-			RAW_TEXT += ` Translate the word "${text}" to ${language} in the ${form} plural form.`;
-
-			if (targetLangCode === 'ru' || targetLangCode === 'pl') {
-				if (form === 'one') {
-					RAW_TEXT += ` Use the singular/nominative form (used with counts like 1, 21, 31...).`;
-				} else if (form === 'few') {
-					RAW_TEXT += ` Use the genitive singular form (used with counts like 2, 3, 4, 22, 23, 24...).`;
-				} else if (form === 'many') {
-					RAW_TEXT += ` Use the genitive plural form (used with counts like 5, 6, 7...20, 25, 26...).`;
-				}
-			} else {
-				if (form === 'one') {
-					RAW_TEXT += ` Use the singular form (used with count = 1).`;
-				} else if (form === 'other') {
-					RAW_TEXT += ` Use the plural form (used with count != 1).`;
-				}
-			}
-
-			RAW_TEXT += ` Respond with ONLY the translated word, nothing else.`;
-
-			pluralData[form] = await this.callLLM(RAW_TEXT);
-			logger.debug(`[generatePluralForms] Generated ${targetLangCode}.${form}: "${pluralData[form]}" for "${text}"`);
-		}
-
-		return pluralData;
+		return translationGeneration.generatePluralForms(text, targetLangCode, forms);
 	},
 
 	async generatePluralFormsForLanguages(text: string, formsByLanguage: Record<string, string[]>): Promise<Record<string, Record<string, string>>> {
-		const validEntries = Object.entries(formsByLanguage)
-			.filter(([langCode, forms]) => languagesMap[langCode] && Array.isArray(forms) && forms.length > 0);
-
-		if (validEntries.length === 0) {
-			return {};
-		}
-
-		let RAW_TEXT = `You are an expert translator. You need to translate from English. Used in beekeeping and monitoring web app.`;
-		RAW_TEXT += ` Translate the word "${text}" for pluralization across multiple languages.`;
-		RAW_TEXT += ` Respond ONLY with valid JSON in this format: {"ru":{"one":"...","few":"..."},"de":{"one":"...","other":"..."}}.`;
-		RAW_TEXT += ` Do not include explanations.`;
-		RAW_TEXT += ` Required plural forms: `;
-		RAW_TEXT += validEntries
-			.map(([langCode, forms]) => `${langCode} (${languagesMap[langCode]}): [${forms.join(', ')}]`)
-			.join('; ');
-		RAW_TEXT += ` Use linguistically correct forms for each plural category.`;
-
-		const rawResponse = await this.callLLM(RAW_TEXT);
-		const parsed = parseJsonObjectFromLlm(rawResponse);
-		if (!parsed) {
-			throw new Error('Failed to parse batched plural JSON from LLM response');
-		}
-
-		const pluralTranslations: Record<string, Record<string, string>> = {};
-		for (const [langCode, forms] of validEntries) {
-			const langValue = parsed[langCode];
-			if (!langValue || typeof langValue !== 'object' || Array.isArray(langValue)) {
-				continue;
-			}
-			for (const form of forms) {
-				const value = langValue[form];
-				if (typeof value === 'string' && value.trim().length > 0) {
-					if (!pluralTranslations[langCode]) {
-						pluralTranslations[langCode] = {};
-					}
-					pluralTranslations[langCode][form] = value.trim();
-				}
-			}
-		}
-
-		return pluralTranslations;
+		return translationGeneration.generatePluralFormsForLanguages(text, formsByLanguage);
 	},
 
 	async callLLM(prompt: string): Promise<string> {
-		return generateGeminiText(prompt, {
-			model: config.gemini?.translationModel || process.env.GEMINI_TRANSLATION_MODEL || "gemini-2.5-pro",
-			systemInstruction: "You are an expert translator for a beekeeping monitoring app. Reply only with translated text.",
-			temperature: 0.05,
-		});
+		return translationGeneration.callTranslationLLM(prompt);
 	},
 	clearCachesForTests(): void {
-		translationIdByKeyCache.clear();
-		hasPluralFormsCache.clear();
-		translationValueCache.clear();
-		pluralFormsCache.clear();
+		clearTranslationCaches();
 		supportsTranslationKeyHashLookup = null;
 	}
 };
