@@ -8440,23 +8440,23 @@
       "plurals": {}
     },
     {
-      "key": "Set minimum confidence for objects detected from uploaded images. These settings apply to frame image detections and bottom board varroa detections. All values below are percentages. Higher percentages are stricter and reduce false positives. Lower percentages detect more objects but may include more false positives.",
+      "key": "Minimum confidence for image detections. Higher values are stricter; lower values find more objects.",
       "namespace": null,
       "context": null,
       "values": {
-        "ar": "عيّن الحد الأدنى للثقة للكائنات المكتشفة في الصور المرفوعة. تنطبق هذه الإعدادات على اكتشافات صور الإطارات واكتشافات حلم الفاروا في لوح الخلية السفلي. جميع القيم أدناه هي نسب مئوية. النسب المئوية الأعلى تكون أكثر صرامة وتقلل من النتائج الإيجابية الخاطئة. النسب المئوية الأقل تكتشف المزيد من الكائنات ولكنها قد تتضمن المزيد من النتائج الإيجابية الخاطئة.",
-        "bn": "আপলোড করা ছবি থেকে সনাক্ত করা বস্তুর জন্য সর্বনিম্ন আস্থা নির্ধারণ করুন। এই সেটিংস ফ্রেমের ছবির সনাক্তকরণ এবং বটম বোর্ডের ভারোয়া মাইট সনাক্তকরণের জন্য প্রযোজ্য। নীচের সমস্ত মান শতাংশে দেওয়া আছে। উচ্চ শতাংশ বেশি কঠোর এবং ভুল পজিটিভ কমায়। নিম্ন শতাংশ বেশি বস্তু সনাক্ত করে তবে এতে আরও ভুল পজিটিভ অন্তর্ভুক্ত থাকতে পারে।",
-        "de": "Legen Sie die minimale Konfidenz für Objekte fest, die auf hochgeladenen Bildern erkannt werden. Diese Einstellungen gelten für die Erkennung auf Rahmenbildern und die Varroa-Erkennung auf dem Gitterboden. Alle nachstehenden Werte sind Prozentangaben. Höhere Prozentwerte sind strenger und reduzieren Falsch-Positive-Ergebnisse. Niedrigere Prozentwerte erkennen mehr Objekte, können aber mehr Falsch-Positive-Ergebnisse enthalten.",
-        "es": "Establezca la confianza mínima para los objetos detectados en las imágenes subidas. Estos ajustes se aplican a las detecciones en imágenes de cuadros y a las detecciones de varroa en el fondo de la colmena. Todos los valores a continuación son porcentajes. Los porcentajes más altos son más estrictos y reducen los falsos positivos. Los porcentajes más bajos detectan más objetos, pero pueden incluir más falsos positivos.",
-        "et": "Määrake üleslaaditud piltidelt tuvastatud objektide minimaalne usaldusväärsus. Need seaded kehtivad raami piltide tuvastustele ja tarupõhjalt varroalesta tuvastustele. Kõik allpool toodud väärtused on protsentides. Kõrgemad protsendid on rangemad ja vähendavad valepositiivseid tulemusi. Madalamad protsendid tuvastavad rohkem objekte, kuid võivad sisaldada rohkem valepositiivseid tulemusi.",
-        "fr": "Définissez le seuil de confiance minimum pour les objets détectés sur les images téléchargées. Ces paramètres s'appliquent aux détections sur les images de cadres et aux détections de varroas sur le plancher de la ruche. Toutes les valeurs ci-dessous sont des pourcentages. Des pourcentages plus élevés sont plus stricts et réduisent les faux positifs. Des pourcentages plus bas détectent plus d'objets mais peuvent inclure plus de faux positifs.",
-        "hi": "अपलोड की गई छवियों से पता लगाए गए ऑब्जेक्ट के लिए न्यूनतम आत्मविश्वास स्तर सेट करें। ये सेटिंग्स फ्रेम छवि पहचान और बॉटम बोर्ड वरroa पहचान पर लागू होती हैं। नीचे दिए गए सभी मान प्रतिशत में हैं। उच्च प्रतिशत अधिक सख्त होते हैं और गलत सकारात्मकता को कम करते हैं। कम प्रतिशत अधिक ऑब्जेक्ट का पता लगाते हैं लेकिन इसमें अधिक गलत सकारात्मकता शामिल हो सकती है।",
-        "ja": "アップロードされた画像から検出されたオブジェクトの最小信頼度を設定します。この設定は、巣枠画像の検出と巣箱の底板でのバロア検出に適用されます。以下の値はすべてパーセンテージです。パーセンテージが高いほど、より厳密になり、誤検出が減少します。パーセンテージが低いほど、より多くのオブジェクトを検出しますが、誤検出が多く含まれる可能性があります。",
-        "pl": "Ustaw minimalny poziom pewności dla obiektów wykrytych na przesłanych zdjęciach. Te ustawienia dotyczą detekcji na zdjęciach ramek oraz detekcji roztoczy Varroa na dennicy ula. Wszystkie poniższe wartości są podane w procentach. Wyższe wartości procentowe są bardziej rygorystyczne i zmniejszają liczbę fałszywych alarmów. Niższe wartości procentowe wykrywają więcej obiektów, ale mogą zawierać więcej fałszywych alarmów.",
-        "pt": "Defina a confiança mínima para objetos detetados nas imagens carregadas. Estas definições aplicam-se a deteções em imagens de quadros e a deteções de varroa no fundo da colmeia. Todos os valores abaixo são percentagens. Percentagens mais altas são mais rigorosas e reduzem os falsos positivos. Percentagens mais baixas detetam mais objetos, mas podem incluir mais falsos positivos.",
-        "ru": "Установите минимальный уровень уверенности для объектов, обнаруженных на загруженных изображениях. Эти настройки применяются к обнаружениям на изображениях рамок и обнаружениям клеща варроа на поддоне улья. Все значения ниже указаны в процентах. Более высокие значения являются более строгими и уменьшают количество ложных срабатываний. Более низкие значения позволяют обнаружить больше объектов, но могут включать больше ложных срабатываний.",
-        "tr": "Yüklenen resimlerden tespit edilen nesneler için minimum güvenilirlik seviyesini ayarlayın. Bu ayarlar, çerçeve resmi tespitleri ve kovan taban tahtası varroa tespitleri için geçerlidir. Aşağıdaki tüm değerler yüzde olarak verilmiştir. Daha yüksek yüzdeler daha katıdır ve yanlış pozitifleri azaltır. Daha düşük yüzdeler daha fazla nesne tespit eder ancak daha fazla yanlış pozitif içerebilir.",
-        "zh": "为从上传图像中检测到的对象设置最低置信度。这些设置适用于蜂框图像检测和巢底板瓦螨检测。以下所有数值均为百分比。百分比越高，要求越严格，并能减少误报。百分比越低，检测到的对象越多，但可能包含更多误报。"
+        "ar": "الحد الأدنى للثقة في اكتشاف الصور. القيم الأعلى أكثر صرامة؛ القيم الأقل تجد المزيد من الكائنات.",
+        "bn": "ছবি সনাক্তকরণের জন্য ন্যূনতম আস্থা। উচ্চ মান বেশি কঠোর; নিম্ন মান আরও বেশি বস্তু খুঁজে পায়।",
+        "de": "Minimale Konfidenz für Bilderkennungen. Höhere Werte sind strenger; niedrigere Werte finden mehr Objekte.",
+        "es": "Confianza mínima para detecciones en imágenes. Valores más altos son más estrictos; valores más bajos encuentran más objetos.",
+        "et": "Minimaalne usaldusväärsus pildituvastustele. Kõrgemad väärtused on rangemad; madalamad leiavad rohkem objekte.",
+        "fr": "Confiance minimale pour les détections d'images. Des valeurs plus élevées sont plus strictes ; des valeurs plus basses détectent plus d'objets.",
+        "hi": "छवि पहचान के लिए न्यूनतम आत्मविश्वास। उच्च मान अधिक सख्त हैं; निम्न मान अधिक वस्तुएँ पाते हैं।",
+        "ja": "画像検出の最小信頼度。値が高いほど厳しく、低いほど多くのオブジェクトを検出します。",
+        "pl": "Minimalna pewność detekcji na obrazach. Wyższe wartości są bardziej rygorystyczne; niższe wykrywają więcej obiektów.",
+        "pt": "Confiança mínima para deteções em imagens. Valores mais altos são mais rigorosos; valores mais baixos encontram mais objetos.",
+        "ru": "Минимальная уверенность для детекций на изображениях. Более высокие значения строже; более низкие находят больше объектов.",
+        "tr": "Görüntü tespitleri için minimum güven. Daha yüksek değerler daha katıdır; daha düşük değerler daha fazla nesne bulur.",
+        "zh": "图像检测的最低置信度。值越高越严格；值越低发现的对象越多。"
       },
       "plurals": {}
     },
