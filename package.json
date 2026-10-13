@@ -51,7 +51,7 @@
   },
   "homepage": "https://github.com/gratheon/user-cycle#readme",
   "engines": {
-    "node": ">=25.0.0"
+    "node": ">=26.0.0"
   },
   "devDependencies": {
     "@types/jest": "29.5.14",
