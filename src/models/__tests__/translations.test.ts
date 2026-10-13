@@ -1,29 +1,17 @@
 import { translationModel } from '../translations';
 import { storage } from '../../storage';
 import { logger } from '../../logger';
-import { generateGeminiText } from '../gemini';
+import { generateClaudeText } from '../anthropic';
 
 jest.mock('../../storage');
 jest.mock('../../logger');
-jest.mock('../gemini', () => ({
-	generateGeminiText: jest.fn(),
-}));
-jest.mock('clarifai-nodejs-grpc', () => ({
-	ClarifaiStub: {
-		grpc: jest.fn(() => ({
-			PostModelOutputs: jest.fn(),
-		})),
-	},
-	grpc: {
-		Metadata: jest.fn(() => ({
-			set: jest.fn(),
-		})),
-	},
+jest.mock('../anthropic', () => ({
+	generateClaudeText: jest.fn(),
 }));
 
 const mockStorage = storage as jest.MockedFunction<typeof storage>;
 const mockLogger = logger as jest.Mocked<typeof logger>;
-const mockGenerateGeminiText = generateGeminiText as jest.MockedFunction<typeof generateGeminiText>;
+const mockGenerateClaudeText = generateClaudeText as jest.MockedFunction<typeof generateClaudeText>;
 
 mockLogger.debug = jest.fn();
 mockLogger.info = jest.fn();
@@ -110,7 +98,7 @@ describe('translationModel caching', () => {
 	});
 
 	it('generates multiple language translations from one LLM call', async () => {
-		mockGenerateGeminiText.mockResolvedValueOnce(JSON.stringify({
+		mockGenerateClaudeText.mockResolvedValueOnce(JSON.stringify({
 			ru: 'Улей',
 			de: 'Bienenstock',
 		}));
@@ -121,11 +109,11 @@ describe('translationModel caching', () => {
 			ru: 'Улей',
 			de: 'Bienenstock',
 		});
-		expect(mockGenerateGeminiText).toHaveBeenCalledTimes(1);
+		expect(mockGenerateClaudeText).toHaveBeenCalledTimes(1);
 	});
 
 	it('generates plural forms for multiple languages from one LLM call', async () => {
-		mockGenerateGeminiText.mockResolvedValueOnce(JSON.stringify({
+		mockGenerateClaudeText.mockResolvedValueOnce(JSON.stringify({
 			ru: { one: 'улей', few: 'улья', many: 'ульев' },
 			de: { one: 'Bienenstock', other: 'Bienenstöcke' }
 		}));
@@ -139,7 +127,7 @@ describe('translationModel caching', () => {
 			ru: { one: 'улей', few: 'улья', many: 'ульев' },
 			de: { one: 'Bienenstock', other: 'Bienenstöcke' }
 		});
-		expect(mockGenerateGeminiText).toHaveBeenCalledTimes(1);
+		expect(mockGenerateClaudeText).toHaveBeenCalledTimes(1);
 	});
 
 	it('batches getByKeys lookups and reuses in-memory cache', async () => {

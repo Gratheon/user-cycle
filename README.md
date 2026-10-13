@@ -21,7 +21,7 @@ A comprehensive user management microservice for the [Gratheon](https://gratheon
 - **Internationalization (i18n)**
   - 13 language support (en, ru, et, tr, pl, de, fr, zh, hi, es, ar, bn, pt, ja)
   - Dual translation system (legacy + modern key-based)
-  - AI-powered translations via Clarifai LLM
+  - AI-powered translations via Anthropic Claude (Haiku)
   - Plural form support with language-specific rules
   
 - **User Management**
@@ -41,7 +41,7 @@ A comprehensive user management microservice for the [Gratheon](https://gratheon
 **External Integrations**
 - **Payment Processing**: Stripe
 - **Email**: AWS SES (Simple Email Service)
-- **AI Translations**: Clarifai (GPT model via gRPC)
+- **AI Translations**: Anthropic Claude Haiku via `@anthropic-ai/sdk` (`ANTHROPIC_API_KEY`)
 - **Monitoring**: Sentry (error tracking), ClickStack (observability)
 - **Schema Registry**: GraphQL Federation schema registration
 
@@ -222,7 +222,7 @@ flowchart LR
     user-cycle --"register schema"--> graphql-schema-registry
     graphql-router --> graphql-schema-registry
 
-    web-app--"translate text" --> user-cycle --"translate phrases"--> clarifai
+    web-app--"translate text" --> user-cycle --"translate phrases"--> anthropic
     user-cycle--"get/set translations"--> mysql
 
     user-cycle--"send emails"--> aws-ses["AWS SES"]
@@ -276,7 +276,7 @@ flowchart LR
    - Translation lookup and auto-creation
    - Batch translation processing
    - Plural form handling
-   - Mock dependencies: storage, logger, Clarifai
+   - Mock dependencies: storage, logger, Anthropic client
 
 2. **Registration Integration Tests** (`test/integration/register.test.ts:219`)
    - Successful registration flow

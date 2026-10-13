@@ -4,7 +4,7 @@ services:
     build:
       dockerfile: Dockerfile.dev
     environment:
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - ENV_ID=dev
       - NODE_OPTIONS=--enable-source-maps
       - REDIS_URL=${REDIS_URL:-redis://:pass@redis:6379}

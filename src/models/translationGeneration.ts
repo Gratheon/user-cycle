@@ -1,5 +1,4 @@
-import config from "../config/index";
-import { generateGeminiText } from "./gemini";
+import { generateClaudeText } from "./anthropic";
 import { languagesMap } from "./translationLanguages";
 import { logger } from "../logger";
 
@@ -23,10 +22,8 @@ function parseJsonObjectFromLlm(raw: string): Record<string, any> | null {
 }
 
 export async function callTranslationLLM(prompt: string): Promise<string> {
-	return generateGeminiText(prompt, {
-		model: config.gemini?.translationModel || process.env.GEMINI_TRANSLATION_MODEL || "gemini-2.5-pro",
+	return generateClaudeText(prompt, {
 		systemInstruction: "You are an expert translator for a beekeeping monitoring app. Reply only with translated text.",
-		temperature: 0.05,
 	});
 }
 

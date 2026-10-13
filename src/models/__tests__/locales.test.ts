@@ -1,17 +1,17 @@
 import { localeModel } from '../locales';
-import { generateGeminiText } from '../gemini';
+import { generateClaudeText } from '../anthropic';
 import { storage } from '../../storage';
 import { logger } from '../../logger';
 
 jest.mock('../../storage');
 jest.mock('../../logger');
-jest.mock('../gemini', () => ({
-  generateGeminiText: jest.fn().mockResolvedValue('mocked translation')
+jest.mock('../anthropic', () => ({
+  generateClaudeText: jest.fn().mockResolvedValue('mocked translation')
 }));
 
 const mockStorage = storage as jest.MockedFunction<typeof storage>;
 const mockLogger = logger as jest.Mocked<typeof logger>;
-const mockGenerateGeminiText = generateGeminiText as jest.MockedFunction<typeof generateGeminiText>;
+const mockGenerateClaudeText = generateClaudeText as jest.MockedFunction<typeof generateClaudeText>;
 
 mockLogger.debug = jest.fn();
 mockLogger.info = jest.fn();
@@ -308,8 +308,8 @@ describe('localeModel.translate', () => {
         tc: 'plural:few (genitive singular - for counts like 2, 3, 4...)'
       });
 
-      expect(mockGenerateGeminiText).toHaveBeenCalled();
-      const [prompt] = mockGenerateGeminiText.mock.calls[0];
+      expect(mockGenerateClaudeText).toHaveBeenCalled();
+      const [prompt] = mockGenerateClaudeText.mock.calls[0];
       expect(prompt).toContain('PLURAL FORM');
       expect(prompt).toContain('genitive singular');
     });
@@ -333,7 +333,7 @@ describe('localeModel.translate', () => {
         nl: 'Familie'
       };
 
-      mockGenerateGeminiText.mockResolvedValueOnce(JSON.stringify(translatedFamily));
+      mockGenerateClaudeText.mockResolvedValueOnce(JSON.stringify(translatedFamily));
 
       const queryMock = jest.fn()
         .mockResolvedValueOnce([])
@@ -382,7 +382,7 @@ describe('localeModel.translate', () => {
       expect(result.he).toBe('משפחה');
       expect(result.ko).toBe('가족');
       expect(result.nl).toBe('Familie');
-      expect(mockGenerateGeminiText).toHaveBeenCalledTimes(1);
+      expect(mockGenerateClaudeText).toHaveBeenCalledTimes(1);
     });
   });
 });
