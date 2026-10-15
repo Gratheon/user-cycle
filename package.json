@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "User registration, billing, deletion, management",
   "dependencies": {
+    "@anthropic-ai/sdk": "0.133.0",
     "@apollo/federation": "0.38.1",
     "@aws-sdk/client-ses": "3.980.0",
     "@databases/mysql": "7.0.0",
@@ -10,7 +11,6 @@
     "apollo-server-core": "3.13.0",
     "apollo-server-fastify": "3.13.0",
     "axios": "1.13.4",
-    "clarifai-nodejs-grpc": "11.11.0",
     "cross-fetch": "4.0.0",
     "dataloader": "^2.2.3",
     "deep-email-validator": "0.1.21",
@@ -51,7 +51,7 @@
   },
   "homepage": "https://github.com/gratheon/user-cycle#readme",
   "engines": {
-    "node": ">=25.0.0"
+    "node": ">=26.0.0"
   },
   "devDependencies": {
     "@types/jest": "29.5.14",

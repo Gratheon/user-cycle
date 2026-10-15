@@ -2,8 +2,7 @@ import { sql } from "@databases/mysql";
 
 import { storage } from "../storage";
 import { logger } from "../logger";
-import config from "../config/index";
-import { generateGeminiText } from "./gemini";
+import { generateClaudeText } from "./anthropic";
 
 const languagesMap = {
 	'ru': 'russian',
@@ -377,10 +376,8 @@ async function translate(targetLangCode, translation, tc) {
 
 	RAW_TEXT += ` Do not write anything else but the translation in the target language (no extra notes or other languages) of the following phrase: ${translation['en']}`;
 
-	return generateGeminiText(RAW_TEXT, {
-		model: config.gemini?.translationModel || process.env.GEMINI_TRANSLATION_MODEL || "gemini-2.5-pro",
+	return generateClaudeText(RAW_TEXT, {
 		systemInstruction: "You are an expert translator for a beekeeping monitoring app. Reply only with translated text.",
-		temperature: 0.05,
 	});
 }
 
@@ -411,10 +408,8 @@ async function translateMany(targetLangCodes: string[], translation: any, tc: st
 	RAW_TEXT += `. Respond ONLY with valid JSON object where keys are language codes and values are translations.`;
 	RAW_TEXT += ` Example: {"ru":"...","et":"..."}.`;
 
-	const rawResponse = await generateGeminiText(RAW_TEXT, {
-		model: config.gemini?.translationModel || process.env.GEMINI_TRANSLATION_MODEL || "gemini-2.5-pro",
+	const rawResponse = await generateClaudeText(RAW_TEXT, {
 		systemInstruction: "You are an expert translator for a beekeeping monitoring app. Reply only with translated text.",
-		temperature: 0.05,
 	});
 
 	const parsed = parseJsonObjectFromLlm(rawResponse);

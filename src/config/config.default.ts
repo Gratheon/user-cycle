@@ -55,12 +55,9 @@ const config = {
   // this must match graphql-router
   JWT_KEY: 'okzfERFAXXbRTQWkGFfjo3EcAXjRijnGnaAMEsTXnmdjAVDkQrfyLzscPwUiymbj',
   SENDGRID_API_KEY: '',
-  gemini: {
-    apiKey: process.env.GEMINI_API_KEY || '',
-    translationModel: process.env.GEMINI_TRANSLATION_MODEL || 'gemini-2.5-pro'
-  },
-  clarifai: {
-    translation_PAT: ''
+  anthropic: {
+    apiKey: process.env.ANTHROPIC_API_KEY || '',
+    translationModel: process.env.ANTHROPIC_TRANSLATION_MODEL || 'claude-haiku-5-5'
   },
 
   google_oauth: {

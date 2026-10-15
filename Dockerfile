@@ -1,4 +1,4 @@
-FROM platformatic/node-caged:25-slim AS base
+FROM platformatic/node-caged:26-slim AS base
 
 WORKDIR /app
 
@@ -24,7 +24,7 @@ COPY . .
 
 RUN pnpm run build
 
-FROM platformatic/node-caged:25-slim AS runtime
+FROM platformatic/node-caged:26-slim AS runtime
 
 WORKDIR /app
 ENV NODE_ENV=production
