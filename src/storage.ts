@@ -3,6 +3,12 @@ import * as fs from "fs";
 import * as crypto from "crypto";
 import config from "./config";
 
+// WHY: config.prod.ts replaces the whole postgres section, so pool limits are read with env and default fallbacks here
+function positiveInt(value: unknown, fallback: number): number {
+  const parsed = Math.floor(Number(value));
+  return parsed >= 1 ? parsed : fallback;
+}
+
 export { sql };
 
 let db;
@@ -40,9 +46,10 @@ async function tryConnect(logger): Promise<boolean> {
       // DigitalOcean managed Postgres requires TLS ("require" in prod); "prefer" also works with a local container without TLS
       ssl: ssl as any,
       bigIntMode: 'number',
-      poolSize: 5,
+      // The managed Postgres cluster is shared by all services and has ~22 usable slots
+      poolSize: positiveInt(config.postgres.poolSize ?? process.env.DB_POOL_SIZE, 3),
       maxUses: 7500,
-      idleTimeoutMilliseconds: 30_000,
+      idleTimeoutMilliseconds: positiveInt(config.postgres.idleTimeoutMilliseconds ?? process.env.DB_IDLE_TIMEOUT_MS, 10_000),
       queueTimeoutMilliseconds: 60_000,
       onError: (err) => {
         logger.error(`Postgres connection pool error: ${err.message}`);
