@@ -10,6 +10,9 @@ const config = {
     database: process.env.DB_NAME || 'user_cycle',
     // disable | prefer | require | no-verify
     ssl: process.env.DB_SSL || 'prefer',
+    // optional pool limits, defaults live in src/storage.ts
+    poolSize: process.env.DB_POOL_SIZE,
+    idleTimeoutMilliseconds: process.env.DB_IDLE_TIMEOUT_MS,
   },
 
   redis: {
