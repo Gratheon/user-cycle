@@ -1,4 +1,4 @@
-import { sql } from "@databases/mysql";
+import { sql } from "@databases/pg";
 import { storage } from "../storage";
 
 export const billingHistoryModel = {
@@ -6,10 +6,10 @@ export const billingHistoryModel = {
 		const result = await storage().query(
 			sql`SELECT 
 				id,
-				event_type as eventType,
-				billing_plan as billingPlan,
+				event_type as "eventType",
+				billing_plan as "billingPlan",
 				details,
-				created_at as createdAt
+				created_at as "createdAt"
 			FROM billing_history
 			WHERE user_id=${userId}
 			ORDER BY created_at DESC

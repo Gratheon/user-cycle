@@ -1,4 +1,4 @@
-import { sql } from "@databases/mysql";
+import { sql } from "@databases/pg";
 import { v4 as uuidv4 } from 'uuid';
 
 import { storage } from "../storage";
@@ -9,7 +9,7 @@ export const tokenModel = {
 		const result = await storage().query(
 			sql`SELECT *
 			FROM api_tokens
-			WHERE user_id=${ctx.uid} AND \`date_deleted\` IS NULL
+			WHERE user_id=${ctx.uid} AND date_deleted IS NULL
 			ORDER BY date_added DESC
 			LIMIT 10`
 		);
@@ -20,7 +20,7 @@ export const tokenModel = {
 		const result = await storage().query(
 			sql`SELECT user_id
 			FROM api_tokens
-			WHERE token=${token} AND \`date_deleted\` IS NULL
+			WHERE token=${token} AND date_deleted IS NULL
 			LIMIT 1`
 		);
 
@@ -44,11 +44,12 @@ export const tokenModel = {
 
 		const result = await storage().query(
 			sql`INSERT INTO api_tokens (token, user_id)
-			VALUES(${token}, ${user_id})`
+			VALUES(${token}, ${user_id})
+			RETURNING id`
 		);
 
 		return {
-			id: result.insertId,
+			id: result[0].id,
 			user_id,
 			token
 		}
@@ -58,9 +59,9 @@ export const tokenModel = {
 export const shareTokenModel = {
 	getTokens: async function (ctx) {
 		const result = await storage().query(
-			sql`SELECT *, target_url as targetUrl
+			sql`SELECT *, target_url as "targetUrl"
 			FROM share_tokens
-			WHERE user_id=${ctx.uid} AND \`date_deleted\` IS NULL
+			WHERE user_id=${ctx.uid} AND date_deleted IS NULL
 			ORDER BY date_added DESC
 			LIMIT 10`
 		);
@@ -72,7 +73,7 @@ export const shareTokenModel = {
 		const result = await storage().query(
 			sql`SELECT user_id
 			FROM share_tokens
-			WHERE token=${token} AND \`date_deleted\` IS NULL
+			WHERE token=${token} AND date_deleted IS NULL
 			LIMIT 1`
 		);
 
@@ -117,11 +118,12 @@ export const shareTokenModel = {
 
 		const result = await storage().query(
 			sql`INSERT INTO share_tokens (token, user_id, name, target_url, scopes)
-			VALUES(${token}, ${user_id}, ${name}, ${targetUrl}, ${JSON.stringify(scopes)})`
+			VALUES(${token}, ${user_id}, ${name}, ${targetUrl}, ${JSON.stringify(scopes)})
+			RETURNING id`
 		);
 
 		return {
-			id: result.insertId,
+			id: result[0].id,
 			user_id,
 			token,
 			targetUrl
@@ -132,9 +134,9 @@ export const shareTokenModel = {
 	getTokenDetailsByToken: async function (token: string): Promise<{ id: number; name: string; scopes: any; userId: number } | null> { // Added userId to return type
 		console.log(`shareTokenModel.getTokenDetailsByToken: Validating token: ${token}`); // Log received token
 		const result = await storage().query(
-			sql`SELECT id, name, scopes, user_id as userId
+			sql`SELECT id, name, scopes, user_id as "userId"
 			FROM share_tokens
-			WHERE token=${token} AND \`date_deleted\` IS NULL
+			WHERE token=${token} AND date_deleted IS NULL
 			LIMIT 1`
 		);
 		console.log(`shareTokenModel.getTokenDetailsByToken: DB query result for token ${token}:`, result); // Log DB result

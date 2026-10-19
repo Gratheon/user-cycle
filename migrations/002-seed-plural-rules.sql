@@ -1,0 +1,26 @@
+-- CLDR plural categories per supported language (used to generate plural translation forms)
+INSERT INTO plural_rules (lang, forms) VALUES
+  ('en', '["one", "other"]'),
+  ('ru', '["one", "few", "many"]'),
+  ('pl', '["one", "few", "many"]'),
+  ('et', '["one", "other"]'),
+  ('tr', '["one", "other"]'),
+  ('de', '["one", "other"]'),
+  ('fr', '["one", "other"]'),
+  ('zh', '["other"]'),
+  ('hi', '["one", "other"]'),
+  ('es', '["one", "other"]'),
+  ('ar', '["zero", "one", "two", "few", "many", "other"]'),
+  ('bn', '["one", "other"]'),
+  ('pt', '["one", "other"]'),
+  ('ja', '["other"]'),
+  ('lv', '["zero", "one", "other"]'),
+  ('lt', '["one", "few", "many", "other"]'),
+  ('hu', '["one", "other"]'),
+  ('uk', '["one", "few", "many", "other"]'),
+  ('it', '["one", "other"]'),
+  ('ro', '["one", "few", "other"]'),
+  ('he', '["one", "two", "other"]'),
+  ('ko', '["other"]'),
+  ('nl', '["one", "other"]')
+ON CONFLICT (lang) DO NOTHING;

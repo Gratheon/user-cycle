@@ -1,4 +1,4 @@
-import { sql } from "@databases/mysql";
+import { sql } from "@databases/pg";
 import { storage } from "../storage";
 import { logger } from "../logger";
 import { clearTranslationCaches, hasPluralFormsCache, pluralFormsCache, translationIdByKeyCache, translationValueCache } from "./translationCache";
@@ -20,9 +20,9 @@ function buildKeyNamespaceWhereClause(pairs: Array<{ key: string; namespace: str
 
 	for (const pair of pairs) {
 		if (caseInsensitive) {
-			whereClause = sql`${whereClause} OR (LOWER(\`key\`) = LOWER(${pair.key}) AND namespace <=> ${pair.namespace})`;
+			whereClause = sql`${whereClause} OR (LOWER(key) = LOWER(${pair.key}) AND namespace IS NOT DISTINCT FROM ${pair.namespace})`;
 		} else {
-			whereClause = sql`${whereClause} OR (\`key\` = ${pair.key} AND namespace <=> ${pair.namespace})`;
+			whereClause = sql`${whereClause} OR (key = ${pair.key} AND namespace IS NOT DISTINCT FROM ${pair.namespace})`;
 		}
 	}
 
@@ -90,7 +90,7 @@ export const translationModel = {
 
 		const exactWhereClause = buildKeyNamespaceWhereClause(missingInputs, false);
 		const exactMatches = await storage().query(
-			sql`SELECT id, \`key\`, namespace FROM translations WHERE ${exactWhereClause}`
+			sql`SELECT id, key, namespace FROM translations WHERE ${exactWhereClause}`
 		);
 
 		const foundIdsByCacheKey = new Map<string, number>();
@@ -106,7 +106,7 @@ export const translationModel = {
 		if (unresolved.length > 0) {
 			const caseInsensitiveWhereClause = buildKeyNamespaceWhereClause(unresolved, true);
 			const caseInsensitiveMatches = await storage().query(
-				sql`SELECT id, \`key\`, namespace FROM translations WHERE ${caseInsensitiveWhereClause}`
+				sql`SELECT id, key, namespace FROM translations WHERE ${caseInsensitiveWhereClause}`
 			);
 
 			for (const row of caseInsensitiveMatches) {
@@ -151,9 +151,9 @@ export const translationModel = {
 			try {
 				result = await storage().query(
 					sql`SELECT id FROM translations
-						WHERE key_hash = SHA2(${key}, 256)
-						  AND \`key\` = ${key}
-						  AND namespace <=> ${namespace}
+						WHERE key_hash = utf8_sha256_hex(${key})
+						  AND key = ${key}
+						  AND namespace IS NOT DISTINCT FROM ${namespace}
 						LIMIT 1`
 				);
 				supportsTranslationKeyHashLookup = true;
@@ -170,8 +170,8 @@ export const translationModel = {
 		if (result.length === 0 && supportsTranslationKeyHashLookup === false) {
 			result = await storage().query(
 				sql`SELECT id FROM translations
-					WHERE \`key\` = ${key}
-					  AND namespace <=> ${namespace}
+					WHERE key = ${key}
+					  AND namespace IS NOT DISTINCT FROM ${namespace}
 					LIMIT 1`
 			);
 		}
@@ -179,7 +179,7 @@ export const translationModel = {
 		if (result.length === 0) {
 			logger.debug(`[getByKey] Exact match not found, trying case-insensitive for "${key}"`);
 			result = await storage().query(
-				sql`SELECT id FROM translations WHERE LOWER(\`key\`) = LOWER(${key}) AND namespace <=> ${namespace} LIMIT 1`
+				sql`SELECT id FROM translations WHERE LOWER(key) = LOWER(${key}) AND namespace IS NOT DISTINCT FROM ${namespace} ORDER BY id LIMIT 1`
 			);
 			if (result.length > 0) {
 				logger.debug(`[getByKey] Found case-insensitive match:`, { id: result[0].id });
@@ -280,10 +280,11 @@ export const translationModel = {
 
 		try {
 			await storage().query(
-				sql`INSERT INTO translations (\`key\`, namespace, context) VALUES (${key}, ${namespace}, ${context})`
+				sql`INSERT INTO translations (key, namespace, context) VALUES (${key}, ${namespace}, ${context})`
 			);
 		} catch (error) {
-			if ((error as any)?.code === 'ER_DUP_ENTRY') {
+			// 23505 = unique_violation: a concurrent request created the same key
+			if ((error as any)?.code === '23505') {
 				const duplicatedId = await this.getByKey(key, namespace);
 				if (duplicatedId !== null) {
 					return duplicatedId;
@@ -322,7 +323,8 @@ export const translationModel = {
 		await storage().query(
 			sql`INSERT INTO translation_values (translation_id, lang, value) 
 				VALUES (${translationId}, ${lang}, ${value})
-				ON DUPLICATE KEY UPDATE value = ${value}, date_updated = NOW()`
+				ON CONFLICT (translation_id, lang) DO UPDATE
+				SET value = EXCLUDED.value, date_updated = NOW()`
 		);
 		translationValueCache.set(translationLangKey(translationId, lang), value);
 	},
@@ -354,7 +356,8 @@ export const translationModel = {
 		await storage().query(
 			sql`INSERT INTO plural_forms (translation_id, lang, plural_data) 
 				VALUES (${translationId}, ${lang}, ${jsonData})
-				ON DUPLICATE KEY UPDATE plural_data = ${jsonData}, date_updated = NOW()`
+				ON CONFLICT (translation_id, lang) DO UPDATE
+				SET plural_data = EXCLUDED.plural_data, date_updated = NOW()`
 		);
 		pluralFormsCache.set(translationLangKey(translationId, lang), pluralData);
 		hasPluralFormsCache.set(String(translationId), true);

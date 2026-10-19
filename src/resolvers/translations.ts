@@ -324,11 +324,11 @@ export const translationResolvers = {
 			logger.info(`[batchTranslateLanguage] Starting batch translation for ${languagesMap[langCode]} (${langCode})`);
 
 			const { storage } = require('../storage');
-			const { sql } = require('@databases/mysql');
+			const { sql } = require('@databases/pg');
 
 			try {
 				const allTranslations = await storage().query(
-					sql`SELECT id, \`key\`, context FROM translations ORDER BY id`
+					sql`SELECT id, key, context FROM translations ORDER BY id`
 				);
 
 				logger.info(`[batchTranslateLanguage] Found ${allTranslations.length} translation keys to process`);

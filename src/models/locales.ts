@@ -1,4 +1,4 @@
-import { sql } from "@databases/mysql";
+import { sql } from "@databases/pg";
 
 import { storage } from "../storage";
 import { logger } from "../logger";
@@ -49,9 +49,9 @@ export const localeModel = {
 		let result;
 
 		if (key) {
-			result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE \`key\`=${key} LIMIT 1`);
+			result = await storage().query(sql`SELECT id, key, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE key=${key} LIMIT 1`);
 		} else {
-			result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE en=${en} LIMIT 1`);
+			result = await storage().query(sql`SELECT id, key, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE en=${en} LIMIT 1`);
 		}
 
 		let translation = result[0]
@@ -59,12 +59,12 @@ export const localeModel = {
 			if (process.env.ENV_ID == 'dev') {
 				if (!translation) {
 				logger.info(`[translate] Creating new translation entry: key="${key}" (${key?.length} chars), en="${en}"`);
-				await storage().query(sql`INSERT INTO locales (\`key\`, translation_context, en) VALUES(${key}, ${tc}, ${en})`);
+				await storage().query(sql`INSERT INTO locales (key, translation_context, en) VALUES(${key}, ${tc}, ${en})`);
 
 				if (key) {
-					result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE \`key\`=${key} LIMIT 1`);
+					result = await storage().query(sql`SELECT id, key, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE key=${key} LIMIT 1`);
 				} else {
-					result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE en=${en} LIMIT 1`);
+					result = await storage().query(sql`SELECT id, key, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE en=${en} LIMIT 1`);
 				}
 					translation = result[0]
 				}
@@ -113,9 +113,9 @@ export const localeModel = {
 				}
 
 			if (key) {
-				result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE \`key\`=${key} LIMIT 1`);
+				result = await storage().query(sql`SELECT id, key, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE key=${key} LIMIT 1`);
 			} else {
-				result = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE en=${en} LIMIT 1`);
+				result = await storage().query(sql`SELECT id, key, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE en=${en} LIMIT 1`);
 			}
 			translation = result[0]
 		}
@@ -143,7 +143,7 @@ export const localeModel = {
 		if (keyRequests.length > 0) {
 			const keys = keyRequests.map(r => r.key);
 			const keyResults = await storage().query(
-				sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE \`key\` IN (${keys})`
+				sql`SELECT id, key, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE key = ANY(${keys}::citext[])`
 			);
 			results.push(...keyResults);
 		}
@@ -152,7 +152,7 @@ export const localeModel = {
 		if (enRequests.length > 0) {
 			const enTexts = enRequests.map(r => r.en);
 			const enResults = await storage().query(
-				sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE en IN (${enTexts})`
+				sql`SELECT id, key, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE en = ANY(${enTexts}::citext[])`
 			);
 			results.push(...enResults);
 		}
@@ -180,13 +180,13 @@ export const localeModel = {
 
 			for (const request of missingTranslations) {
 				logger.info(`[translateBatch] Creating new entry: key="${request.key || null}" (${request.key?.length} chars), en="${request.en}"`);
-				await storage().query(sql`INSERT INTO locales (\`key\`, translation_context, en) VALUES(${request.key || null}, ${request.tc || ''}, ${request.en})`);
+				await storage().query(sql`INSERT INTO locales (key, translation_context, en) VALUES(${request.key || null}, ${request.tc || ''}, ${request.en})`);
 
 				let newResult;
 				if (request.key) {
-					newResult = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE \`key\`=${request.key} LIMIT 1`);
+					newResult = await storage().query(sql`SELECT id, key, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE key=${request.key} LIMIT 1`);
 				} else {
-					newResult = await storage().query(sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE en=${request.en} LIMIT 1`);
+					newResult = await storage().query(sql`SELECT id, key, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE en=${request.en} LIMIT 1`);
 				}
 
 				if (newResult[0]) {
@@ -314,7 +314,7 @@ export const localeModel = {
 			if (keyRequests.length > 0) {
 				const keys = keyRequests.map(r => r.key);
 				const keyResults = await storage().query(
-					sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE \`key\` IN (${keys})`
+					sql`SELECT id, key, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE key = ANY(${keys}::citext[])`
 				);
 				finalResults.push(...keyResults);
 			}
@@ -322,7 +322,7 @@ export const localeModel = {
 			if (enRequests.length > 0) {
 				const enTexts = enRequests.map(r => r.en);
 				const enResults = await storage().query(
-					sql`SELECT id, \`key\`, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE en IN (${enTexts})`
+					sql`SELECT id, key, en, ru, et, tr, pl, de, fr, lv, lt, hu, uk, it, ro, he, ko, nl FROM locales WHERE en = ANY(${enTexts}::citext[])`
 				);
 				finalResults.push(...enResults);
 			}

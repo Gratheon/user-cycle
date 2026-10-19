@@ -3,8 +3,8 @@
 
 const fs = require("fs");
 const path = require("path");
-const createConnectionPool = require("@databases/mysql").default;
-const { sql } = require("@databases/mysql");
+const createConnectionPool = require("@databases/pg").default;
+const { sql } = require("@databases/pg");
 
 const DEFAULT_FILE = "translations/user-cycle-translations.json";
 
@@ -22,15 +22,16 @@ function loadAppConfigIfAvailable() {
 
 function resolveDbConfig() {
   const appConfig = loadAppConfigIfAvailable();
-  const appMysql = appConfig && appConfig.mysql ? appConfig.mysql : {};
+  const appDb = appConfig && appConfig.postgres ? appConfig.postgres : {};
 
-  const host = process.env.MYSQL_HOST || appMysql.host || "127.0.0.1";
-  const port = process.env.MYSQL_PORT || appMysql.port || "5100";
-  const user = process.env.MYSQL_USER || appMysql.user || "test";
-  const password = process.env.MYSQL_PASSWORD || appMysql.password || "test";
-  const database = process.env.MYSQL_DATABASE || appMysql.database || "user-cycle";
+  const host = process.env.DB_HOST || appDb.host || "127.0.0.1";
+  const port = process.env.DB_PORT || appDb.port || "5432";
+  const user = process.env.DB_USER || appDb.user || "test";
+  const password = process.env.DB_PASSWORD || appDb.password || "test";
+  const database = process.env.DB_NAME || appDb.database || "user_cycle";
+  const ssl = process.env.DB_SSL || appDb.ssl || "prefer";
 
-  return { host, port, user, password, database };
+  return { host, port, user, password, database, ssl };
 }
 
 function resolveFilePath(inputPath) {
@@ -41,7 +42,7 @@ function resolveFilePath(inputPath) {
 }
 
 function buildDsn(cfg) {
-  return `mysql://${cfg.user}:${cfg.password}@${cfg.host}:${cfg.port}/${cfg.database}?connectionLimit=3&waitForConnections=true`;
+  return `postgresql://${encodeURIComponent(cfg.user)}:${encodeURIComponent(cfg.password)}@${cfg.host}:${cfg.port}/${cfg.database}`;
 }
 
 function parseArgs() {
@@ -59,9 +60,9 @@ function stringifyStable(value) {
 
 async function exportSnapshot(db, filePath) {
   const translations = await db.query(
-    sql`SELECT id, \`key\`, namespace, context
+    sql`SELECT id, key, namespace, context
         FROM translations
-        ORDER BY namespace IS NULL DESC, namespace, \`key\``
+        ORDER BY namespace IS NULL DESC, namespace, LOWER(key), key`
   );
 
   const values = await db.query(
@@ -112,7 +113,9 @@ async function exportSnapshot(db, filePath) {
 
 async function getTranslationId(db, key, namespace) {
   const rows = await db.query(
-    sql`SELECT id FROM translations WHERE \`key\` = ${key} AND namespace <=> ${namespace} LIMIT 1`
+    sql`SELECT id FROM translations
+        WHERE key_hash = utf8_sha256_hex(${key}) AND namespace IS NOT DISTINCT FROM ${namespace}
+        LIMIT 1`
   );
   if (!rows.length) {
     throw new Error(`Translation not found after upsert (key="${key}", namespace="${namespace}")`);
@@ -132,9 +135,10 @@ async function importSnapshot(db, filePath) {
 
   for (const item of items) {
     await db.query(
-      sql`INSERT INTO translations (\`key\`, namespace, context)
+      // unique_key_namespace_hash is NULLS NOT DISTINCT, so NULL-namespace keys upsert too
+      sql`INSERT INTO translations (key, namespace, context)
           VALUES (${item.key}, ${item.namespace ?? null}, ${item.context ?? null})
-          ON DUPLICATE KEY UPDATE context = VALUES(context)`
+          ON CONFLICT (key_hash, namespace) DO UPDATE SET context = EXCLUDED.context`
     );
 
     const translationId = await getTranslationId(db, item.key, item.namespace ?? null);
@@ -144,7 +148,8 @@ async function importSnapshot(db, filePath) {
       await db.query(
         sql`INSERT INTO translation_values (translation_id, lang, value)
             VALUES (${translationId}, ${lang}, ${String(value)})
-            ON DUPLICATE KEY UPDATE value = VALUES(value), date_updated = NOW()`
+            ON CONFLICT (translation_id, lang) DO UPDATE
+            SET value = EXCLUDED.value, date_updated = NOW()`
       );
     }
 
@@ -153,7 +158,8 @@ async function importSnapshot(db, filePath) {
       await db.query(
         sql`INSERT INTO plural_forms (translation_id, lang, plural_data)
             VALUES (${translationId}, ${lang}, ${JSON.stringify(pluralData)})
-            ON DUPLICATE KEY UPDATE plural_data = VALUES(plural_data), date_updated = NOW()`
+            ON CONFLICT (translation_id, lang) DO UPDATE
+            SET plural_data = EXCLUDED.plural_data, date_updated = NOW()`
       );
     }
   }
@@ -165,7 +171,7 @@ async function main() {
   const { command, filePath } = parseArgs();
   const dbCfg = resolveDbConfig();
   const dsn = buildDsn(dbCfg);
-  const db = createConnectionPool({ connectionString: dsn, bigIntMode: "number" });
+  const db = createConnectionPool({ connectionString: dsn, ssl: dbCfg.ssl, bigIntMode: "number" });
 
   try {
     if (command === "export") {

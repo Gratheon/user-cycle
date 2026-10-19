@@ -6,7 +6,7 @@
     "@anthropic-ai/sdk": "0.133.0",
     "@apollo/federation": "0.38.1",
     "@aws-sdk/client-ses": "3.980.0",
-    "@databases/mysql": "7.0.0",
+    "@databases/pg": "5.5.0",
     "@gratheon/log-lib": "4.1.2",
     "apollo-server-core": "3.13.0",
     "apollo-server-fastify": "3.13.0",

@@ -2,12 +2,14 @@ const config = {
   sentryDsn: "",
   schemaRegistryHost: `http://gql-schema-registry:3000`,
   selfUrl: "user-cycle:4000",
-  mysql: {
-    host: 'mysql',
-    port: '3306',
-    user: 'test',
-    password: 'test',
-    database: 'user-cycle',
+  postgres: {
+    host: process.env.DB_HOST || 'postgres',
+    port: process.env.DB_PORT || '5432',
+    user: process.env.DB_USER || 'test',
+    password: process.env.DB_PASSWORD || 'test',
+    database: process.env.DB_NAME || 'user_cycle',
+    // disable | prefer | require | no-verify
+    ssl: process.env.DB_SSL || 'prefer',
   },
 
   redis: {

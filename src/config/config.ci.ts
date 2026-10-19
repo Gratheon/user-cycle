@@ -2,13 +2,14 @@ import config from './config.default';
 
 const testConfig = {
   ...config,
-  mysql: {
-    ...config.mysql,
+  postgres: {
+    ...config.postgres,
     host: '127.0.0.1',
-    port: '3306',
+    port: '5432',
     user: 'test',
     password: 'test',
-    database: 'user-cycle',
+    database: 'user_cycle',
+    ssl: 'disable',
   },
   schemaRegistryHost: 'http://127.0.0.1:3999',
   selfUrl: 'http://127.0.0.1:4000',
