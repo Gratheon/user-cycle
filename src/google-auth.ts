@@ -78,7 +78,8 @@ export function registerGoogle(app) {
 				logger.info('Google auth - user does not exist, registering');
 				const expirationDate = new Date();
 				expirationDate.setDate(expirationDate.getDate() + TRIAL_DAYS);
-				const expirationDateString = expirationDate.toISOString().substring(0, 19).replace('T', ' ');
+				// Full ISO string with Z: TIMESTAMPTZ must not depend on the session time zone
+				const expirationDateString = expirationDate.toISOString();
 
 				// generate random password
 				const password = Math.random().toString(36).substring(2, 15);

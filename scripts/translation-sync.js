@@ -62,7 +62,8 @@ async function exportSnapshot(db, filePath) {
   const translations = await db.query(
     sql`SELECT id, key, namespace, context
         FROM translations
-        ORDER BY namespace IS NULL DESC, namespace, LOWER(key), key`
+        -- COLLATE "C": stable snapshot order regardless of the server collation
+        ORDER BY namespace IS NULL DESC, namespace COLLATE "C", LOWER(key) COLLATE "C", key COLLATE "C"`
   );
 
   const values = await db.query(

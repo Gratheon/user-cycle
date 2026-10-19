@@ -17,7 +17,16 @@ export function isStorageConnected(): boolean {
   return isConnected;
 }
 
+let connecting = false;
+
 async function tryConnect(logger): Promise<boolean> {
+  // Reconnect attempts can outlive the 10s interval (connect timeout + migrations): never overlap them
+  if (connecting) {
+    return false;
+  }
+  connecting = true;
+
+  let pool;
   try {
     const { user, password, host, port, database, ssl } = config.postgres;
 
@@ -26,9 +35,9 @@ async function tryConnect(logger): Promise<boolean> {
     const startTimes = new Map<SQLQuery, number>();
     let connectionsCount = 0;
 
-    db = createConnectionPool({
+    pool = createConnectionPool({
       connectionString: `postgresql://${encodeURIComponent(user)}:${encodeURIComponent(password)}@${host}:${port}/${database}`,
-      // DigitalOcean managed Postgres requires TLS; "prefer" also works with a local container without TLS
+      // DigitalOcean managed Postgres requires TLS ("require" in prod); "prefer" also works with a local container without TLS
       ssl: ssl as any,
       bigIntMode: 'number',
       poolSize: 5,
@@ -70,17 +79,10 @@ async function tryConnect(logger): Promise<boolean> {
       },
     });
 
-    process.once('SIGTERM', () => {
-      if (reconnectInterval) {
-        clearInterval(reconnectInterval);
-      }
-      db.dispose().catch((ex) => {
-        console.error(ex);
-      });
-    });
+    await migrate(pool, logger);
 
-    await migrate(logger);
-
+    // Published only after migrations succeeded, so requests never see a half-migrated schema
+    db = pool;
     isConnected = true;
     logger.info('Postgres connection established successfully');
 
@@ -94,14 +96,24 @@ async function tryConnect(logger): Promise<boolean> {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logger.error(`Failed to connect to Postgres: ${errorMessage}`);
     isConnected = false;
-    // Drop the half-initialised pool so periodic retries do not leak connections
-    await db?.dispose().catch(() => {});
-    db = undefined;
+    // Drop the failed pool so periodic retries do not leak connections
+    await pool?.dispose().catch(() => {});
     return false;
+  } finally {
+    connecting = false;
   }
 }
 
 export async function initStorage(logger) {
+  process.once('SIGTERM', () => {
+    if (reconnectInterval) {
+      clearInterval(reconnectInterval);
+    }
+    db?.dispose().catch((ex) => {
+      console.error(ex);
+    });
+  });
+
   const connected = await tryConnect(logger);
 
   if (!connected) {
@@ -114,7 +126,7 @@ export async function initStorage(logger) {
   }
 }
 
-async function migrate(logger) {
+async function migrate(db, logger) {
   await db.query(sql`CREATE TABLE IF NOT EXISTS _db_migrations (
     hash VARCHAR(255),
     filename VARCHAR(255),

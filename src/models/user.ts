@@ -60,25 +60,26 @@ export const userModel = {
 
 		return result;
 	},
-	extendAccountExpirationByOneMonth: async ({ email }) => {
+	// db: pass a transaction connection to make the update part of a larger unit of work
+	extendAccountExpirationByOneMonth: async ({ email }, db = storage()) => {
 		// extend subscriptions where date_expiration is in the future
 		// WHY sql``: the previous raw-string queries were rejected by @databases with
 		// "Invalid query", so Stripe invoice.paid never extended subscriptions
-		await storage().query(
+		await db.query(
 			sql`UPDATE account
 			SET date_expiration = date_expiration + INTERVAL '1 month'
 			WHERE email=${email} AND date_expiration > NOW()`
 		);
 
 		// extend subscriptions where date_expiration is in the past
-		await storage().query(
+		await db.query(
 			sql`UPDATE account
 			SET date_expiration = NOW() + INTERVAL '1 month'
 			WHERE email=${email} AND date_expiration < NOW()`
 		);
 	},
-	updateSubscription: async ({ subscription, email }) => {
-		await storage().query(
+	updateSubscription: async ({ subscription, email }, db = storage()) => {
+		await db.query(
 			sql`UPDATE account SET stripe_subscription=${subscription} WHERE email=${email}`
 		);
 	},
