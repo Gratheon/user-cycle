@@ -65,17 +65,16 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      mysql:
-        image: mysql:8.0
+      postgres:
+        image: postgres:18
         env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: user-cycle
-          MYSQL_USER: test
-          MYSQL_PASSWORD: test
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: user_cycle
         ports:
-          - 3306:3306
+          - 5432:5432
         options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1 -ptest"
+          --health-cmd="pg_isready -U test -d user_cycle"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=10

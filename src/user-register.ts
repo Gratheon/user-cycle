@@ -96,7 +96,8 @@ export default async function registerUser(_, { input }) {
 
     const expirationDate = new Date();
     expirationDate.setDate(expirationDate.getDate() + TRIAL_DAYS);
-    const expirationDateString = expirationDate.toISOString().substring(0, 19).replace('T', ' ');
+    // Full ISO string with Z: TIMESTAMPTZ must not depend on the session time zone
+    const expirationDateString = expirationDate.toISOString();
 
     await userModel.create(first_name, last_name, email, password, lang || 'en', locale || null, expirationDateString, 'professional');
     id = await userModel.findByEmailAndPass(email, password)

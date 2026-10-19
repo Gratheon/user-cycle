@@ -5,7 +5,7 @@ import fastifyRawBody from 'fastify-raw-body';
 // local dependencies
 import {logger} from './logger';
 import config from './config/index';
-import { storage } from "./storage";
+import { sql, storage } from "./storage";
 import { userModel } from './models/user';
 import { billingHistoryModel } from './models/billingHistory';
 
@@ -44,17 +44,31 @@ export function registerStripe(app) {
 				return;
 			}
 			try {
+				// One transaction for the event row and every account/billing write it causes:
+				// a crash or error mid-way rolls everything back, and Stripe's retry reprocesses it.
+				await storage().tx(async (dbi) => {
 				const session = event?.data?.object;
-				await storage().query(
-					"INSERT INTO `stripe_events` (`id`, `user_id`, `type`, `created`, `data`) " +
-					"VALUES (?, (SELECT id FROM `account` WHERE `email`=?), ?, FROM_UNIXTIME(?), ?)", [
-					parsedBody.id,
-					session?.customer_email,
-					parsedBody.type,
-					parsedBody.created,
-					JSON.stringify(parsedBody.data),
-				]
+				// WHY sql``: the previous raw-string queries were rejected by @databases with
+				// "Invalid query", so no webhook was ever processed.
+				// ON CONFLICT DO NOTHING makes Stripe retries idempotent: an already stored event
+				// is acknowledged without extending subscriptions or changing plans twice.
+				const inserted = await dbi.query(
+					sql`INSERT INTO stripe_events (id, user_id, "type", created, data)
+					VALUES (
+						${parsedBody.id},
+						(SELECT id FROM account WHERE email=${session?.customer_email ?? null} LIMIT 1),
+						${parsedBody.type},
+						to_timestamp(${Number(parsedBody.created)}),
+						${JSON.stringify(parsedBody.data)}
+					)
+					ON CONFLICT (id) DO NOTHING
+					RETURNING id`
 				);
+
+				if (inserted.length === 0) {
+					logger.info(`Stripe event ${parsedBody.id} was already processed, skipping`);
+					return;
+				}
 
 					// Handle the event
 					switch (event.type) {
@@ -65,7 +79,7 @@ export function registerStripe(app) {
 								await userModel.updateSubscription({
 									subscription: session.subscription,
 									email: session.customer_email
-								});
+								}, dbi);
 							}
 
 							{
@@ -76,31 +90,31 @@ export function registerStripe(app) {
 									: null;
 
 								if (paidPlan) {
-									const userRows = await storage().query(
-										"SELECT id, billing_plan FROM `account` WHERE `email`=? LIMIT 1",
-										[session.customer_email]
+									const userRows = await dbi.query(
+										sql`SELECT id, billing_plan FROM account WHERE email=${session.customer_email} LIMIT 1`
 									);
 
 									if (userRows && userRows[0]?.id) {
 										const userId = userRows[0].id;
 										const previousPlan = userRows[0].billing_plan || 'free';
 
-										await storage().query(
-											"UPDATE `account` SET billing_plan=? WHERE `email`=?",
-											[paidPlan, session.customer_email]
+										await dbi.query(
+											sql`UPDATE account SET billing_plan=${paidPlan} WHERE email=${session.customer_email}`
 										);
 
 										await billingHistoryModel.addSubscriptionCreated(
 											userId,
 											paidPlan,
-											sessionCycle
+											sessionCycle,
+											dbi
 										);
 
 										if (previousPlan !== paidPlan) {
 											await billingHistoryModel.addTierChanged(
 												userId,
 												paidPlan,
-												`Checkout completed (${sessionCycle})`
+												`Checkout completed (${sessionCycle})`,
+												dbi
 											);
 										}
 									}
@@ -114,12 +128,12 @@ export function registerStripe(app) {
 						logger.info('Extending session for email', session.customer_email);
 						await userModel.extendAccountExpirationByOneMonth({
 							email: session.customer_email
-						});
+						}, dbi);
 						break;
 					case 'invoice.payment_failed':
 						logger.warn('Payment failed for email', session.customer_email);
-						const userIdFailed = await storage().query(
-							"SELECT id, billing_plan FROM `account` WHERE `email`=?", [session.customer_email]
+						const userIdFailed = await dbi.query(
+							sql`SELECT id, billing_plan FROM account WHERE email=${session.customer_email} LIMIT 1`
 						);
 
 						if (userIdFailed && userIdFailed[0]?.id) {
@@ -128,17 +142,18 @@ export function registerStripe(app) {
 							await billingHistoryModel.addPaymentFailed(
 								userIdFailed[0].id,
 								previousPlan,
-								'Payment method declined'
+								'Payment method declined',
+								dbi
 							);
 
-							await storage().query(
-								"UPDATE `account` SET billing_plan='free', stripe_subscription=NULL WHERE `email`=?",
-								[session.customer_email]
+							await dbi.query(
+								sql`UPDATE account SET billing_plan='free', stripe_subscription=NULL WHERE email=${session.customer_email}`
 							);
 
 							await billingHistoryModel.addSubscriptionExpired(
 								userIdFailed[0].id,
-								previousPlan
+								previousPlan,
+								dbi
 							);
 						}
 						break;
@@ -160,6 +175,7 @@ export function registerStripe(app) {
 					default:
 						logger.info(`Unhandled event type ${event.type}`);
 				}
+				});
 
 			} catch (e) {
 				logger.error(e);

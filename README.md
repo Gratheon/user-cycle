@@ -35,7 +35,7 @@ A comprehensive user management microservice for the [Gratheon](https://gratheon
 - **Runtime**: Node.js 22+ with TypeScript 5.2
 - **Web Framework**: Fastify 3.29
 - **GraphQL**: Apollo Server 3.13 with Federation support
-- **Database**: MySQL with `@databases/mysql` query builder
+- **Database**: PostgreSQL with `@databases/pg` query builder
 - **Testing**: Jest 29 with ts-jest
 
 **External Integrations**
@@ -47,12 +47,13 @@ A comprehensive user management microservice for the [Gratheon](https://gratheon
 
 ## Database Architecture
 
-**Database**: MySQL 8.0+ with custom migration system
+**Database**: PostgreSQL 15+ (uses `citext` and `UNIQUE NULLS NOT DISTINCT`) with custom migration system
 
 **Migration System**
-- SHA-256 hash-based tracking in `_db_migrations` table
-- 24 SQL migrations in `/migrations/` directory
-- Automatic migration execution on startup
+- Filename + SHA-256 hash tracking in `_db_migrations` table
+- `/migrations/001-baseline.sql` recreates the schema that previously lived in MySQL (the old MySQL migrations are in git history)
+- Automatic migration execution on startup, each migration in its own transaction
+- Never edit an applied migration; add a new numbered file instead
 
 **Key Tables** (10 core tables)
 - `account` - User accounts with billing and subscription data
@@ -67,9 +68,9 @@ A comprehensive user management microservice for the [Gratheon](https://gratheon
 - `plural_rules` - Grammatical plural rules per language
 
 **Connection Details**
-- Development: `mysql:3306` (Docker service)
-- Production: DigitalOcean Managed MySQL
-- Connection pool: 3 max connections
+- Development: `postgres:5432` (Docker service), database `user_cycle`; override with `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_SSL`
+- Production: DigitalOcean Managed PostgreSQL (TLS required)
+- Connection pool: 5 max connections
 - Auto-reconnect with 10s interval
 - Query performance logging
 
@@ -176,7 +177,7 @@ npm run typecheck     # TypeScript type checking
 | ------ | ------------------------ | ------------------------------ |
 | POST   | /graphql                 | GraphQL API (Apollo Server)    |
 | POST   | /webhook                 | Stripe webhook handler         |
-| GET    | /health                  | Health check (MySQL status)    |
+| GET    | /health                  | Health check (Postgres status) |
 | GET    | /metrics                 | Prometheus metrics endpoint    |
 | GET    | /auth/google             | Initiate Google OAuth flow     |
 | GET    | /auth/google/callback    | OAuth callback handler         |
@@ -217,13 +218,13 @@ stripe listen --forward-to localhost:4000/webhook
 flowchart LR
     web-app("<a href='https://github.com/Gratheon/web-app'>web-app</a>") --> graphql-router
 
-    graphql-router --> user-cycle("<a href='https://github.com/Gratheon/user-cycle'>user-cycle</a>") --"CRUD on user"--> mysql
+    graphql-router --> user-cycle("<a href='https://github.com/Gratheon/user-cycle'>user-cycle</a>") --"CRUD on user"--> postgres
     user-cycle --> stripe
     user-cycle --"register schema"--> graphql-schema-registry
     graphql-router --> graphql-schema-registry
 
     web-app--"translate text" --> user-cycle --"translate phrases"--> anthropic
-    user-cycle--"get/set translations"--> mysql
+    user-cycle--"get/set translations"--> postgres
 
     user-cycle--"send emails"--> aws-ses["AWS SES"]
     user-cycle--"error tracking"--> sentry
@@ -249,7 +250,7 @@ flowchart LR
 │   ├── resolvers.ts           # GraphQL resolvers (565 lines)
 │   ├── schema.ts              # Schema loader
 │   ├── schema-registry.ts     # Federation registration
-│   ├── storage.ts             # MySQL connection + migrations
+│   ├── storage.ts             # Postgres connection + migrations
 │   ├── send-mail.ts           # AWS SES email sender
 │   └── error_code.ts          # Error constants
 │

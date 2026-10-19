@@ -1,4 +1,4 @@
-import { sql } from "@databases/mysql";
+import { sql } from "@databases/pg";
 import { storage } from "../storage";
 
 export const billingHistoryModel = {
@@ -6,10 +6,10 @@ export const billingHistoryModel = {
 		const result = await storage().query(
 			sql`SELECT 
 				id,
-				event_type as eventType,
-				billing_plan as billingPlan,
+				event_type as "eventType",
+				billing_plan as "billingPlan",
 				details,
-				created_at as createdAt
+				created_at as "createdAt"
 			FROM billing_history
 			WHERE user_id=${userId}
 			ORDER BY created_at DESC
@@ -19,8 +19,9 @@ export const billingHistoryModel = {
 		return result;
 	},
 
-	addEvent: async function (userId: number, eventType: string, billingPlan: string | null, details: string | null) {
-		await storage().query(
+	// db: optional transaction connection (Stripe webhooks write atomically with the event row)
+	addEvent: async function (userId: number, eventType: string, billingPlan: string | null, details: string | null, db = storage()) {
+		await db.query(
 			sql`INSERT INTO billing_history (user_id, event_type, billing_plan, details)
 			VALUES(${userId}, ${eventType}, ${billingPlan}, ${details})`
 		);
@@ -35,9 +36,9 @@ export const billingHistoryModel = {
 		await this.addEvent(userId, 'tier_changed', billingPlan, details);
 	},
 
-	addSubscriptionCreated: async function (userId: number, billingPlan: string, cycle: string) {
+	addSubscriptionCreated: async function (userId: number, billingPlan: string, cycle: string, db = storage()) {
 		const details = `Subscribed to ${billingPlan} (${cycle})`;
-		await this.addEvent(userId, 'subscription_created', billingPlan, details);
+		await this.addEvent(userId, 'subscription_created', billingPlan, details, db);
 	},
 
 	addSubscriptionCancelled: async function (userId: number, billingPlan: string) {
@@ -45,13 +46,13 @@ export const billingHistoryModel = {
 		await this.addEvent(userId, 'subscription_cancelled', billingPlan, details);
 	},
 
-	addSubscriptionExpired: async function (userId: number, previousPlan: string) {
+	addSubscriptionExpired: async function (userId: number, previousPlan: string, db = storage()) {
 		const details = `Subscription expired, moved from ${previousPlan} to free tier`;
-		await this.addEvent(userId, 'subscription_expired', 'free', details);
+		await this.addEvent(userId, 'subscription_expired', 'free', details, db);
 	},
 
-	addTierChanged: async function (userId: number, newPlan: string, reason: string = 'Manual change') {
-		await this.addEvent(userId, 'tier_changed', newPlan, reason);
+	addTierChanged: async function (userId: number, newPlan: string, reason: string = 'Manual change', db = storage()) {
+		await this.addEvent(userId, 'tier_changed', newPlan, reason, db);
 	},
 
 	addPaymentSucceeded: async function (userId: number, billingPlan: string, amount: number, currency: string) {
@@ -59,7 +60,7 @@ export const billingHistoryModel = {
 		await this.addEvent(userId, 'payment_succeeded', billingPlan, details);
 	},
 
-	addPaymentFailed: async function (userId: number, billingPlan: string, reason: string = 'Payment failed') {
-		await this.addEvent(userId, 'payment_failed', billingPlan, reason);
+	addPaymentFailed: async function (userId: number, billingPlan: string, reason: string = 'Payment failed', db = storage()) {
+		await this.addEvent(userId, 'payment_failed', billingPlan, reason, db);
 	}
 };

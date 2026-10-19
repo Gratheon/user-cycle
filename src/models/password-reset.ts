@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import sha1 from 'sha1';
 
-import { sql } from '@databases/mysql';
+import { sql } from '@databases/pg';
 import { storage } from '../storage';
 
 export const PASSWORD_RESET_TOKEN_BYTES = 32;
@@ -65,9 +65,9 @@ export const passwordResetModel = {
 		return await storage().tx(async (dbi) => {
 			for (const identityHash of uniqueIdentityHashes) {
 				const rows = await dbi.query(
-					sql`SELECT request_count as requestCount
+					sql`SELECT request_count as "requestCount"
 					FROM password_reset_request_limit
-					WHERE identity_hash=${identityHash} AND request_date=UTC_DATE()
+					WHERE identity_hash=${identityHash} AND request_date=(NOW() AT TIME ZONE 'UTC')::date
 					LIMIT 1
 					FOR UPDATE`
 				);
@@ -80,8 +80,9 @@ export const passwordResetModel = {
 			for (const identityHash of uniqueIdentityHashes) {
 				await dbi.query(
 					sql`INSERT INTO password_reset_request_limit (identity_hash, request_date, request_count)
-					VALUES (${identityHash}, UTC_DATE(), 1)
-					ON DUPLICATE KEY UPDATE request_count=request_count + 1`
+					VALUES (${identityHash}, (NOW() AT TIME ZONE 'UTC')::date, 1)
+					ON CONFLICT (identity_hash, request_date) DO UPDATE
+					SET request_count = password_reset_request_limit.request_count + 1, updated_at = NOW()`
 				);
 			}
 
@@ -93,11 +94,10 @@ export const passwordResetModel = {
 		const token = createToken();
 		const tokenHash = createTokenHash(token);
 		const expiresAt = new Date(Date.now() + PASSWORD_RESET_TOKEN_TTL_MS);
-		const expiresAtSql = expiresAt.toISOString().substring(0, 19).replace('T', ' ');
 
 		await storage().query(
 			sql`INSERT INTO password_reset_token (user_id, token_hash, expires_at)
-			VALUES (${userId}, ${tokenHash}, ${expiresAtSql})`
+			VALUES (${userId}, ${tokenHash}, ${expiresAt})`
 		);
 
 		return { token, expiresAt };
@@ -116,11 +116,11 @@ export const passwordResetModel = {
 
 		return await storage().tx(async (dbi) => {
 			const rows = await dbi.query(
-				sql`SELECT id, user_id as userId
+				sql`SELECT id, user_id as "userId"
 				FROM password_reset_token
 				WHERE token_hash=${tokenHash}
 					AND used_at IS NULL
-					AND expires_at > UTC_TIMESTAMP()
+					AND expires_at > NOW()
 				LIMIT 1
 				FOR UPDATE`
 			);
@@ -138,7 +138,7 @@ export const passwordResetModel = {
 
 			await dbi.query(
 				sql`UPDATE password_reset_token
-				SET used_at=UTC_TIMESTAMP()
+				SET used_at=NOW()
 				WHERE id=${resetToken.id}`
 			);
 

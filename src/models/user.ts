@@ -1,4 +1,4 @@
-import { sql } from "@databases/mysql";
+import { sql } from "@databases/pg";
 import sha1 from 'sha1';
 
 import { storage } from "../storage";
@@ -32,7 +32,7 @@ export const userModel = {
 	expireToFreeIfNeeded: async function (uid: number): Promise<string | null> {
 		const result = await storage().tx(async (dbi) => {
 			const rows = await dbi.query(
-				sql`SELECT id, billing_plan as billingPlan
+				sql`SELECT id, billing_plan as "billingPlan"
 				FROM account
 				WHERE id=${uid}
 					AND billing_plan <> 'free'
@@ -60,42 +60,38 @@ export const userModel = {
 
 		return result;
 	},
-	extendAccountExpirationByOneMonth: async ({ email }) => {
+	// db: pass a transaction connection to make the update part of a larger unit of work
+	extendAccountExpirationByOneMonth: async ({ email }, db = storage()) => {
 		// extend subscriptions where date_expiration is in the future
-		await storage().query(
-			`UPDATE account
-			SET date_expiration = DATE_ADD(date_expiration, INTERVAL 1 MONTH) 
-			WHERE email=? AND date_expiration > NOW()`, [
-			email
-		]
+		// WHY sql``: the previous raw-string queries were rejected by @databases with
+		// "Invalid query", so Stripe invoice.paid never extended subscriptions
+		await db.query(
+			sql`UPDATE account
+			SET date_expiration = date_expiration + INTERVAL '1 month'
+			WHERE email=${email} AND date_expiration > NOW()`
 		);
 
 		// extend subscriptions where date_expiration is in the past
-		await storage().query(
-			`UPDATE account
-			SET date_expiration = DATE_ADD(NOW(), INTERVAL 1 MONTH) 
-			WHERE email=? AND date_expiration<NOW()`, [
-			email
-		]
+		await db.query(
+			sql`UPDATE account
+			SET date_expiration = NOW() + INTERVAL '1 month'
+			WHERE email=${email} AND date_expiration < NOW()`
 		);
 	},
-	updateSubscription: async ({ subscription, email }) => {
-		await storage().query(
-			"UPDATE `account` SET stripe_subscription=? WHERE email=?", [
-			subscription,
-			email
-		]
+	updateSubscription: async ({ subscription, email }, db = storage()) => {
+		await db.query(
+			sql`UPDATE account SET stripe_subscription=${subscription} WHERE email=${email}`
 		);
 	},
 
 	getInvoices: async function (ctx) {
 		const result = await storage().query(
-			sql`SELECT created as \`date\`, 
-				IFNULL(JSON_UNQUOTE(JSON_EXTRACT(data, '$.object.invoice_pdf')), '') as url,
-				IFNULL(JSON_UNQUOTE(JSON_EXTRACT(data, '$.object.total')), 0) as total,
-				IFNULL(JSON_UNQUOTE(JSON_EXTRACT(data, '$.object.currency')), '') as currency
+			sql`SELECT created as "date",
+				COALESCE(data->'object'->>'invoice_pdf', '') as url,
+				COALESCE(data->'object'->>'total', '0') as total,
+				COALESCE(data->'object'->>'currency', '') as currency
 			FROM stripe_events
-			WHERE user_id=${ctx.uid} AND \`type\`='invoice.payment_succeeded'
+			WHERE user_id=${ctx.uid} AND "type"='invoice.payment_succeeded'
 			ORDER BY created DESC
 			LIMIT 10`
 		);
@@ -110,9 +106,9 @@ export const userModel = {
 			try {
 				result = await storage().query(
 					sql`SELECT id, email, first_name, last_name, date_expiration, date_added,
-					stripe_subscription, lang, locale, temperature_unit as temperatureUnit,
-					billing_plan as billingPlan,
-					(date_expiration IS NOT NULL AND date_expiration < NOW()) as isSubscriptionExpired
+					stripe_subscription, lang, locale, temperature_unit as "temperatureUnit",
+					billing_plan as "billingPlan",
+					(date_expiration IS NOT NULL AND date_expiration < NOW()) as "isSubscriptionExpired"
 					FROM account
 					WHERE id=${id}
 					LIMIT 1`
@@ -135,9 +131,9 @@ export const userModel = {
 			try {
 				result = await storage().query(
 					sql`SELECT id, email, first_name, last_name, date_expiration, date_added,
-					stripe_subscription, lang, locale, 'celsius' as temperatureUnit,
-					billing_plan as billingPlan,
-					(date_expiration IS NOT NULL AND date_expiration < NOW()) as isSubscriptionExpired
+					stripe_subscription, lang, locale, 'celsius' as "temperatureUnit",
+					billing_plan as "billingPlan",
+					(date_expiration IS NOT NULL AND date_expiration < NOW()) as "isSubscriptionExpired"
 					FROM account
 					WHERE id=${id}
 					LIMIT 1`
@@ -155,9 +151,9 @@ export const userModel = {
 		if (supportsAccountLocaleColumn === false) {
 			result = await storage().query(
 				sql`SELECT id, email, first_name, last_name, date_expiration, date_added,
-				stripe_subscription, lang, NULL as locale, 'celsius' as temperatureUnit,
-				billing_plan as billingPlan,
-				(date_expiration IS NOT NULL AND date_expiration < NOW()) as isSubscriptionExpired
+				stripe_subscription, lang, NULL as locale, 'celsius' as "temperatureUnit",
+				billing_plan as "billingPlan",
+				(date_expiration IS NOT NULL AND date_expiration < NOW()) as "isSubscriptionExpired"
 				FROM account
 				WHERE id=${id}
 				LIMIT 1`
@@ -169,7 +165,7 @@ export const userModel = {
 
 	deleteSelf: async function (uid) {
 		await storage().query(
-			sql`DELETE FROM \`account\` WHERE id=${uid}`
+			sql`DELETE FROM account WHERE id=${uid}`
 		);
 	},
 
@@ -178,7 +174,7 @@ export const userModel = {
 
 		if (supportsAccountLocaleColumn === false) {
 			await storage().query(
-				sql`UPDATE \`account\`
+				sql`UPDATE account
 				SET first_name=${user.first_name}, last_name=${user.last_name}, lang=${user.lang}
 				WHERE id=${uid}`
 			);
@@ -187,7 +183,7 @@ export const userModel = {
 
 		if (supportsAccountTemperatureUnitColumn === false) {
 			await storage().query(
-				sql`UPDATE \`account\`
+				sql`UPDATE account
 				SET first_name=${user.first_name}, last_name=${user.last_name}, lang=${user.lang},
 				locale=COALESCE(${user.locale}, locale)
 				WHERE id=${uid}`
@@ -197,7 +193,7 @@ export const userModel = {
 
 		try {
 			await storage().query(
-				sql`UPDATE \`account\`
+				sql`UPDATE account
 				SET first_name=${user.first_name}, last_name=${user.last_name}, lang=${user.lang},
 				locale=COALESCE(${user.locale}, locale), temperature_unit=${temperatureUnit}
 				WHERE id=${uid}`
@@ -208,7 +204,7 @@ export const userModel = {
 			if (isMissingTemperatureUnitColumnError(error)) {
 				supportsAccountTemperatureUnitColumn = false;
 				await storage().query(
-					sql`UPDATE \`account\`
+					sql`UPDATE account
 					SET first_name=${user.first_name}, last_name=${user.last_name}, lang=${user.lang},
 					locale=COALESCE(${user.locale}, locale)
 					WHERE id=${uid}`
@@ -223,14 +219,14 @@ export const userModel = {
 			supportsAccountLocaleColumn = false;
 			supportsAccountTemperatureUnitColumn = false;
 			await storage().query(
-				sql`UPDATE \`account\`
+				sql`UPDATE account
 				SET first_name=${user.first_name}, last_name=${user.last_name}, lang=${user.lang}
 				WHERE id=${uid}`
 			);
 		}
 	},
 	updateLastLogin: async function (uid) {
-		await storage().query(sql`UPDATE \`account\` SET date_last_login=NOW() WHERE id=${uid}`);
+		await storage().query(sql`UPDATE account SET date_last_login=NOW() WHERE id=${uid}`);
 	},
 
 	isFirstLogin: async function (uid) {
