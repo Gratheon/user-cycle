@@ -1,17 +1,17 @@
 import { localeModel } from '../locales';
-import { generateClaudeText } from '../anthropic';
+import { generateText } from '../llm';
 import { storage } from '../../storage';
 import { logger } from '../../logger';
 
 jest.mock('../../storage');
 jest.mock('../../logger');
-jest.mock('../anthropic', () => ({
-  generateClaudeText: jest.fn().mockResolvedValue('mocked translation')
+jest.mock('../llm', () => ({
+  generateText: jest.fn().mockResolvedValue('mocked translation')
 }));
 
 const mockStorage = storage as jest.MockedFunction<typeof storage>;
 const mockLogger = logger as jest.Mocked<typeof logger>;
-const mockGenerateClaudeText = generateClaudeText as jest.MockedFunction<typeof generateClaudeText>;
+const mockGenerateClaudeText = generateText as jest.MockedFunction<typeof generateText>;
 
 mockLogger.debug = jest.fn();
 mockLogger.info = jest.fn();

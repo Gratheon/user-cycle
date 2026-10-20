@@ -2,7 +2,7 @@ import { sql } from "@databases/pg";
 
 import { storage } from "../storage";
 import { logger } from "../logger";
-import { generateClaudeText } from "./anthropic";
+import { generateText } from "./llm";
 
 const languagesMap = {
 	'ru': 'russian',
@@ -376,7 +376,7 @@ async function translate(targetLangCode, translation, tc) {
 
 	RAW_TEXT += ` Do not write anything else but the translation in the target language (no extra notes or other languages) of the following phrase: ${translation['en']}`;
 
-	return generateClaudeText(RAW_TEXT, {
+	return generateText(RAW_TEXT, {
 		systemInstruction: "You are an expert translator for a beekeeping monitoring app. Reply only with translated text.",
 	});
 }
@@ -408,7 +408,7 @@ async function translateMany(targetLangCodes: string[], translation: any, tc: st
 	RAW_TEXT += `. Respond ONLY with valid JSON object where keys are language codes and values are translations.`;
 	RAW_TEXT += ` Example: {"ru":"...","et":"..."}.`;
 
-	const rawResponse = await generateClaudeText(RAW_TEXT, {
+	const rawResponse = await generateText(RAW_TEXT, {
 		systemInstruction: "You are an expert translator for a beekeeping monitoring app. Reply only with translated text.",
 	});
 

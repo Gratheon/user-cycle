@@ -1,4 +1,4 @@
-import { generateClaudeText } from "./anthropic";
+import { generateText } from "./llm";
 import { languagesMap } from "./translationLanguages";
 import { logger } from "../logger";
 
@@ -22,7 +22,7 @@ function parseJsonObjectFromLlm(raw: string): Record<string, any> | null {
 }
 
 export async function callTranslationLLM(prompt: string): Promise<string> {
-	return generateClaudeText(prompt, {
+	return generateText(prompt, {
 		systemInstruction: "You are an expert translator for a beekeeping monitoring app. Reply only with translated text.",
 	});
 }

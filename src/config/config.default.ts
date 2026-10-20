@@ -60,9 +60,9 @@ const config = {
   // this must match graphql-router
   JWT_KEY: 'okzfERFAXXbRTQWkGFfjo3EcAXjRijnGnaAMEsTXnmdjAVDkQrfyLzscPwUiymbj',
   SENDGRID_API_KEY: '',
-  anthropic: {
-    apiKey: process.env.ANTHROPIC_API_KEY || '',
-    translationModel: process.env.ANTHROPIC_TRANSLATION_MODEL || 'claude-haiku-5-5'
+  openai: {
+    apiKey: process.env.OPENAI_API_KEY || '',
+    translationModel: process.env.OPENAI_TRANSLATION_MODEL || 'gpt-6-luna'
   },
 
   google_oauth: {
