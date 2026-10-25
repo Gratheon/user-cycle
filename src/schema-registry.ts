@@ -1,7 +1,6 @@
 import fs from 'fs';
-import { resolve, dirname } from 'path';
+import { resolve } from 'path';
 import fetch from "cross-fetch";
-import { print } from "graphql";
 import sha1 from 'sha1';
 
 import config from './config/index';

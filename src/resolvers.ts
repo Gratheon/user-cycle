@@ -12,7 +12,7 @@ import error_code, { err } from './error_code';
 import { logger } from './logger';
 import registerUser from './user-register';
 import { sleepForSecurity } from './models/sleep';
-import { sendAdminUserRegisteredMail, sendPasswordResetMail, sendWelcomeMail } from './send-mail';
+import { sendPasswordResetMail } from './send-mail';
 import { registrationNonceModel } from './models/registration-nonce';
 import { wrapGraphqlResolversWithMetrics } from './metrics';
 import { translationResolvers } from './resolvers/translations';

@@ -38,25 +38,6 @@ function isMissingKeyHashColumnError(error: unknown): boolean {
 	return err.code === 'ER_BAD_FIELD_ERROR' && err.sqlMessage?.includes('key_hash') === true;
 }
 
-function parseJsonObjectFromLlm(raw: string): Record<string, any> | null {
-	if (!raw) return null;
-	const trimmed = raw.trim();
-	const withoutCodeFence = trimmed
-		.replace(/^```(?:json)?\s*/i, '')
-		.replace(/\s*```$/i, '')
-		.trim();
-
-	try {
-		const parsed = JSON.parse(withoutCodeFence);
-		if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-			return parsed as Record<string, any>;
-		}
-		return null;
-	} catch {
-		return null;
-	}
-}
-
 export const translationModel = {
 	async getByKeys(inputs: Array<{ key: string; namespace: string | null }>): Promise<Array<number | null>> {
 		if (inputs.length === 0) return [];

@@ -499,7 +499,7 @@ describe('localeModel.translateBatch', () => {
       { en: 'Save', tc: '', key: undefined }
     ];
 
-    const result = await localeModel.translateBatch(requests);
+    await localeModel.translateBatch(requests);
 
     expect(queryMock).toHaveBeenCalledTimes(1);
   });
@@ -520,7 +520,7 @@ describe('localeModel.translateBatch', () => {
       { en: 'New Text', tc: 'button', key: undefined }
     ];
 
-    const result = await localeModel.translateBatch(requests);
+    await localeModel.translateBatch(requests);
 
     expect(hasSqlFragment(queryMock, 'INSERT INTO locales')).toBe(true);
   });

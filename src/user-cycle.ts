@@ -4,7 +4,6 @@ import fastify from "fastify";
 import {buildSubgraphSchema} from '@apollo/federation';
 import gql from "graphql-tag";
 
-import config from './config/index';
 import {schema} from './schema';
 import {resolvers} from './resolvers';
 

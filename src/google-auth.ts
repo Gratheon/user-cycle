@@ -5,7 +5,7 @@ import config from './config/index';
 import { logger } from './logger'
 import { TRIAL_DAYS, userModel } from "./models/user";
 import { tokenModel } from "./models/tokens";
-import { sendAdminUserRegisteredMail, sendWelcomeMail } from "./send-mail";
+import { sendWelcomeMail } from "./send-mail";
 import { billingHistoryModel } from "./models/billingHistory";
 
 function getGoogleProfileLocale(profile): string | null {
@@ -38,9 +38,9 @@ export function registerGoogle(app) {
 				grant_type: 'authorization_code',
 			});
 
-			const { access_token, id_token } = data;
+			const { access_token } = data;
 
-			// Use access_token or id_token to fetch user profile
+			// Use access_token to fetch user profile
 			const { data: profile } = await axios.get('https://www.googleapis.com/oauth2/v1/userinfo', {
 				headers: { Authorization: `Bearer ${access_token}` },
 			});
