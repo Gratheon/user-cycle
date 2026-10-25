@@ -3,7 +3,6 @@ import DataLoader from 'dataloader';
 import error_code, { err } from '../error_code';
 import { logger } from '../logger';
 import { localeModel } from '../models/locales';
-import { sleepForSecurity } from '../models/sleep';
 import { translationModel } from '../models/translations';
 import { translationRedisCache } from '../cache/translationRedisCache';
 
