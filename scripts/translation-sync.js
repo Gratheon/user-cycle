@@ -172,7 +172,8 @@ async function main() {
   const { command, filePath } = parseArgs();
   const dbCfg = resolveDbConfig();
   const dsn = buildDsn(dbCfg);
-  const db = createConnectionPool({ connectionString: dsn, ssl: dbCfg.ssl, bigIntMode: "number" });
+  // poolSize 1: the shared Postgres cluster has few slots and this script runs queries sequentially
+  const db = createConnectionPool({ connectionString: dsn, ssl: dbCfg.ssl, bigIntMode: "number", poolSize: 1 });
 
   try {
     if (command === "export") {
